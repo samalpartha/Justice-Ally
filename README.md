@@ -1,20 +1,42 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
-</div>
 
-# Run and deploy your AI Studio app
+# JusticeAlly: Universal Legal Navigator
 
-This contains everything you need to run your app locally.
+JusticeAlly is an advanced AI-powered legal assistant designed to democratize access to justice. Acting as a "Senior Litigation Strategist" for pro-se litigants, it combines ruthless strategy with compassionate administrative guidance.
 
-View your app in AI Studio: https://ai.studio/apps/drive/1tVgcomk2PKZmLvlonHXiJM0olGFz-IuC
+## 🚀 Key Features
 
-## Run Locally
+### 1. Triage & Risk Assessment
+- **Pro Se Suitability Test:** Determines if a user can handle a case alone (Green/Yellow/Red risk).
+- **Wallet Reality Check:** Estimates filing fees, hidden costs, and compares against attorney rates.
 
-**Prerequisites:**  Node.js
+### 2. Secure Evidence Vault
+- **Multi-Modal Ingestion:** Accepts PDFs, Images, and **Videos (MP4)**.
+- **Video Understanding:** Uses **Gemini 3 Pro** to analyze footage (e.g., bodycams, CCTV).
+- **External Links:** Attach court dockets or news articles as evidence.
 
+### 3. War Room Strategy
+- **Sun Tzu Analysis:** Applies "Art of War" principles (e.g., "Win without fighting" via settlement).
+- **Black Letter Law:** Maps facts to legal elements (Duty, Breach, Causation, Damages).
+- **Procedural Roadmap:** Generates discovery questions and identifies deadlines.
 
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+### 4. Tactical Chat & Research
+- **AI Chatbot:** Powered by **Gemini 3 Pro** for high-level reasoning.
+- **Legal Research Mode:** Toggles **Google Search Grounding** to find up-to-date case law and statutes.
+- **Text-to-Speech:** Uses **Gemini Flash TTS** to read advice aloud.
+- **Wargaming:** Simulates opposing counsel arguments.
+
+### 5. Live Strategy (Voice)
+- **Real-Time Conversation:** Uses **Gemini Live API (Native Audio)** for low-latency voice interaction.
+- **Oral Argument Practice:** Rehearse your case verbally with the AI.
+
+## 🛠️ Technology Stack
+
+- **Frontend:** React, TailwindCSS, Recharts.
+- **AI Core:** `@google/genai` SDK.
+  - **Reasoning/Vision:** `gemini-3-pro-preview`
+  - **Speed/Search:** `gemini-2.5-flash`
+  - **Audio/Voice:** `gemini-2.5-flash-native-audio-preview-09-2025`
+  - **TTS:** `gemini-2.5-flash-preview-tts`
+
+## ⚠️ Disclaimer
+JusticeAlly is an AI tool for informational and educational purposes only. It does not constitute legal advice or create an attorney-client relationship. Users should always verify information with a qualified attorney or court clerk.

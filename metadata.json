@@ -1,5 +1,7 @@
 {
   "name": "JusticeAlly",
-  "description": "AI Senior Litigation Strategist and Procedural Expert for pro-se litigants and junior attorneys. Features document analysis, strategic planning, and automated legal drafting support.",
-  "requestFramePermissions": []
+  "description": "Universal Legal Navigator and Senior Litigation Strategist. Features Pro Se suitability assessment, cost estimation, document analysis, and strategic planning.",
+  "requestFramePermissions": [
+    "microphone"
+  ]
 }
