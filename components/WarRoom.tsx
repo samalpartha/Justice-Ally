@@ -38,41 +38,43 @@ const WarRoom: React.FC<WarRoomProps> = ({ caseData, onFilesAdded, onLinkAdded, 
   };
 
   const EmptyState = () => (
-    <div className="h-full flex flex-col items-center justify-center p-8 text-center">
-      <div className="w-16 h-16 bg-slate-800 rounded-full flex items-center justify-center mb-4">
-        <svg className="w-8 h-8 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
-        </svg>
+    <div className="h-full flex flex-col items-center justify-center p-8 text-center bg-slate-950">
+      <div className="w-20 h-20 border-2 border-slate-800 rounded-sm flex items-center justify-center mb-6 bg-slate-900 shadow-2xl">
+         <svg className="w-10 h-10 text-slate-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+         </svg>
       </div>
-      <h2 className="text-2xl font-bold text-slate-300">War Room Empty</h2>
-      <p className="text-slate-500 mt-2 mb-6 max-w-md">Upload documents to unlock strategic insights.</p>
+      <h2 className="text-3xl font-serif font-bold text-slate-200 tracking-tight mb-2">Strategy Unavailable</h2>
+      <p className="text-slate-500 mb-8 max-w-md font-serif text-sm leading-relaxed">
+        No case analysis has been generated yet. Please populate the <strong>Evidence Vault</strong> and run the analysis engine to build your litigation plan.
+      </p>
       
       {onLoadDemo && (
         <button 
           onClick={onLoadDemo}
-          className="px-6 py-3 bg-amber-600 hover:bg-amber-500 text-white font-bold rounded-lg transition-colors flex items-center gap-2 shadow-lg shadow-amber-900/20"
+          title="Populate with sample Landlord/Tenant case data."
+          className="px-6 py-3 bg-slate-900 hover:bg-slate-800 text-amber-600 font-bold rounded-sm transition-colors border border-amber-600/50 uppercase tracking-[0.1em] text-xs shadow-lg hover:border-amber-600 flex items-center gap-2"
         >
-          <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
-          Load Demo Case
+          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+          Load Simulation Data
         </button>
       )}
     </div>
   );
 
   return (
-    <div className="h-full flex flex-col overflow-hidden relative">
-      {/* War Room Header */}
-      <div className="shrink-0 p-6 border-b border-slate-800 bg-slate-900/50 flex justify-between items-center">
+    <div className="h-full flex flex-col overflow-hidden relative bg-slate-950">
+      {/* Strategy Header */}
+      <div className="shrink-0 px-8 py-6 border-b-2 border-slate-800 bg-slate-950 shadow-xl z-10 flex justify-between items-center">
         <div>
-          <h1 className="text-2xl font-bold text-white flex items-center gap-2">
-            <svg className="w-6 h-6 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" /></svg>
-            STRATEGY WAR ROOM
+          <h1 className="text-2xl font-serif font-black text-white flex items-center gap-3 tracking-tight">
+             CASE STRATEGY & PLANNING
           </h1>
-          <p className="text-xs text-slate-400">Review intelligence, map procedures, and execute.</p>
+          <p className="text-[10px] text-amber-600 uppercase tracking-[0.3em] font-bold mt-1">Litigation Roadmap</p>
         </div>
         
         {onFilesAdded && (
-          <div className="flex gap-2">
+          <div className="flex gap-4">
             <input 
               type="file" 
               ref={fileInputRef}
@@ -81,33 +83,33 @@ const WarRoom: React.FC<WarRoomProps> = ({ caseData, onFilesAdded, onLinkAdded, 
               onChange={handleFileChange}
             />
             
-            {/* Add Link Button */}
             <div className="relative">
                <button
                  onClick={() => setShowLinkInput(!showLinkInput)}
-                 className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-sm font-semibold rounded border border-slate-700 flex items-center gap-2 transition-colors"
+                 className="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-slate-300 text-[10px] font-bold uppercase rounded-sm border border-slate-700 flex items-center gap-2 transition-colors tracking-wider"
+                 title="Add an external URL (Case Law, News Article) to the strategy context."
                >
-                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" /></svg>
-                 Add Link
+                 <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" /></svg>
+                 Add Citation
                </button>
                {showLinkInput && (
-                 <div className="absolute right-0 top-full mt-2 w-80 bg-slate-900 border border-slate-700 rounded-lg p-4 shadow-xl z-50">
-                    <h4 className="text-xs font-bold text-slate-400 uppercase mb-2">Attach External URL</h4>
+                 <div className="absolute right-0 top-full mt-2 w-80 bg-slate-900 border border-slate-600 rounded-sm shadow-2xl z-50 p-6">
+                    <h4 className="text-[10px] font-bold text-slate-400 uppercase mb-4 tracking-widest border-b border-slate-700 pb-2">External Authority</h4>
                     <input 
-                      className="w-full bg-slate-950 border border-slate-700 rounded px-2 py-1 mb-2 text-sm text-white" 
-                      placeholder="Title (e.g. Court Docket)" 
+                      className="w-full bg-slate-950 border-b border-slate-600 rounded-none px-0 py-2 mb-3 text-sm text-white font-serif focus:border-amber-600 outline-none placeholder:text-slate-600" 
+                      placeholder="Citation Title" 
                       value={linkName} 
                       onChange={e => setLinkName(e.target.value)} 
                     />
                     <input 
-                      className="w-full bg-slate-950 border border-slate-700 rounded px-2 py-1 mb-3 text-sm text-white" 
-                      placeholder="https://..." 
+                      className="w-full bg-slate-950 border-b border-slate-600 rounded-none px-0 py-2 mb-6 text-sm text-white font-serif focus:border-amber-600 outline-none placeholder:text-slate-600" 
+                      placeholder="Source URL" 
                       value={linkUrl} 
                       onChange={e => setLinkUrl(e.target.value)} 
                     />
-                    <div className="flex justify-end gap-2">
-                       <button onClick={() => setShowLinkInput(false)} className="text-xs text-slate-500 hover:text-white">Cancel</button>
-                       <button onClick={handleLinkSubmit} className="text-xs bg-amber-600 hover:bg-amber-500 text-white px-3 py-1 rounded font-bold">Add</button>
+                    <div className="flex justify-end gap-3">
+                       <button onClick={() => setShowLinkInput(false)} className="text-xs text-slate-500 hover:text-white uppercase font-bold tracking-wider">Cancel</button>
+                       <button onClick={handleLinkSubmit} className="text-xs bg-amber-700 hover:bg-amber-600 text-white px-4 py-2 rounded-sm font-bold uppercase tracking-wider">Attach</button>
                     </div>
                  </div>
                )}
@@ -115,34 +117,36 @@ const WarRoom: React.FC<WarRoomProps> = ({ caseData, onFilesAdded, onLinkAdded, 
 
             <button 
               onClick={() => fileInputRef.current?.click()}
-              className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 text-sm font-semibold rounded border border-slate-700 flex items-center gap-2 transition-colors"
+              className="px-4 py-2 bg-amber-700 hover:bg-amber-600 text-white text-[10px] font-bold uppercase rounded-sm border border-amber-600 flex items-center gap-2 transition-colors tracking-wider shadow-lg"
+              title="Upload new evidence directly to this view."
             >
-              <svg className="w-4 h-4 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /></svg>
-              Quick Add Evidence
+              <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /></svg>
+              Quick Add
             </button>
           </div>
         )}
       </div>
 
       <div className="flex-1 overflow-y-auto custom-scrollbar p-8">
-        <div className="max-w-6xl mx-auto space-y-8">
+        <div className="max-w-[1600px] mx-auto space-y-8">
           
-          {/* Strategist Notepad (Persistent) */}
-          <div className="bg-slate-900 border border-slate-800 rounded-xl p-6">
-            <div className="flex items-center justify-between mb-3">
-               <h3 className="text-sm font-bold text-slate-400 uppercase flex items-center gap-2">
-                 <svg className="w-4 h-4 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
-                 Strategist Notepad (Case Theory)
+          {/* Counsel's Notes (Always Visible) */}
+          <div className="bg-[#1c1c1e] border border-slate-800 rounded-sm shadow-lg relative overflow-hidden group">
+            <div className="bg-slate-900/80 px-6 py-3 border-b border-slate-800 flex justify-between items-center">
+               <h3 className="text-[10px] font-bold text-slate-400 uppercase flex items-center gap-2 tracking-[0.2em]">
+                 <svg className="w-3 h-3 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
+                 Counsel's Memorandum
                </h3>
                <DictationButton 
                   onTranscript={(text) => onNotesChange && onNotesChange((caseData?.notes || '') + (caseData?.notes ? '\n' : '') + text)} 
+                  className="text-slate-500 hover:text-amber-500"
                />
             </div>
             <textarea
               value={caseData?.notes || ''}
               onChange={(e) => onNotesChange && onNotesChange(e.target.value)}
-              placeholder="Jot down quick facts, verbal threats, or specific dates not found in documents. e.g. 'Client remembers landlord threatened eviction on call June 12th'..."
-              className="w-full bg-slate-950 text-slate-200 text-sm p-4 rounded border border-slate-700 focus:border-amber-500 outline-none min-h-[100px] resize-none font-mono"
+              placeholder="Record privileged observations, client instructions, and non-documentary facts..."
+              className="w-full bg-slate-950/50 text-slate-200 text-sm p-6 outline-none min-h-[120px] resize-none font-serif leading-7"
             />
           </div>
 
@@ -150,108 +154,131 @@ const WarRoom: React.FC<WarRoomProps> = ({ caseData, onFilesAdded, onLinkAdded, 
              <EmptyState />
           ) : (
             <>
-              {/* Sun Tzu Header */}
-              <div className="bg-gradient-to-r from-slate-900 to-slate-800 rounded-xl p-8 border border-amber-900/30 relative overflow-hidden">
-                <div className="absolute top-0 right-0 p-4 opacity-10">
-                  <svg className="w-32 h-32 text-amber-500" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M19.42 12.54l-7.42-7.42-7.42 7.42c-.78.78-.78 2.05 0 2.83l7.42 7.42 7.42-7.42c.78-.78.78-2.05 0-2.83zm-7.42 5.59l-5.59-5.59 5.59-5.59 5.59 5.59-5.59 5.59z"/>
-                  </svg>
+              {/* Executive Strategy Tier */}
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                {/* Core Theory */}
+                <div className="lg:col-span-2 bg-slate-900 rounded-sm border-l-4 border-amber-600 p-8 shadow-md relative overflow-hidden">
+                   <div className="absolute top-0 right-0 p-8 opacity-5 pointer-events-none">
+                      <svg className="w-32 h-32 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zm0 9l2.5-1.25L12 8.5l-2.5 1.25L12 11zm0 2.5l-5-2.5-5 2.5 10 5 10-5-5-2.5-5 2.5z"/></svg>
+                   </div>
+                   <h2 className="text-[10px] font-bold uppercase text-amber-600 tracking-widest mb-4 flex items-center gap-2">
+                     Proposed Case Theory
+                   </h2>
+                   <h3 className="text-3xl font-serif font-black text-slate-100 mb-6 tracking-tight">"{caseData.strategy.sunTzu.strategyName}"</h3>
+                   
+                   <div className="grid md:grid-cols-2 gap-8 relative z-10">
+                     <div>
+                        <span className="block text-[9px] text-slate-500 uppercase font-bold tracking-widest mb-2">Guiding Principle</span>
+                        <blockquote className="text-lg italic text-slate-300 font-serif border-l-2 border-slate-700 pl-4 leading-relaxed">
+                          "{caseData.strategy.sunTzu.quote}"
+                        </blockquote>
+                     </div>
+                     <div>
+                        <span className="block text-[9px] text-slate-500 uppercase font-bold tracking-widest mb-2">Tactical Application</span>
+                        <p className="text-sm text-slate-200 leading-relaxed font-serif">{caseData.strategy.sunTzu.application}</p>
+                     </div>
+                   </div>
                 </div>
-                <h2 className="text-amber-500 font-serif text-xl mb-2">The Art of Litigation</h2>
-                <h1 className="text-3xl md:text-4xl font-bold text-white mb-4">"{caseData.strategy.sunTzu.strategyName}"</h1>
-                <blockquote className="text-lg italic text-slate-300 border-l-4 border-amber-600 pl-4 mb-6">
-                  "{caseData.strategy.sunTzu.quote}"
-                </blockquote>
-                <div className="grid md:grid-cols-2 gap-6">
-                  <div>
-                    <h4 className="text-xs font-bold uppercase text-slate-500 mb-2">Strategic Application</h4>
-                    <p className="text-sm text-slate-200 leading-relaxed">{caseData.strategy.sunTzu.application}</p>
-                  </div>
-                  <div>
-                    <h4 className="text-xs font-bold uppercase text-slate-500 mb-2">Opponent Profile</h4>
-                    <p className="text-sm text-slate-200 leading-relaxed bg-slate-950/50 p-3 rounded border border-slate-800">
+
+                {/* Opponent Profile */}
+                <div className="bg-slate-900 rounded-sm border border-slate-800 p-6 shadow-md flex flex-col">
+                  <h3 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-4 flex items-center gap-2 border-b border-slate-800 pb-2">
+                    <svg className="w-4 h-4 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
+                    Opposing Party Profile
+                  </h3>
+                  <div className="flex-1 bg-slate-950 p-4 border border-slate-800 rounded-sm">
+                    <p className="text-sm text-slate-300 leading-relaxed font-serif">
                       {caseData.strategy.sunTzu.opponentProfile}
                     </p>
                   </div>
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                {/* Black Letter Law */}
-                <div className="bg-slate-900 rounded-xl border border-slate-800 p-6">
-                  <div className="flex items-center justify-between mb-6">
-                    <h3 className="text-xl font-bold text-slate-200">Black Letter Law Analysis</h3>
-                    <span className="text-xs bg-slate-800 text-slate-400 px-2 py-1 rounded">Elements of Claim</span>
-                  </div>
-                  
-                  <div className="space-y-4">
-                    {caseData.strategy.blackLetter.claimElements.map((el, idx) => (
-                      <div key={idx} className="relative pl-6 border-l-2 border-slate-700">
-                        <div className={`absolute -left-[5px] top-1 w-2.5 h-2.5 rounded-full ${
-                          el.status === 'strong' ? 'bg-green-500' : el.status === 'weak' ? 'bg-amber-500' : 'bg-red-500'
-                        }`}></div>
-                        <h4 className="font-semibold text-slate-200 text-sm">{el.element}</h4>
-                        <p className="text-xs text-slate-400 mt-1">{el.evidence || "No direct evidence found."}</p>
-                        <span className={`inline-block mt-2 text-[10px] font-bold uppercase px-1.5 py-0.5 rounded ${
-                          el.status === 'strong' ? 'bg-green-900/30 text-green-400' : 
-                          el.status === 'weak' ? 'bg-amber-900/30 text-amber-400' : 'bg-red-900/30 text-red-400'
-                        }`}>
-                          Case Strength: {el.status}
+              {/* Claims Matrix (Black Letter Law) */}
+              <div className="bg-slate-900 rounded-sm border border-slate-800 shadow-md overflow-hidden">
+                <div className="px-6 py-4 border-b border-slate-800 bg-slate-950 flex justify-between items-center">
+                  <h3 className="text-sm font-serif font-bold text-slate-200 flex items-center gap-2">
+                    <span className="text-amber-600">§</span> Claims & Defenses Matrix
+                  </h3>
+                  <div className="flex gap-2">
+                    {caseData.strategy.blackLetter.affirmativeDefenses.map((def, idx) => (
+                        <span key={idx} className="text-[9px] bg-slate-900 border border-slate-700 text-slate-400 px-2 py-1 uppercase tracking-wider font-bold rounded-sm">
+                          Defense: {def}
                         </span>
-                      </div>
                     ))}
                   </div>
-
-                  <div className="mt-8 pt-6 border-t border-slate-800">
-                    <h4 className="text-sm font-bold text-slate-300 mb-3">Suggested Affirmative Defenses</h4>
-                    <div className="flex flex-wrap gap-2">
-                      {caseData.strategy.blackLetter.affirmativeDefenses.map((def, idx) => (
-                        <span key={idx} className="px-3 py-1 bg-slate-800 text-slate-300 text-xs rounded-full border border-slate-700">
-                          {def}
-                        </span>
+                </div>
+                
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left border-collapse">
+                    <thead>
+                      <tr className="border-b border-slate-800 bg-slate-900/50">
+                        <th className="p-4 text-[10px] font-bold text-slate-500 uppercase tracking-widest w-1/4">Legal Element</th>
+                        <th className="p-4 text-[10px] font-bold text-slate-500 uppercase tracking-widest w-24">Status</th>
+                        <th className="p-4 text-[10px] font-bold text-slate-500 uppercase tracking-widest">Supporting Evidence / Notes</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-800">
+                      {caseData.strategy.blackLetter.claimElements.map((el, idx) => (
+                        <tr key={idx} className="hover:bg-slate-800/30 transition-colors">
+                          <td className="p-4 text-sm font-serif font-bold text-slate-200">{el.element}</td>
+                          <td className="p-4">
+                             <span className={`inline-flex items-center gap-1.5 px-2 py-1 rounded-sm text-[9px] font-bold uppercase tracking-wider border ${
+                               el.status === 'strong' ? 'bg-green-950/30 text-green-500 border-green-800' : 
+                               el.status === 'weak' ? 'bg-amber-950/30 text-amber-500 border-amber-800' : 
+                               'bg-red-950/30 text-red-500 border-red-800'
+                             }`}>
+                               <span className={`w-1.5 h-1.5 rounded-full ${
+                                 el.status === 'strong' ? 'bg-green-500' : el.status === 'weak' ? 'bg-amber-500' : 'bg-red-500'
+                               }`}></span>
+                               {el.status}
+                             </span>
+                          </td>
+                          <td className="p-4 text-sm text-slate-400 font-serif italic border-l border-slate-800/50">
+                            {el.evidence || "No direct evidence identified."}
+                          </td>
+                        </tr>
                       ))}
-                    </div>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              {/* Procedural Roadmap */}
+              <div className="grid md:grid-cols-2 gap-8">
+                <div className="bg-slate-900 rounded-sm border border-slate-800 p-6 shadow-md">
+                  <h3 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-4 flex items-center gap-2 border-b border-slate-800 pb-2">
+                    <svg className="w-4 h-4 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                    Statutory Deadlines & Next Steps
+                  </h3>
+                  
+                  <div className="bg-blue-950/10 border-l-2 border-blue-500 p-4 mb-6">
+                     <span className="block text-[9px] text-blue-500 uppercase font-bold mb-1">Immediate Action</span>
+                     <p className="text-sm text-slate-200 font-serif font-medium">{caseData.strategy.procedural.nextStep}</p>
                   </div>
+
+                  <ul className="space-y-3">
+                    {caseData.strategy.procedural.deadlines.map((d, i) => (
+                      <li key={i} className="flex items-center gap-3 text-xs text-slate-300 font-mono border-b border-slate-800/50 pb-2 last:border-0">
+                         <span className="text-slate-600">●</span> {d}
+                      </li>
+                    ))}
+                  </ul>
                 </div>
 
-                {/* Procedural Next Steps */}
-                <div className="space-y-6">
-                  <div className="bg-slate-900 rounded-xl border border-slate-800 p-6">
-                    <h3 className="text-xl font-bold text-slate-200 mb-4">Procedural Roadmap</h3>
-                    <div className="bg-amber-900/10 border border-amber-900/30 p-4 rounded-lg mb-6">
-                      <h4 className="text-amber-500 text-xs font-bold uppercase mb-1">Immediate Action</h4>
-                      <p className="text-lg text-white font-semibold">{caseData.strategy.procedural.nextStep}</p>
-                    </div>
-                    
-                    {caseData.strategy.procedural.deadlines.length > 0 && (
-                      <div className="mb-6">
-                        <h4 className="text-sm font-bold text-slate-400 mb-2">Critical Deadlines</h4>
-                        <ul className="space-y-2">
-                          {caseData.strategy.procedural.deadlines.map((d, i) => (
-                            <li key={i} className="flex items-center text-sm text-red-300">
-                              <svg className="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                              </svg>
-                              {d}
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    )}
-                  </div>
-
-                  <div className="bg-slate-900 rounded-xl border border-slate-800 p-6">
-                    <h3 className="text-xl font-bold text-slate-200 mb-4">Discovery Engine</h3>
-                    <p className="text-xs text-slate-500 mb-4">Proposed interrogatories to expose weaknesses.</p>
-                    <ul className="space-y-3">
-                      {caseData.strategy.procedural.discoveryQuestions.map((q, i) => (
-                        <li key={i} className="flex gap-3 text-sm text-slate-300 bg-slate-950 p-3 rounded border border-slate-800/50">
-                          <span className="text-amber-600 font-bold font-mono">Q{i+1}.</span>
-                          {q}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
+                <div className="bg-slate-900 rounded-sm border border-slate-800 p-6 shadow-md">
+                  <h3 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-4 flex items-center gap-2 border-b border-slate-800 pb-2">
+                    <svg className="w-4 h-4 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+                    Discovery Plan (Interrogatories)
+                  </h3>
+                  <ul className="space-y-4">
+                    {caseData.strategy.procedural.discoveryQuestions.map((q, i) => (
+                      <li key={i} className="flex gap-3 text-sm text-slate-300 bg-slate-950 p-3 border border-slate-800 rounded-sm">
+                         <span className="text-amber-600 font-serif font-bold text-xs pt-0.5">Q{i+1}.</span>
+                         <span className="font-serif italic text-xs leading-relaxed">{q}</span>
+                      </li>
+                    ))}
+                  </ul>
                 </div>
               </div>
             </>

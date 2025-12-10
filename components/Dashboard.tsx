@@ -3,20 +3,23 @@ import React, { useState, useEffect } from 'react';
 import { UploadedFile, CaseData, DocumentAnalysis, CaseContext } from '../types';
 import FileUploader from './FileUploader';
 import DictationButton from './DictationButton';
+import { RedactionTool } from './RedactionTool';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 
 interface DashboardProps {
   files: UploadedFile[];
   onFilesAdded: (files: File[]) => void;
   onLinkAdded: (link: UploadedFile) => void;
+  onFileUpdated?: (file: UploadedFile) => void;
   caseData: CaseData | null;
   analyzing: boolean;
   onAnalyze: (desc: string) => void;
   context?: CaseContext;
 }
 
-const Dashboard: React.FC<DashboardProps> = ({ files, onFilesAdded, onLinkAdded, caseData, analyzing, onAnalyze, context }) => {
+const Dashboard: React.FC<DashboardProps> = ({ files, onFilesAdded, onLinkAdded, onFileUpdated, caseData, analyzing, onAnalyze, context }) => {
   const [caseDesc, setCaseDesc] = useState('');
+  const [redactingFile, setRedactingFile] = useState<UploadedFile | null>(null);
 
   // Pre-fill description from context if available
   useEffect(() => {
@@ -31,77 +34,128 @@ const Dashboard: React.FC<DashboardProps> = ({ files, onFilesAdded, onLinkAdded,
     fullDoc: doc
   })) || [];
 
+  const handleRedactionSave = (newFile: File, base64: string) => {
+    if (redactingFile && onFileUpdated) {
+        const updated: UploadedFile = {
+            ...redactingFile,
+            file: newFile,
+            base64: base64,
+            name: "redacted_" + redactingFile.name
+        };
+        onFileUpdated(updated);
+        setRedactingFile(null);
+    }
+  };
+
+  const isImage = (file: UploadedFile) => {
+     return file.type.startsWith('image/');
+  };
+
   return (
-    <div className="h-full overflow-y-auto p-8 custom-scrollbar">
-      <div className="max-w-6xl mx-auto space-y-8">
+    <div className="h-full overflow-y-auto p-8 custom-scrollbar bg-slate-950">
+      {redactingFile && (
+        <RedactionTool 
+          file={redactingFile} 
+          onSave={handleRedactionSave} 
+          onCancel={() => setRedactingFile(null)} 
+        />
+      )}
+      
+      <div className="max-w-[1400px] mx-auto space-y-12">
         
         {/* Header Section with Context */}
-        <div className="flex justify-between items-end">
+        <div className="flex justify-between items-end border-b-2 border-slate-800 pb-6">
           <div>
-            <h2 className="text-3xl font-bold text-white mb-2 flex items-center gap-2">
-              <svg className="w-8 h-8 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-              </svg>
-              SECURE EVIDENCE VAULT
+            <h2 className="text-3xl font-serif font-black text-slate-100 mb-2 flex items-center gap-3 tracking-tight">
+              Evidence Docket
             </h2>
-            <p className="text-slate-400">Upload case files, videos (MP4), emails, and notices. All data is encrypted and analyzed for strategic leverage.</p>
+            <p className="text-amber-600 text-xs uppercase tracking-[0.2em] font-bold">Secure Repository & Chain of Custody</p>
           </div>
           {context && (
             <div className="text-right hidden sm:block">
-              <span className="block text-xs text-slate-500 uppercase">Current Matter</span>
-              <span className="text-amber-500 font-semibold text-sm">{context.caseType}</span>
-              <span className="block text-xs text-slate-600">{context.jurisdiction}</span>
+              <span className="block text-[10px] text-slate-500 uppercase tracking-widest font-bold mb-1">Matter Reference</span>
+              <div className="bg-slate-900 px-4 py-2 border-l-2 border-amber-600">
+                <span className="text-slate-200 font-serif font-bold text-sm block">{context.caseType}</span>
+                <span className="block text-xs text-slate-500 font-mono mt-0.5">{context.jurisdiction}</span>
+              </div>
             </div>
           )}
         </div>
 
         {/* Input Section */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div className="lg:col-span-2 bg-slate-900 p-6 rounded-xl border border-slate-800">
-            <h3 className="text-lg font-semibold text-slate-200 mb-4 flex items-center gap-2">
-              <span className="w-2 h-2 bg-amber-500 rounded-full"></span>
-              Document & Video Ingestion
-            </h3>
-            <div className="space-y-4">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
+          <div className="lg:col-span-2 bg-slate-900 border border-slate-800 rounded-sm shadow-xl p-0 overflow-hidden">
+            <div className="bg-slate-950 border-b border-slate-800 px-6 py-4 flex justify-between items-center">
+               <h3 className="text-sm font-bold text-slate-300 uppercase tracking-widest flex items-center gap-2">
+                 <span className="text-amber-600">§</span> Ingest Evidence
+               </h3>
+               <span className="text-[10px] text-slate-500 font-mono">{files.length} ITEMS LOGGED</span>
+            </div>
+            
+            <div className="p-6 space-y-8">
               <FileUploader onFilesSelected={onFilesAdded} onLinkAdded={onLinkAdded} />
               
               {files.length > 0 && (
-                <div className="bg-slate-950 rounded p-3 border border-slate-800 max-h-40 overflow-y-auto">
-                  <ul className="space-y-2">
-                    {files.map(f => (
-                      <li key={f.id} className="text-sm text-slate-300 flex justify-between items-center group">
-                        <div className="flex items-center gap-2 overflow-hidden">
-                           {f.type === 'link' ? (
-                             <svg className="w-4 h-4 text-blue-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" /></svg>
-                           ) : f.type.startsWith('video') ? (
-                             <svg className="w-4 h-4 text-purple-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>
-                           ) : (
-                             <svg className="w-4 h-4 text-slate-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
-                           )}
-                           <span className="truncate">{f.name}</span>
-                        </div>
-                        {f.type === 'link' ? (
-                          <span className="text-xs bg-blue-900/30 text-blue-400 px-2 py-1 rounded uppercase">Link</span>
-                        ) : (
-                          <span className="text-xs bg-slate-800 px-2 py-1 rounded text-slate-500 uppercase">{f.type.split('/')[1] || f.type}</span>
-                        )}
-                      </li>
-                    ))}
-                  </ul>
+                <div className="border border-slate-800 rounded-sm">
+                  <table className="w-full text-left border-collapse">
+                    <thead>
+                      <tr className="bg-slate-950 border-b border-slate-800">
+                        <th className="p-3 text-[10px] font-bold text-slate-500 uppercase tracking-widest w-16">ID</th>
+                        <th className="p-3 text-[10px] font-bold text-slate-500 uppercase tracking-widest">Exhibit Name</th>
+                        <th className="p-3 text-[10px] font-bold text-slate-500 uppercase tracking-widest w-24">Type</th>
+                        <th className="p-3 text-[10px] font-bold text-slate-500 uppercase tracking-widest w-24 text-right">Action</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-800">
+                      {files.map((f, idx) => (
+                        <tr key={f.id} className="hover:bg-slate-800/50 transition-colors group">
+                          <td className="p-3 text-[10px] font-mono text-slate-600">{(idx + 1).toString().padStart(3, '0')}</td>
+                          <td className="p-3">
+                             <div className="flex items-center gap-3">
+                                {f.type === 'link' ? (
+                                  <svg className="w-4 h-4 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" /></svg>
+                                ) : isImage(f) ? (
+                                  <svg className="w-4 h-4 text-purple-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                                ) : (
+                                  <svg className="w-4 h-4 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+                                )}
+                                <span className="text-sm text-slate-300 font-serif truncate max-w-[200px]">{f.name}</span>
+                             </div>
+                          </td>
+                          <td className="p-3">
+                             <span className="text-[9px] font-bold uppercase tracking-wider text-slate-500 border border-slate-700 px-1.5 py-0.5 rounded-sm">
+                               {f.type.split('/')[1] || 'LINK'}
+                             </span>
+                          </td>
+                          <td className="p-3 text-right">
+                             {isImage(f) && (
+                               <button 
+                                 onClick={() => setRedactingFile(f)}
+                                 className="text-[10px] font-bold uppercase tracking-wider text-amber-600 hover:text-white transition-colors opacity-0 group-hover:opacity-100"
+                               >
+                                 Redact
+                               </button>
+                             )}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
                 </div>
               )}
 
               <div className="relative">
+                 <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">Statement of Facts</label>
                  <textarea
                   value={caseDesc}
                   onChange={(e) => setCaseDesc(e.target.value)}
-                  placeholder="Briefly describe your legal goal (e.g., 'I want full custody' or 'Defend against breach of contract')..."
-                  className="w-full bg-slate-950 text-slate-200 border border-slate-700 rounded-lg p-3 text-sm focus:border-amber-500 focus:outline-none h-24 resize-none"
+                  placeholder="Detailed narrative of events..."
+                  className="w-full bg-slate-950 text-slate-200 border border-slate-800 rounded-sm p-4 text-sm focus:border-amber-600 focus:outline-none h-32 resize-none font-serif leading-relaxed shadow-inner"
                 />
-                <div className="absolute top-2 right-2">
+                <div className="absolute top-8 right-2">
                   <DictationButton 
                     onTranscript={(text) => setCaseDesc(prev => prev + (prev ? ' ' : '') + text)} 
-                    className="bg-slate-900 hover:bg-slate-800 border border-slate-700 shadow-lg"
+                    className="bg-slate-900 hover:bg-slate-800 border border-slate-800 shadow-lg text-slate-400"
                   />
                 </div>
               </div>
@@ -109,58 +163,64 @@ const Dashboard: React.FC<DashboardProps> = ({ files, onFilesAdded, onLinkAdded,
               <button
                 onClick={() => onAnalyze(caseDesc)}
                 disabled={analyzing || files.length === 0 || !caseDesc}
-                className={`w-full py-3 rounded-lg font-bold text-sm tracking-wide transition-all ${
+                title="Run deep analysis on all Vault contents to generate the War Room strategy."
+                className={`w-full py-4 rounded-sm font-bold text-xs tracking-[0.2em] uppercase transition-all ${
                   analyzing 
-                    ? 'bg-slate-700 text-slate-400 cursor-not-allowed' 
-                    : 'bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-500 hover:to-amber-600 text-white shadow-lg shadow-amber-900/20'
+                    ? 'bg-slate-800 text-slate-500 cursor-not-allowed border border-slate-700' 
+                    : 'bg-amber-700 hover:bg-amber-600 text-white shadow-lg border border-amber-500'
                 }`}
               >
-                {analyzing ? 'ANALYZING EVIDENCE...' : 'ANALYZE CASE & STRATEGY'}
+                {analyzing ? 'Analyzing Precedents...' : 'Execute Case Analysis'}
               </button>
             </div>
           </div>
 
           {/* Stats / Quick View */}
-          <div className="bg-slate-900 p-6 rounded-xl border border-slate-800 flex flex-col">
-            <h3 className="text-lg font-semibold text-slate-200 mb-4">Evidence Relevance</h3>
-            {caseData ? (
-              <div className="flex-1 min-h-[200px]">
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={relevanceData} layout="vertical" margin={{ left: 0, right: 20 }}>
-                     <XAxis type="number" domain={[0, 10]} hide />
-                     <YAxis dataKey="name" type="category" width={100} tick={{fill: '#94a3b8', fontSize: 10}} />
-                     <Tooltip 
-                        contentStyle={{ backgroundColor: '#0f172a', borderColor: '#334155' }}
-                        itemStyle={{ color: '#fbbf24' }}
-                        cursor={{fill: '#1e293b'}}
-                     />
-                     <Bar dataKey="score" radius={[0, 4, 4, 0]} barSize={20}>
-                        {relevanceData.map((entry, index) => (
-                          <Cell key={`cell-${index}`} fill={entry.score > 7 ? '#d97706' : '#475569'} />
-                        ))}
-                     </Bar>
-                  </BarChart>
-                </ResponsiveContainer>
-              </div>
-            ) : (
-              <div className="flex-1 flex items-center justify-center text-slate-600 text-sm italic">
-                Awaiting analysis...
-              </div>
-            )}
+          <div className="bg-slate-900 rounded-sm border border-slate-800 shadow-xl flex flex-col p-0 overflow-hidden h-fit">
+             <div className="bg-slate-950 border-b border-slate-800 px-6 py-4">
+               <h3 className="text-sm font-bold text-slate-300 uppercase tracking-widest flex items-center gap-2">
+                 <span className="text-amber-600">§</span> Relevance Index
+               </h3>
+             </div>
+             <div className="p-6">
+                {caseData ? (
+                  <div className="h-[300px]">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <BarChart data={relevanceData} layout="vertical" margin={{ left: 0, right: 20 }}>
+                         <XAxis type="number" domain={[0, 10]} hide />
+                         <YAxis dataKey="name" type="category" width={80} tick={{fill: '#64748b', fontSize: 10, fontFamily: 'serif'}} />
+                         <Tooltip 
+                            contentStyle={{ backgroundColor: '#0f172a', borderColor: '#334155', fontFamily: 'serif' }}
+                            itemStyle={{ color: '#fbbf24' }}
+                            cursor={{fill: '#1e293b'}}
+                         />
+                         <Bar dataKey="score" barSize={12}>
+                            {relevanceData.map((entry, index) => (
+                              <Cell key={`cell-${index}`} fill={entry.score > 7 ? '#d97706' : '#475569'} />
+                            ))}
+                         </Bar>
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </div>
+                ) : (
+                  <div className="py-20 flex flex-col items-center justify-center text-slate-600 space-y-4">
+                    <div className="w-16 h-16 border-2 border-dashed border-slate-800 rounded-full flex items-center justify-center">
+                      <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg>
+                    </div>
+                    <span className="text-xs uppercase tracking-widest font-bold">No Data Points</span>
+                  </div>
+                )}
+             </div>
           </div>
         </div>
 
         {/* Executive Summary */}
         {caseData && caseData.caseSummary && (
-          <div className="bg-slate-900 border border-amber-900/30 rounded-xl p-6 relative overflow-hidden">
-             <div className="absolute top-0 right-0 p-4 opacity-5 pointer-events-none">
-                <svg className="w-24 h-24 text-amber-500" fill="currentColor" viewBox="0 0 24 24"><path d="M14 17H4v2h10v-2zm6-8H4v2h16V9zM4 15h16v-2H4v2zM4 5v2h16V5H4z"/></svg>
-             </div>
-             <h3 className="text-xl font-bold text-slate-200 mb-3 flex items-center gap-2">
-               <svg className="w-5 h-5 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
-               Executive Case Summary
+          <div className="bg-slate-900 border-t-4 border-amber-600 rounded-sm p-8 shadow-xl">
+             <h3 className="text-xl font-serif font-black text-slate-100 mb-4 flex items-center gap-3">
+               Executive Case Brief
              </h3>
-             <div className="text-slate-300 leading-relaxed text-sm bg-slate-950/50 p-4 rounded border border-slate-800/50">
+             <div className="text-slate-300 leading-8 text-sm bg-slate-950 p-8 border-l-2 border-slate-700 font-serif">
                {caseData.caseSummary}
              </div>
           </div>
@@ -169,28 +229,36 @@ const Dashboard: React.FC<DashboardProps> = ({ files, onFilesAdded, onLinkAdded,
         {/* Document Grid */}
         {caseData && (
           <div>
-            <h3 className="text-xl font-bold text-slate-200 mb-4">Analyzed Documents</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+            <div className="flex items-center gap-4 mb-8 border-b-2 border-slate-800 pb-2">
+               <h3 className="text-2xl font-serif font-black text-slate-100">Exhibits & Analysis</h3>
+               <span className="bg-slate-800 text-slate-400 text-[10px] font-bold px-2 py-1 uppercase tracking-wider">{caseData.documents.length} Exhibits</span>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
               {caseData.documents.map((doc: DocumentAnalysis, idx: number) => (
-                <div key={idx} className="bg-slate-900 border border-slate-800 rounded-lg p-4 hover:border-slate-600 transition-colors">
-                  <div className="flex justify-between items-start mb-2">
-                    <span className="inline-block px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-slate-800 text-slate-400">
-                      {doc.docType}
+                <div key={idx} className="bg-slate-900 border border-slate-800 rounded-sm p-6 hover:border-slate-600 transition-colors group shadow-lg flex flex-col">
+                  <div className="flex justify-between items-start mb-4">
+                    <span className="inline-block px-2 py-0.5 border border-slate-700 text-[10px] font-bold uppercase bg-slate-950 text-slate-400 tracking-widest">
+                      Ex. {String.fromCharCode(65 + idx)}
                     </span>
-                    <span className={`inline-block px-2 py-0.5 rounded text-[10px] font-bold uppercase ${
-                      doc.relevanceScore > 7 ? 'bg-amber-900/30 text-amber-500' : 'bg-slate-800 text-slate-500'
+                    <span className={`inline-block px-2 py-0.5 text-[10px] font-bold uppercase tracking-widest border ${
+                      doc.relevanceScore > 7 ? 'border-amber-900/50 text-amber-600 bg-amber-950/20' : 'border-slate-800 text-slate-500 bg-slate-950'
                     }`}>
-                      Relevance: {doc.relevanceScore}/10
+                      Rel: {doc.relevanceScore}/10
                     </span>
                   </div>
-                  <h4 className="font-semibold text-slate-200 mb-2 truncate" title={doc.fileName}>{doc.fileName}</h4>
-                  <p className="text-slate-400 text-xs mb-3 line-clamp-3">{doc.summary}</p>
+                  <h4 className="font-serif font-bold text-slate-100 mb-3 text-lg leading-tight">{doc.fileName}</h4>
+                  <p className="text-slate-400 text-xs mb-6 line-clamp-3 leading-relaxed font-serif flex-1">{doc.summary}</p>
                   
                   {doc.redFlags.length > 0 && (
-                    <div className="mt-2 pt-2 border-t border-slate-800">
-                      <p className="text-[10px] text-red-400 font-bold uppercase mb-1">Red Flags Detected:</p>
-                      <ul className="list-disc list-inside text-[10px] text-red-300/80">
-                        {doc.redFlags.map((flag, i) => <li key={i}>{flag}</li>)}
+                    <div className="mt-auto bg-red-950/20 p-4 border-l-2 border-red-800">
+                      <p className="text-[9px] text-red-500 font-bold uppercase mb-2 tracking-widest flex items-center gap-1">
+                        Risks Detected
+                      </p>
+                      <ul className="space-y-1">
+                        {doc.redFlags.map((flag, i) => (
+                           <li key={i} className="text-xs text-red-300/80 font-serif leading-snug">• {flag}</li>
+                        ))}
                       </ul>
                     </div>
                   )}

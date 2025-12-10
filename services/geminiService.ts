@@ -388,7 +388,10 @@ export class LiveSessionClient {
   private active = false;
   private stream: MediaStream | null = null;
 
-  constructor(private onStatusChange: (status: string) => void) {}
+  constructor(
+    private onStatusChange: (status: string) => void,
+    private onTranscript?: (role: 'user' | 'model', text: string) => void
+  ) {}
 
   async connect() {
     if (!process.env.API_KEY) throw new Error("API Key missing");
@@ -416,6 +419,15 @@ export class LiveSessionClient {
           if (base64Audio) {
              await this.playAudio(base64Audio);
           }
+          
+          // Handle Subtitles / Transcription
+          if (message.serverContent?.inputTranscription?.text) {
+             this.onTranscript?.('user', message.serverContent.inputTranscription.text);
+          }
+          if (message.serverContent?.outputTranscription?.text) {
+             this.onTranscript?.('model', message.serverContent.outputTranscription.text);
+          }
+
           if (message.serverContent?.interrupted) {
             this.stopAudio();
           }
@@ -431,6 +443,8 @@ export class LiveSessionClient {
       },
       config: {
         responseModalities: [Modality.AUDIO],
+        inputAudioTranscription: {}, // Request transcription for user input
+        outputAudioTranscription: {}, // Request transcription for model output
         speechConfig: {
           voiceConfig: { prebuiltVoiceConfig: { voiceName: 'Fenrir' } }
         },
@@ -479,7 +493,6 @@ export class LiveSessionClient {
     const audioBytes = decodeAudio(base64);
     
     // Decode PCM to AudioBuffer
-    // RAW PCM decoding (no header)
     const buffer = this.outputAudioContext.createBuffer(1, audioBytes.length / 2, 24000);
     const channelData = buffer.getChannelData(0);
     const dataInt16 = new Int16Array(audioBytes.buffer);
@@ -505,10 +518,31 @@ export class LiveSessionClient {
 
   async disconnect() {
     this.active = false;
-    if (this.stream) this.stream.getTracks().forEach(t => t.stop());
-    if (this.inputAudioContext) this.inputAudioContext.close();
-    if (this.outputAudioContext) this.outputAudioContext.close();
-    // No explicit close on session object in types, but connection will drop
+    
+    if (this.stream) {
+      this.stream.getTracks().forEach(t => t.stop());
+      this.stream = null;
+    }
+    
+    // Fix: Check state before closing to avoid "Cannot close a closed AudioContext" error
+    if (this.inputAudioContext && this.inputAudioContext.state !== 'closed') {
+      try {
+        await this.inputAudioContext.close();
+      } catch (e) {
+        console.warn("Error closing input context:", e);
+      }
+    }
+    this.inputAudioContext = null;
+
+    if (this.outputAudioContext && this.outputAudioContext.state !== 'closed') {
+      try {
+        await this.outputAudioContext.close();
+      } catch (e) {
+        console.warn("Error closing output context:", e);
+      }
+    }
+    this.outputAudioContext = null;
+
     this.onStatusChange("Disconnected");
   }
 }

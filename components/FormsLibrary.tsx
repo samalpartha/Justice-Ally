@@ -45,7 +45,6 @@ const FormsLibrary: React.FC = () => {
   };
 
   const getStateCourtUrl = (state: string) => {
-    // A simplified map or heuristic for major states, fallback to search for others
     const urls: Record<string, string> = {
       "California": "https://www.courts.ca.gov/forms.htm",
       "New York": "https://www.nycourts.gov/forms/",
@@ -58,86 +57,82 @@ const FormsLibrary: React.FC = () => {
 
   return (
     <div className="h-full overflow-y-auto custom-scrollbar p-8 bg-slate-950">
-      <div className="max-w-4xl mx-auto space-y-8">
+      <div className="max-w-4xl mx-auto space-y-12">
         
         {/* Header */}
-        <div className="text-center space-y-2">
-          <div className="w-12 h-12 bg-slate-800 rounded-full flex items-center justify-center mx-auto border border-slate-700">
-            <svg className="w-6 h-6 text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-            </svg>
-          </div>
-          <h1 className="text-3xl font-bold text-white tracking-tight">Forms Repository</h1>
-          <p className="text-slate-400 max-w-xl mx-auto">
-            Access official court forms and generic templates. Always use the official form for your specific jurisdiction when available.
+        <div className="text-center space-y-4 border-b-2 border-slate-800 pb-8">
+          <h1 className="text-4xl font-serif font-black text-slate-100 tracking-tight">Forms Repository</h1>
+          <p className="text-amber-600 uppercase tracking-[0.2em] font-bold text-xs">
+            Standardized Legal Instruments
           </p>
         </div>
 
         {/* State Selector */}
-        <div className="bg-slate-900 border border-slate-800 rounded-xl p-6">
-           <label className="block text-xs font-bold text-slate-500 uppercase mb-2">Select Your Jurisdiction</label>
+        <div className="bg-slate-900 border border-slate-800 rounded-sm p-8 shadow-lg">
+           <label className="block text-[10px] font-bold text-slate-500 uppercase mb-3 tracking-widest">Jurisdiction Selector</label>
            <div className="flex gap-4">
-             <select 
-               value={selectedState} 
-               onChange={(e) => setSelectedState(e.target.value)}
-               className="flex-1 bg-slate-950 border border-slate-700 text-white rounded p-3 focus:border-amber-500 outline-none"
-             >
-               {STATES.map(s => <option key={s} value={s}>{s}</option>)}
-             </select>
+             <div className="relative flex-1">
+               <select 
+                 value={selectedState} 
+                 onChange={(e) => setSelectedState(e.target.value)}
+                 className="w-full bg-slate-950 border-b-2 border-slate-700 text-white rounded-none p-3 focus:border-amber-600 outline-none appearance-none font-serif text-sm hover:bg-slate-800 cursor-pointer"
+               >
+                 {STATES.map(s => <option key={s} value={s}>{s}</option>)}
+               </select>
+               <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-500">
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
+               </div>
+             </div>
              <a 
                href={getStateCourtUrl(selectedState)} 
                target="_blank" 
                rel="noreferrer"
-               className="px-6 py-3 bg-amber-600 hover:bg-amber-500 text-white font-bold rounded flex items-center gap-2 transition-colors whitespace-nowrap"
+               className="px-6 py-3 bg-amber-700 hover:bg-amber-600 text-white font-bold rounded-sm flex items-center gap-2 transition-colors whitespace-nowrap uppercase text-xs tracking-wider shadow"
              >
-               <span>Visit {selectedState} Court Portal</span>
+               <span>Access Court Portal</span>
                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
              </a>
            </div>
         </div>
 
-        {/* Federal / Immigration */}
-        <div className="grid md:grid-cols-2 gap-6">
-          <div className="bg-slate-900 p-6 rounded-xl border border-slate-800">
-             <h3 className="text-lg font-bold text-white mb-3 flex items-center gap-2">
-               <span className="text-blue-400">🇺🇸</span> Federal & Immigration
-             </h3>
-             <ul className="space-y-3">
-               <li>
-                 <a href="https://www.uscis.gov/forms/all-forms" target="_blank" rel="noreferrer" className="block p-3 bg-slate-950 rounded border border-slate-800 hover:border-blue-500 transition-colors group">
-                   <div className="font-bold text-slate-200 group-hover:text-blue-400">USCIS Forms (Immigration)</div>
-                   <div className="text-xs text-slate-500">I-130, I-485, N-400, I-765</div>
-                 </a>
-               </li>
-               <li>
-                 <a href="https://www.uscourts.gov/forms-fees/forms" target="_blank" rel="noreferrer" className="block p-3 bg-slate-950 rounded border border-slate-800 hover:border-blue-500 transition-colors group">
-                   <div className="font-bold text-slate-200 group-hover:text-blue-400">Federal Court Forms</div>
-                   <div className="text-xs text-slate-500">Civil Pro Se Forms, Bankruptcy</div>
-                 </a>
-               </li>
-             </ul>
+        {/* Content Grid */}
+        <div className="grid md:grid-cols-2 gap-10">
+          <div className="bg-slate-900 rounded-sm border border-slate-800 shadow-xl overflow-hidden">
+             <div className="bg-slate-950 px-6 py-4 border-b border-slate-800">
+                <h3 className="font-serif font-bold text-slate-200 flex items-center gap-3">
+                  <span className="text-blue-500">§</span> Federal & Immigration
+                </h3>
+             </div>
+             <div className="divide-y divide-slate-800">
+               <a href="https://www.uscis.gov/forms/all-forms" target="_blank" rel="noreferrer" className="block p-5 hover:bg-slate-800 transition-colors group">
+                   <div className="font-bold text-slate-300 text-sm group-hover:text-white mb-1">USCIS Forms (Immigration)</div>
+                   <div className="text-[10px] text-slate-500 uppercase tracking-wider font-bold">I-130 • I-485 • N-400 • I-765</div>
+               </a>
+               <a href="https://www.uscourts.gov/forms-fees/forms" target="_blank" rel="noreferrer" className="block p-5 hover:bg-slate-800 transition-colors group">
+                   <div className="font-bold text-slate-300 text-sm group-hover:text-white mb-1">Federal Court Forms</div>
+                   <div className="text-[10px] text-slate-500 uppercase tracking-wider font-bold">Civil Pro Se • Bankruptcy</div>
+               </a>
+             </div>
           </div>
           
-          <div className="bg-slate-900 p-6 rounded-xl border border-slate-800">
-             <h3 className="text-lg font-bold text-white mb-3 flex items-center gap-2">
-               <span className="text-amber-500">⚖️</span> Generic Templates
-             </h3>
-             <p className="text-xs text-slate-400 mb-4">
-               Use these queries to find the specific version for {selectedState}.
-             </p>
-             <div className="space-y-2 max-h-48 overflow-y-auto custom-scrollbar">
+          <div className="bg-slate-900 rounded-sm border border-slate-800 shadow-xl overflow-hidden">
+             <div className="bg-slate-950 px-6 py-4 border-b border-slate-800">
+                <h3 className="font-serif font-bold text-slate-200 flex items-center gap-3">
+                  <span className="text-amber-500">§</span> Generic Templates
+                </h3>
+             </div>
+             <div className="divide-y divide-slate-800 max-h-80 overflow-y-auto custom-scrollbar">
                {COMMON_FORMS.map((form, idx) => (
-                 <div key={idx} className="flex justify-between items-center p-2 rounded hover:bg-slate-800 border border-transparent hover:border-slate-700 transition-colors">
+                 <div key={idx} className="flex justify-between items-start p-5 hover:bg-slate-800 transition-colors group">
                     <div>
-                      <div className="text-sm font-semibold text-slate-300">{form.title}</div>
-                      <div className="text-[10px] text-slate-500">{form.desc}</div>
+                      <div className="text-sm font-bold text-slate-300 group-hover:text-amber-500 transition-colors font-serif">{form.title}</div>
+                      <div className="text-xs text-slate-500 mt-1 leading-relaxed">{form.desc}</div>
                     </div>
                     <a 
                       href={getSearchUrl(selectedState, form.keywords)} 
                       target="_blank" 
                       rel="noreferrer"
-                      className="p-2 text-slate-400 hover:text-amber-500"
-                      title="Search for this form"
+                      className="ml-4 p-2 text-slate-500 hover:text-white bg-slate-950 hover:bg-amber-600 rounded-sm transition-all border border-slate-700 hover:border-amber-600"
                     >
                       <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
                     </a>
@@ -146,14 +141,6 @@ const FormsLibrary: React.FC = () => {
              </div>
           </div>
         </div>
-
-        <div className="bg-amber-900/10 border border-amber-900/30 p-6 rounded-xl">
-           <h4 className="text-amber-500 font-bold uppercase text-xs mb-2">Pro-Se Tip</h4>
-           <p className="text-sm text-slate-300">
-             Courts are strict about formatting. Whenever possible, fill out the PDF provided by the court rather than drafting your own document from scratch. If you must draft from scratch (like a Motion), use "Pleading Paper" format (numbered lines).
-           </p>
-        </div>
-
       </div>
     </div>
   );

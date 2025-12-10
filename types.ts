@@ -76,6 +76,16 @@ export interface TriageResult {
   };
 }
 
+export type UserRole = 'litigant' | 'attorney';
+
+export interface UserProfile {
+  id: string;
+  name: string;
+  email: string;
+  role: UserRole;
+  barNumber?: string; // Only for attorneys
+}
+
 export enum AppMode {
   TRIAGE = 'TRIAGE',
   DASHBOARD = 'DASHBOARD',

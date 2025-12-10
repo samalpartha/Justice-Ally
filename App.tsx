@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Layout from './components/Layout';
 import Dashboard from './components/Dashboard';
 import WarRoom from './components/WarRoom';
@@ -8,18 +8,52 @@ import Triage from './components/Triage';
 import Help from './components/Help';
 import LiveSession from './components/LiveSession';
 import FormsLibrary from './components/FormsLibrary';
-import { AppMode, UploadedFile, CaseData, CaseContext, TriageResult } from './types';
+import Login from './components/Login';
+import { AppMode, UploadedFile, CaseData, CaseContext, TriageResult, UserProfile, UserRole } from './types';
 import { analyzeCaseFiles, fileToBase64, base64ToFile } from './services/geminiService';
 
 const SAVE_KEY = 'justiceAlly_save_v1';
+const USER_KEY = 'justiceAlly_user_v1';
 
 const App: React.FC = () => {
+  // User Session State
+  const [user, setUser] = useState<UserProfile | null>(null);
+
+  // App State
   const [currentMode, setMode] = useState<AppMode>(AppMode.TRIAGE);
   const [files, setFiles] = useState<UploadedFile[]>([]);
   const [caseData, setCaseData] = useState<CaseData | null>(null);
   const [analyzing, setAnalyzing] = useState(false);
   const [caseContext, setCaseContext] = useState<CaseContext | undefined>();
   const [triageResult, setTriageResult] = useState<TriageResult | null>(null);
+
+  // Load User on Init
+  useEffect(() => {
+    const savedUser = localStorage.getItem(USER_KEY);
+    if (savedUser) {
+      setUser(JSON.parse(savedUser));
+    }
+  }, []);
+
+  const handleLogin = (role: UserRole, name: string, email: string) => {
+    const profile: UserProfile = {
+      id: Math.random().toString(36).substr(2, 9),
+      name,
+      email,
+      role
+    };
+    setUser(profile);
+    localStorage.setItem(USER_KEY, JSON.stringify(profile));
+  };
+
+  const handleLogout = () => {
+    setUser(null);
+    localStorage.removeItem(USER_KEY);
+    // Optional: Clear case data on logout for privacy
+    setFiles([]);
+    setCaseData(null);
+    setCaseContext(undefined);
+  };
 
   const handleFilesAdded = (newFiles: File[]) => {
     const uploaded: UploadedFile[] = newFiles.map(f => ({
@@ -33,6 +67,10 @@ const App: React.FC = () => {
 
   const handleLinkAdded = (link: UploadedFile) => {
     setFiles(prev => [...prev, link]);
+  };
+
+  const handleFileUpdated = (updatedFile: UploadedFile) => {
+    setFiles(prev => prev.map(f => f.id === updatedFile.id ? updatedFile : f));
   };
 
   const handleAnalyze = async (description: string) => {
@@ -203,12 +241,18 @@ const App: React.FC = () => {
     }
   };
 
+  if (!user) {
+    return <Login onLogin={handleLogin} />;
+  }
+
   return (
     <Layout 
       currentMode={currentMode} 
       setMode={setMode}
       onSave={saveCase}
       onLoad={loadCase}
+      user={user}
+      onLogout={handleLogout}
     >
       {currentMode === AppMode.TRIAGE && (
         <Triage onComplete={handleTriageComplete} />
@@ -218,6 +262,7 @@ const App: React.FC = () => {
           files={files} 
           onFilesAdded={handleFilesAdded}
           onLinkAdded={handleLinkAdded}
+          onFileUpdated={handleFileUpdated}
           caseData={caseData}
           analyzing={analyzing}
           onAnalyze={handleAnalyze}
