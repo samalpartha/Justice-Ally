@@ -2,6 +2,7 @@
 import React, { useRef, useState } from 'react';
 import { CaseData, UploadedFile } from '../types';
 import DictationButton from './DictationButton';
+import { useLanguage } from '../context/LanguageContext';
 
 interface WarRoomProps {
   caseData: CaseData | null;
@@ -12,6 +13,7 @@ interface WarRoomProps {
 }
 
 const WarRoom: React.FC<WarRoomProps> = ({ caseData, onFilesAdded, onLinkAdded, onNotesChange, onLoadDemo }) => {
+  const { t } = useLanguage();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [showLinkInput, setShowLinkInput] = useState(false);
   const [linkUrl, setLinkUrl] = useState('');
@@ -44,9 +46,9 @@ const WarRoom: React.FC<WarRoomProps> = ({ caseData, onFilesAdded, onLinkAdded, 
            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
          </svg>
       </div>
-      <h2 className="text-3xl font-serif font-bold text-slate-200 tracking-tight mb-2">Strategy Unavailable</h2>
+      <h2 className="text-3xl font-serif font-bold text-slate-200 tracking-tight mb-2">{t('warroom', 'unavailable')}</h2>
       <p className="text-slate-500 mb-8 max-w-md font-serif text-sm leading-relaxed">
-        No case analysis has been generated yet. Please populate the <strong>Evidence Vault</strong> and run the analysis engine to build your litigation plan.
+        {t('warroom', 'unavailableDesc')}
       </p>
       
       {onLoadDemo && (
@@ -56,7 +58,7 @@ const WarRoom: React.FC<WarRoomProps> = ({ caseData, onFilesAdded, onLinkAdded, 
           className="px-6 py-3 bg-slate-900 hover:bg-slate-800 text-amber-600 font-bold rounded-sm transition-colors border border-amber-600/50 uppercase tracking-[0.1em] text-xs shadow-lg hover:border-amber-600 flex items-center gap-2"
         >
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-          Load Simulation Data
+          {t('warroom', 'loadDemo')}
         </button>
       )}
     </div>
@@ -68,9 +70,9 @@ const WarRoom: React.FC<WarRoomProps> = ({ caseData, onFilesAdded, onLinkAdded, 
       <div className="shrink-0 px-8 py-6 border-b-2 border-slate-800 bg-slate-950 shadow-xl z-10 flex justify-between items-center">
         <div>
           <h1 className="text-2xl font-serif font-black text-white flex items-center gap-3 tracking-tight">
-             CASE STRATEGY & PLANNING
+             {t('warroom', 'header')}
           </h1>
-          <p className="text-[10px] text-amber-600 uppercase tracking-[0.3em] font-bold mt-1">Litigation Roadmap</p>
+          <p className="text-[10px] text-amber-600 uppercase tracking-[0.3em] font-bold mt-1">{t('warroom', 'subHeader')}</p>
         </div>
         
         {onFilesAdded && (
@@ -90,7 +92,7 @@ const WarRoom: React.FC<WarRoomProps> = ({ caseData, onFilesAdded, onLinkAdded, 
                  title="Add an external URL (Case Law, News Article) to the strategy context."
                >
                  <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" /></svg>
-                 Add Citation
+                 {t('warroom', 'addCitation')}
                </button>
                {showLinkInput && (
                  <div className="absolute right-0 top-full mt-2 w-80 bg-slate-900 border border-slate-600 rounded-sm shadow-2xl z-50 p-6">
@@ -121,7 +123,7 @@ const WarRoom: React.FC<WarRoomProps> = ({ caseData, onFilesAdded, onLinkAdded, 
               title="Upload new evidence directly to this view."
             >
               <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /></svg>
-              Quick Add
+              {t('warroom', 'quickAdd')}
             </button>
           </div>
         )}
@@ -135,7 +137,7 @@ const WarRoom: React.FC<WarRoomProps> = ({ caseData, onFilesAdded, onLinkAdded, 
             <div className="bg-slate-900/80 px-6 py-3 border-b border-slate-800 flex justify-between items-center">
                <h3 className="text-[10px] font-bold text-slate-400 uppercase flex items-center gap-2 tracking-[0.2em]">
                  <svg className="w-3 h-3 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
-                 Counsel's Memorandum
+                 {t('warroom', 'memo')}
                </h3>
                <DictationButton 
                   onTranscript={(text) => onNotesChange && onNotesChange((caseData?.notes || '') + (caseData?.notes ? '\n' : '') + text)} 
@@ -145,7 +147,7 @@ const WarRoom: React.FC<WarRoomProps> = ({ caseData, onFilesAdded, onLinkAdded, 
             <textarea
               value={caseData?.notes || ''}
               onChange={(e) => onNotesChange && onNotesChange(e.target.value)}
-              placeholder="Record privileged observations, client instructions, and non-documentary facts..."
+              placeholder={t('warroom', 'memoPlaceholder')}
               className="w-full bg-slate-950/50 text-slate-200 text-sm p-6 outline-none min-h-[120px] resize-none font-serif leading-7"
             />
           </div>
@@ -162,19 +164,19 @@ const WarRoom: React.FC<WarRoomProps> = ({ caseData, onFilesAdded, onLinkAdded, 
                       <svg className="w-32 h-32 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zm0 9l2.5-1.25L12 8.5l-2.5 1.25L12 11zm0 2.5l-5-2.5-5 2.5 10 5 10-5-5-2.5-5 2.5z"/></svg>
                    </div>
                    <h2 className="text-[10px] font-bold uppercase text-amber-600 tracking-widest mb-4 flex items-center gap-2">
-                     Proposed Case Theory
+                     {t('warroom', 'theory')}
                    </h2>
                    <h3 className="text-3xl font-serif font-black text-slate-100 mb-6 tracking-tight">"{caseData.strategy.sunTzu.strategyName}"</h3>
                    
                    <div className="grid md:grid-cols-2 gap-8 relative z-10">
                      <div>
-                        <span className="block text-[9px] text-slate-500 uppercase font-bold tracking-widest mb-2">Guiding Principle</span>
+                        <span className="block text-[9px] text-slate-500 uppercase font-bold tracking-widest mb-2">{t('warroom', 'guidingPrinciple')}</span>
                         <blockquote className="text-lg italic text-slate-300 font-serif border-l-2 border-slate-700 pl-4 leading-relaxed">
                           "{caseData.strategy.sunTzu.quote}"
                         </blockquote>
                      </div>
                      <div>
-                        <span className="block text-[9px] text-slate-500 uppercase font-bold tracking-widest mb-2">Tactical Application</span>
+                        <span className="block text-[9px] text-slate-500 uppercase font-bold tracking-widest mb-2">{t('warroom', 'tacticalApp')}</span>
                         <p className="text-sm text-slate-200 leading-relaxed font-serif">{caseData.strategy.sunTzu.application}</p>
                      </div>
                    </div>
@@ -184,7 +186,7 @@ const WarRoom: React.FC<WarRoomProps> = ({ caseData, onFilesAdded, onLinkAdded, 
                 <div className="bg-slate-900 rounded-sm border border-slate-800 p-6 shadow-md flex flex-col">
                   <h3 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-4 flex items-center gap-2 border-b border-slate-800 pb-2">
                     <svg className="w-4 h-4 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
-                    Opposing Party Profile
+                    {t('warroom', 'opponentProfile')}
                   </h3>
                   <div className="flex-1 bg-slate-950 p-4 border border-slate-800 rounded-sm">
                     <p className="text-sm text-slate-300 leading-relaxed font-serif">
@@ -198,7 +200,7 @@ const WarRoom: React.FC<WarRoomProps> = ({ caseData, onFilesAdded, onLinkAdded, 
               <div className="bg-slate-900 rounded-sm border border-slate-800 shadow-md overflow-hidden">
                 <div className="px-6 py-4 border-b border-slate-800 bg-slate-950 flex justify-between items-center">
                   <h3 className="text-sm font-serif font-bold text-slate-200 flex items-center gap-2">
-                    <span className="text-amber-600">§</span> Claims & Defenses Matrix
+                    <span className="text-amber-600">§</span> {t('warroom', 'matrix')}
                   </h3>
                   <div className="flex gap-2">
                     {caseData.strategy.blackLetter.affirmativeDefenses.map((def, idx) => (
@@ -213,9 +215,9 @@ const WarRoom: React.FC<WarRoomProps> = ({ caseData, onFilesAdded, onLinkAdded, 
                   <table className="w-full text-left border-collapse">
                     <thead>
                       <tr className="border-b border-slate-800 bg-slate-900/50">
-                        <th className="p-4 text-[10px] font-bold text-slate-500 uppercase tracking-widest w-1/4">Legal Element</th>
-                        <th className="p-4 text-[10px] font-bold text-slate-500 uppercase tracking-widest w-24">Status</th>
-                        <th className="p-4 text-[10px] font-bold text-slate-500 uppercase tracking-widest">Supporting Evidence / Notes</th>
+                        <th className="p-4 text-[10px] font-bold text-slate-500 uppercase tracking-widest w-1/4">{t('warroom', 'legalElement')}</th>
+                        <th className="p-4 text-[10px] font-bold text-slate-500 uppercase tracking-widest w-24">{t('warroom', 'status')}</th>
+                        <th className="p-4 text-[10px] font-bold text-slate-500 uppercase tracking-widest">{t('warroom', 'evidenceNotes')}</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-800">
@@ -249,11 +251,11 @@ const WarRoom: React.FC<WarRoomProps> = ({ caseData, onFilesAdded, onLinkAdded, 
                 <div className="bg-slate-900 rounded-sm border border-slate-800 p-6 shadow-md">
                   <h3 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-4 flex items-center gap-2 border-b border-slate-800 pb-2">
                     <svg className="w-4 h-4 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
-                    Statutory Deadlines & Next Steps
+                    {t('warroom', 'deadlines')}
                   </h3>
                   
                   <div className="bg-blue-950/10 border-l-2 border-blue-500 p-4 mb-6">
-                     <span className="block text-[9px] text-blue-500 uppercase font-bold mb-1">Immediate Action</span>
+                     <span className="block text-[9px] text-blue-500 uppercase font-bold mb-1">{t('warroom', 'immediateAction')}</span>
                      <p className="text-sm text-slate-200 font-serif font-medium">{caseData.strategy.procedural.nextStep}</p>
                   </div>
 
@@ -269,7 +271,7 @@ const WarRoom: React.FC<WarRoomProps> = ({ caseData, onFilesAdded, onLinkAdded, 
                 <div className="bg-slate-900 rounded-sm border border-slate-800 p-6 shadow-md">
                   <h3 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-4 flex items-center gap-2 border-b border-slate-800 pb-2">
                     <svg className="w-4 h-4 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
-                    Discovery Plan (Interrogatories)
+                    {t('warroom', 'discoveryPlan')}
                   </h3>
                   <ul className="space-y-4">
                     {caseData.strategy.procedural.discoveryQuestions.map((q, i) => (

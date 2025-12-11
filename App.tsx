@@ -8,14 +8,17 @@ import Triage from './components/Triage';
 import Help from './components/Help';
 import LiveSession from './components/LiveSession';
 import FormsLibrary from './components/FormsLibrary';
+import JuvenileJustice from './components/JuvenileJustice';
 import Login from './components/Login';
 import { AppMode, UploadedFile, CaseData, CaseContext, TriageResult, UserProfile, UserRole } from './types';
 import { analyzeCaseFiles, fileToBase64, base64ToFile } from './services/geminiService';
+import { useLanguage } from './context/LanguageContext';
 
 const SAVE_KEY = 'justiceAlly_save_v1';
 const USER_KEY = 'justiceAlly_user_v1';
 
-const App: React.FC = () => {
+const AppContent: React.FC = () => {
+  const { t, language } = useLanguage();
   // User Session State
   const [user, setUser] = useState<UserProfile | null>(null);
 
@@ -76,12 +79,12 @@ const App: React.FC = () => {
   const handleAnalyze = async (description: string) => {
     setAnalyzing(true);
     try {
-      const result = await analyzeCaseFiles(files, description, caseContext);
+      const result = await analyzeCaseFiles(files, description, language, caseContext);
       setCaseData(result);
       setMode(AppMode.WAR_ROOM); // Auto switch to War Room on success
     } catch (error) {
       console.error("Analysis failed", error);
-      alert("Analysis failed. Please ensure API Key is set in environment.");
+      alert(t('alerts', 'analysisFailed'));
     } finally {
       setAnalyzing(false);
     }
@@ -138,7 +141,7 @@ const App: React.FC = () => {
         }
       }
     });
-    alert("Demo Case Loaded: Smith v. Landlord (Eviction Defense)");
+    alert(t('alerts', 'demoLoaded'));
   };
 
   const handleTriageComplete = (ctx: CaseContext, result: TriageResult) => {
@@ -180,7 +183,7 @@ const App: React.FC = () => {
       
       try {
         localStorage.setItem(SAVE_KEY, json);
-        alert("Case saved successfully to local browser storage.");
+        alert(t('alerts', 'saveSuccess'));
       } catch (quotaError) {
         // If quota exceeded, try saving without heavy file content (but keep links)
         console.warn("Quota exceeded, saving Lite version.");
@@ -190,11 +193,11 @@ const App: React.FC = () => {
         });
         const liteState = { ...stateToSave, files: liteFiles };
         localStorage.setItem(SAVE_KEY, JSON.stringify(liteState));
-        alert("Case saved (Lite Mode). File contents were too large, but links, notes, and strategy are saved.");
+        alert(t('alerts', 'saveLite'));
       }
     } catch (err) {
       console.error("Save failed:", err);
-      alert("Failed to save case.");
+      alert(t('alerts', 'saveFail'));
     }
   };
 
@@ -202,7 +205,7 @@ const App: React.FC = () => {
     try {
       const json = localStorage.getItem(SAVE_KEY);
       if (!json) {
-        alert("No saved case found.");
+        alert(t('alerts', 'noSavedCase'));
         return;
       }
       const state = JSON.parse(json);
@@ -234,10 +237,10 @@ const App: React.FC = () => {
         setFiles(restoredFiles);
       }
       
-      alert("Case loaded successfully.");
+      alert(t('alerts', 'loadSuccess'));
     } catch (err) {
       console.error("Load failed:", err);
-      alert("Failed to load case data.");
+      alert(t('alerts', 'loadFail'));
     }
   };
 
@@ -291,11 +294,18 @@ const App: React.FC = () => {
       {currentMode === AppMode.FORMS && (
         <FormsLibrary />
       )}
+      {currentMode === AppMode.JUVENILE && (
+        <JuvenileJustice />
+      )}
       {currentMode === AppMode.HELP && (
         <Help />
       )}
     </Layout>
   );
+};
+
+const App: React.FC = () => {
+    return <AppContent />;
 };
 
 export default App;

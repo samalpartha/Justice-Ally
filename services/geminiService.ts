@@ -1,6 +1,6 @@
 
 import { GoogleGenAI, Type, Schema, Part, Modality, LiveServerMessage } from "@google/genai";
-import { UploadedFile, CaseData, CaseContext, TriageResult } from "../types";
+import { UploadedFile, CaseData, CaseContext, TriageResult, Language } from "../types";
 
 // --- HELPERS FOR PERSISTENCE ---
 
@@ -58,15 +58,16 @@ function decodeAudio(base64: string) {
   return bytes;
 }
 
-// --- SYSTEM PROMPT ---
+// --- SYSTEM PROMPT GENERATOR ---
 
-const SYSTEM_INSTRUCTION = `
+const getSystemInstruction = (language: Language) => `
 You are **JusticeAlly**, the Universal Legal Navigator and Senior Litigation Strategist.
 Your mission is to democratize access to justice by moving users from "Panic" to "Action."
 
 # CORE IDENTITY
 - **Role:** Strategic Case Manager for pro-se litigants.
 - **Tone:** Professional, Empathetic, Authoritative, "Sun Tzu" Strategic.
+- **Language:** You must communicate in **${language === 'es' ? 'SPANISH (Español)' : 'ENGLISH'}**.
 - **Guardrails:** NEVER invent laws. ALWAYS cite sources. ALWAYS warn "Review Required: AI generated."
 
 # DYNAMIC CAPABILITIES
@@ -95,6 +96,7 @@ B -- No --> D[Result 2];
 - Use lists for steps.
 - If asking for a form, generate the specific search query the user should use if a direct link isn't certain.
 - **Document/Video Analysis:** You have access to the user's uploaded files (PDFs, Images, Videos). When asked to draft timelines or summaries, USE the content of these files.
+- **Language Enforcement:** Even if the JSON Schema keys are in English, the string values (content) must be in ${language === 'es' ? 'Spanish' : 'English'}.
 `;
 
 const TRIAGE_SCHEMA: Schema = {
@@ -191,10 +193,9 @@ const CASE_ANALYSIS_SCHEMA: Schema = {
   required: ["caseSummary", "documents", "strategy"],
 };
 
-export const assessCaseSuitability = async (context: CaseContext): Promise<TriageResult> => {
+export const assessCaseSuitability = async (context: CaseContext, language: Language = 'en'): Promise<TriageResult> => {
   if (!process.env.API_KEY) throw new Error("API Key missing");
   const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
-  // Using Flash for fast JSON generation
   const model = "gemini-2.5-flash";
 
   const prompt = `
@@ -219,13 +220,14 @@ export const assessCaseSuitability = async (context: CaseContext): Promise<Triag
     - If Immigration, provide US DOJ EOIR link.
 
     Return JSON matching the schema.
+    IMPORTANT: The content of the strings (riskAnalysis, advice, etc.) MUST be in ${language === 'es' ? 'SPANISH' : 'ENGLISH'}.
   `;
 
   const response = await ai.models.generateContent({
     model,
     contents: [{ role: "user", parts: [{ text: prompt }] }],
     config: {
-      systemInstruction: SYSTEM_INSTRUCTION,
+      systemInstruction: getSystemInstruction(language),
       responseMimeType: "application/json",
       responseSchema: TRIAGE_SCHEMA,
     },
@@ -239,15 +241,14 @@ export const assessCaseSuitability = async (context: CaseContext): Promise<Triag
 export const analyzeCaseFiles = async (
   files: UploadedFile[],
   caseDescription: string,
-  context?: CaseContext
+  language: Language = 'en',
+  context?: CaseContext,
 ): Promise<CaseData> => {
   if (!process.env.API_KEY) throw new Error("API Key missing");
 
   const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
-  // UPGRADE: Use Pro for complex document reasoning and Video Understanding
   const model = "gemini-3-pro-preview"; 
   
-  // Separate real files from links
   const binaryFiles = files.filter(f => f.file && f.type !== 'link');
   const links = files.filter(f => f.type === 'link');
 
@@ -277,6 +278,7 @@ export const analyzeCaseFiles = async (
     4. **Black Letter Law**: Map facts to legal elements.
     
     Return the output in the specified JSON format.
+    IMPORTANT: The content of the strings MUST be in ${language === 'es' ? 'SPANISH' : 'ENGLISH'}.
   `;
 
   try {
@@ -289,7 +291,7 @@ export const analyzeCaseFiles = async (
         },
       ],
       config: {
-        systemInstruction: SYSTEM_INSTRUCTION,
+        systemInstruction: getSystemInstruction(language),
         responseMimeType: "application/json",
         responseSchema: CASE_ANALYSIS_SCHEMA,
       },
@@ -309,29 +311,24 @@ export const analyzeCaseFiles = async (
 export const sendChatMessage = async (
   history: { role: string; parts: { text: string }[] }[],
   message: string,
+  language: Language = 'en',
   files: UploadedFile[] = [],
   useSearch: boolean = false
 ) => {
   if (!process.env.API_KEY) throw new Error("API Key missing");
 
   const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
-  // UPGRADE: Use Gemini 3 Pro for chat logic, OR Flash if using Search (Search is currently supported well on Flash)
-  // Per instructions: "Use gemini-2.5-flash (with googleSearch tool)" for search grounding.
-  // Otherwise use "gemini-3-pro-preview" for chatbot.
   const model = useSearch ? "gemini-2.5-flash" : "gemini-3-pro-preview";
 
-  // 1. Handle Links (Text Context)
   const links = files.filter(f => f.type === 'link');
   const linksContext = links.length > 0 
     ? `\n\n[System Note] Active External Links in Evidence Vault:\n${links.map(l => `${l.name}: ${l.url}`).join('\n')}` 
     : '';
 
-  // 2. Handle Binary Files (Images/PDFs) - Convert to Parts
   const binaryFiles = files.filter(f => f.file && f.type !== 'link');
   const fileParts = await Promise.all(binaryFiles.map(f => fileToGenerativePart(f.file!)));
 
-  // 3. Construct the Message Payload
-  const augmentedMessage = `${message} ${linksContext} \n\n[Instruction: The user has attached files. Read/View the attached files to answer the query.]`;
+  const augmentedMessage = `${message} ${linksContext} \n\n[Instruction: The user has attached files. Read/View the attached files to answer the query. Respond in ${language === 'es' ? 'Spanish' : 'English'}.]`;
   
   const contentParts: Part[] = [
     { text: augmentedMessage },
@@ -343,18 +340,49 @@ export const sendChatMessage = async (
   const chat = ai.chats.create({
     model,
     config: {
-      systemInstruction: SYSTEM_INSTRUCTION,
+      systemInstruction: getSystemInstruction(language),
       tools: tools,
     },
     history: history,
   });
 
-  // Use the parts array in the sendMessageStream call
   const result = await chat.sendMessageStream({ parts: contentParts });
   return result;
 };
 
-// --- TEXT TO SPEECH ---
+// --- AUDIO TRANSCRIPTION (Robust) ---
+export const transcribeAudio = async (audioBlob: Blob, language: Language = 'en'): Promise<string> => {
+  if (!process.env.API_KEY) throw new Error("API Key missing");
+  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+  
+  // Convert Blob to Base64
+  const reader = new FileReader();
+  const base64Promise = new Promise<string>((resolve, reject) => {
+    reader.onloadend = () => {
+      const result = reader.result as string;
+      const base64 = result.split(',')[1];
+      resolve(base64);
+    };
+    reader.onerror = reject;
+  });
+  reader.readAsDataURL(audioBlob);
+  const base64Audio = await base64Promise;
+
+  const prompt = `Transcribe the attached audio exactly as spoken. Return ONLY the transcription text, no preamble. Language is ${language === 'es' ? 'Spanish' : 'English'}.`;
+
+  const response = await ai.models.generateContent({
+    model: "gemini-2.5-flash", // Flash is fast and good for transcription
+    contents: [{
+      parts: [
+        { inlineData: { mimeType: audioBlob.type || 'audio/webm', data: base64Audio } },
+        { text: prompt }
+      ]
+    }]
+  });
+
+  return response.text || "";
+}
+
 export const textToSpeech = async (text: string): Promise<string> => {
   if (!process.env.API_KEY) throw new Error("API Key missing");
   const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
@@ -382,7 +410,6 @@ export class LiveSessionClient {
   private session: any; // Type is technically Promise<LiveSession>
   private inputAudioContext: AudioContext | null = null;
   private outputAudioContext: AudioContext | null = null;
-  private outputNode: AudioWorkletNode | ScriptProcessorNode | null = null;
   private nextStartTime = 0;
   private sources = new Set<AudioBufferSourceNode>();
   private active = false;
@@ -393,7 +420,7 @@ export class LiveSessionClient {
     private onTranscript?: (role: 'user' | 'model', text: string) => void
   ) {}
 
-  async connect() {
+  async connect(language: Language = 'en') {
     if (!process.env.API_KEY) throw new Error("API Key missing");
     const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
     this.active = true;
@@ -448,7 +475,7 @@ export class LiveSessionClient {
         speechConfig: {
           voiceConfig: { prebuiltVoiceConfig: { voiceName: 'Fenrir' } }
         },
-        systemInstruction: SYSTEM_INSTRUCTION + "\n\nNote: You are in a real-time voice strategy session. Be concise, calm, and authoritative."
+        systemInstruction: getSystemInstruction(language) + "\n\nNote: You are in a real-time voice strategy session. Be concise, calm, and authoritative."
       }
     });
   }
@@ -544,5 +571,103 @@ export class LiveSessionClient {
     this.outputAudioContext = null;
 
     this.onStatusChange("Disconnected");
+  }
+}
+
+// --- STREAMING DICTATION CLIENT (Real-Time) ---
+export class StreamingDictationClient {
+  private session: any;
+  private inputAudioContext: AudioContext | null = null;
+  private stream: MediaStream | null = null;
+  private active = false;
+
+  constructor(
+    private onTranscript: (text: string) => void,
+    private onError: (err: any) => void
+  ) {}
+
+  async start(language: Language) {
+     if (!process.env.API_KEY) throw new Error("API Key missing");
+     const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+     this.active = true;
+
+     try {
+       this.inputAudioContext = new (window.AudioContext || (window as any).webkitAudioContext)({sampleRate: 16000});
+       this.stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+
+       this.session = ai.live.connect({
+         model: 'gemini-2.5-flash-native-audio-preview-09-2025',
+         callbacks: {
+            onopen: () => {
+              this.startAudioStream();
+            },
+            onmessage: (message: LiveServerMessage) => {
+              // Only listen for input transcription (user's voice)
+              if (message.serverContent?.inputTranscription?.text) {
+                 this.onTranscript(message.serverContent.inputTranscription.text);
+              }
+            },
+            onerror: (err) => {
+               this.onError(err);
+               this.stop();
+            },
+            onclose: () => {
+               this.stop();
+            }
+         },
+         config: {
+           // We only want text processing, but Live API requires AUDIO response modality.
+           // We will simply ignore the audio output in the onmessage handler.
+           responseModalities: [Modality.AUDIO], 
+           inputAudioTranscription: {}, 
+           systemInstruction: `You are a dictation assistant. Your only job is to listen. Do not respond to questions. Language: ${language === 'es' ? 'Spanish' : 'English'}.`
+         }
+       });
+
+     } catch (err) {
+       this.onError(err);
+       this.stop();
+     }
+  }
+
+  private startAudioStream() {
+    if (!this.inputAudioContext || !this.stream) return;
+    const source = this.inputAudioContext.createMediaStreamSource(this.stream);
+    const processor = this.inputAudioContext.createScriptProcessor(4096, 1, 1);
+    
+    processor.onaudioprocess = (e) => {
+      if (!this.active) return;
+      const inputData = e.inputBuffer.getChannelData(0);
+      const l = inputData.length;
+      const int16 = new Int16Array(l);
+      for (let i = 0; i < l; i++) {
+        int16[i] = inputData[i] * 32768;
+      }
+      const pcmData = encodeAudio(new Uint8Array(int16.buffer));
+      
+      this.session.then((s: any) => {
+         s.sendRealtimeInput({
+            media: {
+              mimeType: 'audio/pcm;rate=16000',
+              data: pcmData
+            }
+         });
+      });
+    };
+
+    source.connect(processor);
+    processor.connect(this.inputAudioContext.destination);
+  }
+
+  stop() {
+    this.active = false;
+    if (this.stream) {
+      this.stream.getTracks().forEach(t => t.stop());
+      this.stream = null;
+    }
+    if (this.inputAudioContext && this.inputAudioContext.state !== 'closed') {
+      this.inputAudioContext.close();
+    }
+    this.inputAudioContext = null;
   }
 }

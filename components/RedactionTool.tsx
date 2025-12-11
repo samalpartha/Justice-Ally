@@ -1,6 +1,7 @@
 
 import React, { useRef, useState, useEffect } from 'react';
 import { UploadedFile } from '../types';
+import { useLanguage } from '../context/LanguageContext';
 
 interface RedactionToolProps {
   file: UploadedFile;
@@ -9,6 +10,7 @@ interface RedactionToolProps {
 }
 
 export const RedactionTool: React.FC<RedactionToolProps> = ({ file, onSave, onCancel }) => {
+  const { t } = useLanguage();
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [isDrawing, setIsDrawing] = useState(false);
   const [startPos, setStartPos] = useState({ x: 0, y: 0 });
@@ -156,13 +158,13 @@ export const RedactionTool: React.FC<RedactionToolProps> = ({ file, onSave, onCa
           <div>
             <h3 className="text-white font-serif font-bold text-xl flex items-center gap-2">
                <svg className="w-5 h-5 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" /></svg>
-               Redaction Studio
+               {t('redaction', 'header')}
             </h3>
-            <p className="text-slate-500 text-xs mt-1">Draw boxes to permanently blackout PII (Personally Identifiable Information).</p>
+            <p className="text-slate-500 text-xs mt-1">{t('redaction', 'subHeader')}</p>
           </div>
           <div className="flex items-center gap-3">
              <div className="text-[10px] font-bold uppercase text-slate-500 bg-slate-950 px-2 py-1 rounded border border-slate-800">
-                {rects.length} Redactions
+                {rects.length} {t('redaction', 'count')}
              </div>
              <button onClick={onCancel} className="text-slate-400 hover:text-white transition-colors">
                <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
@@ -172,7 +174,7 @@ export const RedactionTool: React.FC<RedactionToolProps> = ({ file, onSave, onCa
         
         {/* Canvas Area */}
         <div className="flex-1 overflow-auto bg-slate-950/50 relative cursor-crosshair flex items-center justify-center p-4">
-           {!image && <div className="text-amber-500 animate-pulse font-mono text-sm">Loading visual evidence...</div>}
+           {!image && <div className="text-amber-500 animate-pulse font-mono text-sm">{t('redaction', 'loading')}</div>}
            <canvas 
              ref={canvasRef}
              onMouseDown={startDrawing}
@@ -187,19 +189,19 @@ export const RedactionTool: React.FC<RedactionToolProps> = ({ file, onSave, onCa
         <div className="px-6 py-4 bg-slate-900 border-t border-slate-800 rounded-b-lg flex justify-between items-center">
            <div className="flex gap-2">
               <button onClick={handleUndo} disabled={rects.length === 0} className="px-4 py-2 bg-slate-800 text-slate-300 rounded-sm hover:bg-slate-700 border border-slate-700 text-xs font-bold uppercase tracking-wider disabled:opacity-50 transition-colors">
-                 Undo
+                 {t('redaction', 'undo')}
               </button>
               <button onClick={() => setRects([])} disabled={rects.length === 0} className="px-4 py-2 bg-slate-800 text-slate-300 rounded-sm hover:bg-slate-700 border border-slate-700 text-xs font-bold uppercase tracking-wider disabled:opacity-50 transition-colors">
-                 Clear All
+                 {t('redaction', 'clear')}
               </button>
            </div>
            <div className="flex gap-3">
              <button onClick={onCancel} className="px-4 py-2 text-slate-400 hover:text-white font-bold uppercase text-xs tracking-wider transition-colors">
-               Cancel
+               {t('redaction', 'cancel')}
              </button>
              <button onClick={handleSave} className="px-6 py-2 bg-amber-700 hover:bg-amber-600 text-white rounded-sm font-bold uppercase text-xs tracking-wider shadow-lg transition-colors flex items-center gap-2">
                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" /></svg>
-               Save Redacted Copy
+               {t('redaction', 'save')}
              </button>
            </div>
         </div>

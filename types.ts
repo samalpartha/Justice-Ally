@@ -94,4 +94,7 @@ export enum AppMode {
   LIVE_STRATEGY = 'LIVE_STRATEGY',
   FORMS = 'FORMS',
   HELP = 'HELP',
+  JUVENILE = 'JUVENILE',
 }
+
+export type Language = 'en' | 'es';

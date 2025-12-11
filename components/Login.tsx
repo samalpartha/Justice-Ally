@@ -1,12 +1,14 @@
 
 import React, { useState } from 'react';
 import { UserRole } from '../types';
+import { useLanguage } from '../context/LanguageContext';
 
 interface LoginProps {
   onLogin: (role: UserRole, name: string, email: string) => void;
 }
 
 const Login: React.FC<LoginProps> = ({ onLogin }) => {
+  const { t, setLanguage, language } = useLanguage();
   const [role, setRole] = useState<UserRole>('litigant');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -31,6 +33,16 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
       <div className="absolute -top-20 -right-20 w-96 h-96 bg-amber-600/5 rounded-full blur-3xl"></div>
       <div className="absolute bottom-0 left-0 w-full h-1/2 bg-gradient-to-t from-slate-900 to-transparent pointer-events-none"></div>
 
+      {/* Language Toggle */}
+      <div className="absolute top-6 right-6 z-20">
+         <button 
+           onClick={() => setLanguage(language === 'en' ? 'es' : 'en')}
+           className="text-xs font-bold uppercase text-slate-500 hover:text-amber-600 transition-colors border border-slate-800 px-3 py-1 rounded-sm bg-slate-900"
+         >
+           {language === 'en' ? 'Español' : 'English'}
+         </button>
+      </div>
+
       <div className="max-w-md w-full bg-slate-900 border border-slate-800 shadow-2xl rounded-sm relative z-10 overflow-hidden">
         {/* Header */}
         <div className="p-8 text-center border-b border-slate-800 bg-slate-950">
@@ -39,8 +51,8 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
                <path d="M12 2c-1.1 0-2 .9-2 2h-3v2h2.55c-.6 2.3-2.65 4-5.05 4-1.3 0-2.5-.35-3.5-1l-1 1.75c1.3.85 2.85 1.25 4.5 1.25 2.5 0 4.8-1.15 6.35-3h6.3c1.55 1.85 3.85 3 6.35 3 1.65 0 3.2-.4 4.5-1.25l-1-1.75c-1 .65-2.2 1-3.5 1-2.4 0-4.45-1.7-5.05-4h2.55V4h-3c0-1.1-.9-2-2-2zm-6 12c-2.2 0-4 1.8-4 4s1.8 4 4 4 4-1.8 4-4-1.8-4-4-4zm12 0c-2.2 0-4 1.8-4 4s1.8 4 4 4 4-1.8 4-4-1.8-4-4-4z"/>
              </svg>
           </div>
-          <h1 className="font-serif font-black text-3xl text-slate-100 tracking-tight mb-2">JUSTICE<span className="text-amber-600">ALLY</span></h1>
-          <p className="text-[10px] text-slate-500 uppercase tracking-[0.3em] font-bold">Secure Legal Workspace</p>
+          <h1 className="font-serif font-black text-3xl text-slate-100 tracking-tight mb-2">{t('common', 'appName')}<span className="text-amber-600">{t('common', 'appSuffix')}</span></h1>
+          <p className="text-[10px] text-slate-500 uppercase tracking-[0.3em] font-bold">{t('login', 'subtitle')}</p>
         </div>
 
         {/* Role Toggles */}
@@ -53,7 +65,7 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
                 : 'bg-slate-950 text-slate-500 hover:text-slate-300'
             }`}
           >
-            Self-Represented
+            {t('login', 'selfRep')}
           </button>
           <button
             onClick={() => setRole('attorney')}
@@ -63,14 +75,14 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
                 : 'bg-slate-950 text-slate-500 hover:text-slate-300'
             }`}
           >
-            Attorney Login
+            {t('login', 'attorneyLogin')}
           </button>
         </div>
 
         {/* Form */}
         <form onSubmit={handleSubmit} className="p-8 space-y-6">
           <div className="space-y-2">
-            <label className="text-[10px] uppercase font-bold text-slate-500 tracking-widest">Email Address</label>
+            <label className="text-[10px] uppercase font-bold text-slate-500 tracking-widest">{t('login', 'emailLabel')}</label>
             <input 
               type="email" 
               required
@@ -82,7 +94,7 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
           </div>
           
           <div className="space-y-2">
-            <label className="text-[10px] uppercase font-bold text-slate-500 tracking-widest">Secure Password</label>
+            <label className="text-[10px] uppercase font-bold text-slate-500 tracking-widest">{t('login', 'passLabel')}</label>
             <input 
               type="password" 
               required
@@ -108,11 +120,11 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
                   <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                   <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                 </svg>
-                Authenticating...
+                {t('login', 'authenticating')}
               </>
             ) : (
               <>
-                <span>Access Secure Vault</span>
+                <span>{t('login', 'authButton')}</span>
                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" /></svg>
               </>
             )}
@@ -122,12 +134,12 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
         {/* Footer */}
         <div className="px-8 py-4 bg-slate-950 border-t border-slate-800 text-center">
           <p className="text-[10px] text-slate-600 font-serif italic">
-            By accessing this system, you acknowledge that communications are protected by end-to-end encryption.
+            {t('login', 'footer')}
           </p>
           <div className="mt-4 flex gap-2 justify-center">
-             <button onClick={() => { setRole('litigant'); setEmail('client@demo.com'); setPassword('demo'); }} className="text-[9px] text-amber-600 uppercase font-bold hover:underline">Demo Litigant</button>
+             <button onClick={() => { setRole('litigant'); setEmail('client@demo.com'); setPassword('demo'); }} className="text-[9px] text-amber-600 uppercase font-bold hover:underline">{t('login', 'demoLitigant')}</button>
              <span className="text-slate-700">|</span>
-             <button onClick={() => { setRole('attorney'); setEmail('counsel@firm.law'); setPassword('demo'); }} className="text-[9px] text-blue-600 uppercase font-bold hover:underline">Demo Attorney</button>
+             <button onClick={() => { setRole('attorney'); setEmail('counsel@firm.law'); setPassword('demo'); }} className="text-[9px] text-blue-600 uppercase font-bold hover:underline">{t('login', 'demoAttorney')}</button>
           </div>
         </div>
       </div>

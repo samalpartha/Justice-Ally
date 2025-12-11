@@ -1,8 +1,10 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import { LiveSessionClient } from '../services/geminiService';
+import { useLanguage } from '../context/LanguageContext';
 
 const LiveSession: React.FC = () => {
+  const { t, language } = useLanguage();
   const [status, setStatus] = useState("Disconnected");
   const [isActive, setIsActive] = useState(false);
   const [transcript, setTranscript] = useState<{role: string, text: string}[]>([]);
@@ -40,7 +42,7 @@ const LiveSession: React.FC = () => {
       setIsActive(false);
     } else {
       setTranscript([]); // Clear previous transcript
-      await clientRef.current?.connect();
+      await clientRef.current?.connect(language); // Pass current language
       setIsActive(true);
     }
   };
@@ -59,8 +61,8 @@ const LiveSession: React.FC = () => {
 
         <div className="z-10 text-center space-y-12 max-w-lg w-full">
           <div className="space-y-4">
-            <h2 className="text-4xl font-serif font-black text-white tracking-tight">Live Strategy Session</h2>
-            <p className="text-amber-600 uppercase tracking-[0.2em] text-xs font-bold">Secure Voice Channel</p>
+            <h2 className="text-4xl font-serif font-black text-white tracking-tight">{t('live', 'header')}</h2>
+            <p className="text-amber-600 uppercase tracking-[0.2em] text-xs font-bold">{t('live', 'secureChannel')}</p>
           </div>
 
           <div className={`w-40 h-40 mx-auto rounded-full border-4 flex items-center justify-center relative shadow-2xl transition-all duration-500 ${isActive ? 'border-amber-600 bg-slate-900' : 'border-slate-800 bg-slate-950'}`}>
@@ -94,7 +96,7 @@ const LiveSession: React.FC = () => {
                   : 'bg-amber-700 hover:bg-amber-600 text-white border-amber-600'
               }`}
             >
-              {isActive ? 'Terminate Connection' : 'Initialize Voice Link'}
+              {isActive ? t('live', 'terminate') : t('live', 'initLink')}
             </button>
           </div>
         </div>
@@ -105,17 +107,17 @@ const LiveSession: React.FC = () => {
          <div className="px-6 py-4 border-b border-slate-800 bg-slate-950">
             <h3 className="font-serif font-bold text-slate-200 text-sm flex items-center gap-2">
                <svg className="w-4 h-4 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" /></svg>
-               Live Transcript
+               {t('live', 'transcript')}
             </h3>
          </div>
          <div ref={scrollRef} className="flex-1 overflow-y-auto p-6 space-y-6 custom-scrollbar">
             {transcript.length === 0 && isActive && (
-               <p className="text-slate-600 text-xs italic text-center mt-10">Listening for audio input...</p>
+               <p className="text-slate-600 text-xs italic text-center mt-10">{t('live', 'listening')}</p>
             )}
             {transcript.map((msg, idx) => (
               <div key={idx} className={`flex flex-col ${msg.role === 'user' ? 'items-end' : 'items-start'}`}>
                  <span className={`text-[9px] font-bold uppercase tracking-widest mb-1 ${msg.role === 'user' ? 'text-slate-500' : 'text-amber-600'}`}>
-                    {msg.role === 'user' ? 'You' : 'Justice Ally'}
+                    {msg.role === 'user' ? (language === 'es' ? 'Usted' : 'You') : 'Justice Ally'}
                  </span>
                  <div className={`p-3 rounded-sm text-sm font-serif max-w-[90%] leading-relaxed ${
                     msg.role === 'user' 

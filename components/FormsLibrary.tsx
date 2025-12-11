@@ -1,5 +1,6 @@
 
 import React, { useState } from 'react';
+import { useLanguage } from '../context/LanguageContext';
 
 const STATES = [
   "Alabama", "Alaska", "Arizona", "Arkansas", "California", "Colorado", "Connecticut", "Delaware", "Florida", "Georgia",
@@ -38,6 +39,7 @@ const COMMON_FORMS = [
 ];
 
 const FormsLibrary: React.FC = () => {
+  const { t } = useLanguage();
   const [selectedState, setSelectedState] = useState("California");
 
   const getSearchUrl = (state: string, query: string) => {
@@ -61,15 +63,15 @@ const FormsLibrary: React.FC = () => {
         
         {/* Header */}
         <div className="text-center space-y-4 border-b-2 border-slate-800 pb-8">
-          <h1 className="text-4xl font-serif font-black text-slate-100 tracking-tight">Forms Repository</h1>
+          <h1 className="text-4xl font-serif font-black text-slate-100 tracking-tight">{t('forms', 'title')}</h1>
           <p className="text-amber-600 uppercase tracking-[0.2em] font-bold text-xs">
-            Standardized Legal Instruments
+            {t('forms', 'subtitle')}
           </p>
         </div>
 
         {/* State Selector */}
         <div className="bg-slate-900 border border-slate-800 rounded-sm p-8 shadow-lg">
-           <label className="block text-[10px] font-bold text-slate-500 uppercase mb-3 tracking-widest">Jurisdiction Selector</label>
+           <label className="block text-[10px] font-bold text-slate-500 uppercase mb-3 tracking-widest">{t('forms', 'selector')}</label>
            <div className="flex gap-4">
              <div className="relative flex-1">
                <select 
@@ -89,7 +91,7 @@ const FormsLibrary: React.FC = () => {
                rel="noreferrer"
                className="px-6 py-3 bg-amber-700 hover:bg-amber-600 text-white font-bold rounded-sm flex items-center gap-2 transition-colors whitespace-nowrap uppercase text-xs tracking-wider shadow"
              >
-               <span>Access Court Portal</span>
+               <span>{t('forms', 'portal')}</span>
                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
              </a>
            </div>
@@ -100,7 +102,7 @@ const FormsLibrary: React.FC = () => {
           <div className="bg-slate-900 rounded-sm border border-slate-800 shadow-xl overflow-hidden">
              <div className="bg-slate-950 px-6 py-4 border-b border-slate-800">
                 <h3 className="font-serif font-bold text-slate-200 flex items-center gap-3">
-                  <span className="text-blue-500">§</span> Federal & Immigration
+                  <span className="text-blue-500">§</span> {t('forms', 'federal')}
                 </h3>
              </div>
              <div className="divide-y divide-slate-800">
@@ -118,7 +120,7 @@ const FormsLibrary: React.FC = () => {
           <div className="bg-slate-900 rounded-sm border border-slate-800 shadow-xl overflow-hidden">
              <div className="bg-slate-950 px-6 py-4 border-b border-slate-800">
                 <h3 className="font-serif font-bold text-slate-200 flex items-center gap-3">
-                  <span className="text-amber-500">§</span> Generic Templates
+                  <span className="text-amber-500">§</span> {t('forms', 'generic')}
                 </h3>
              </div>
              <div className="divide-y divide-slate-800 max-h-80 overflow-y-auto custom-scrollbar">
