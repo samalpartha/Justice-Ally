@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { AppMode, UserProfile } from '../types';
 import { useLanguage } from '../context/LanguageContext';
@@ -37,23 +38,23 @@ const Layout: React.FC<LayoutProps> = ({ currentMode, setMode, onSave, onLoad, u
   return (
     <div className="flex h-screen bg-slate-950 text-slate-200 font-sans selection:bg-amber-900/50 selection:text-amber-100">
       {/* Sidebar - Legal Binder Spine Aesthetic */}
-      <aside className="w-72 bg-slate-950 border-r-4 border-double border-slate-800 flex flex-col shrink-0 z-20 shadow-[4px_0_24px_rgba(0,0,0,0.5)]">
+      <aside className="w-72 bg-slate-950 border-r-4 border-double border-slate-800 flex flex-col shrink-0 z-20 shadow-[4px_0_24px_rgba(0,0,0,0.5)] relative">
         
-        {/* Branding Area - Centered Layout */}
-        <div className="relative p-8 border-b border-slate-800 bg-slate-950 flex flex-col items-center text-center group">
-             {/* Language Toggle - Absolute Positioned */}
-             <div className="absolute top-3 right-3">
-                <button 
-                  onClick={() => setLanguage(language === 'en' ? 'es' : 'en')}
-                  className="flex items-center gap-1 bg-slate-900 hover:bg-slate-800 border border-slate-700 px-2 py-1 rounded-sm transition-all shadow-sm group/lang"
-                  title={language === 'en' ? "Switch to Spanish" : "Cambiar a Inglés"}
-                >
-                  <span className={`text-[10px] font-bold uppercase ${language === 'en' ? 'text-amber-500' : 'text-slate-500'}`}>EN</span>
-                  <span className="text-slate-600 text-[10px]">/</span>
-                  <span className={`text-[10px] font-bold uppercase ${language === 'es' ? 'text-amber-500' : 'text-slate-500'}`}>ES</span>
-                </button>
-             </div>
+        {/* Language Toggle - Absolute Positioned to Avoid Overlap */}
+        <div className="absolute top-4 right-4 z-30">
+            <button 
+                onClick={() => setLanguage(language === 'en' ? 'es' : 'en')}
+                className="flex items-center gap-1 bg-slate-900 hover:bg-slate-800 border border-slate-700 px-2 py-1 rounded-sm transition-all shadow-sm group/lang"
+                title={language === 'en' ? "Switch to Spanish" : "Cambiar a Inglés"}
+            >
+                <span className={`text-[10px] font-bold uppercase ${language === 'en' ? 'text-amber-500' : 'text-slate-500'}`}>EN</span>
+                <span className="text-slate-600 text-[10px]">/</span>
+                <span className={`text-[10px] font-bold uppercase ${language === 'es' ? 'text-amber-500' : 'text-slate-500'}`}>ES</span>
+            </button>
+        </div>
 
+        {/* Branding Area - Centered Layout */}
+        <div className="p-8 border-b border-slate-800 bg-slate-950 flex flex-col items-center text-center group mt-4">
              {/* Centered Icon */}
              <div className="w-14 h-14 flex items-center justify-center border-2 border-amber-700 rounded-sm bg-slate-900 shadow-inner mb-4">
                <svg className="w-8 h-8 text-amber-600" fill="currentColor" viewBox="0 0 24 24">
@@ -102,12 +103,6 @@ const Layout: React.FC<LayoutProps> = ({ currentMode, setMode, onSave, onLoad, u
              icon={<svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19.428 15.428a2 2 0 00-1.022-.547l-2.384-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" /></svg>}
            />
            <NavItem 
-             mode={AppMode.CHAT} 
-             label={t('sidebar', 'tacticalChat')} 
-             sub={t('sidebar', 'aiCoCounsel')}
-             icon={<svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" /></svg>}
-           />
-           <NavItem 
              mode={AppMode.LIVE_STRATEGY} 
              label={t('sidebar', 'liveStrategy')} 
              sub={t('sidebar', 'voiceConsult')}
@@ -118,6 +113,12 @@ const Layout: React.FC<LayoutProps> = ({ currentMode, setMode, onSave, onLoad, u
              label={t('sidebar', 'formsLib')} 
              sub={t('sidebar', 'templates')}
              icon={<svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>}
+           />
+           <NavItem 
+             mode={AppMode.TRAFFIC} 
+             label={t('sidebar', 'traffic')} 
+             sub={t('sidebar', 'dui')}
+             icon={<svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>}
            />
            <NavItem 
              mode={AppMode.JUVENILE} 

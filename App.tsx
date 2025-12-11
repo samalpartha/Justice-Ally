@@ -3,15 +3,15 @@ import React, { useState, useEffect } from 'react';
 import Layout from './components/Layout';
 import Dashboard from './components/Dashboard';
 import WarRoom from './components/WarRoom';
-import ChatInterface from './components/ChatInterface';
 import Triage from './components/Triage';
 import Help from './components/Help';
 import LiveSession from './components/LiveSession';
 import FormsLibrary from './components/FormsLibrary';
 import JuvenileJustice from './components/JuvenileJustice';
+import TrafficDefense from './components/TrafficDefense';
 import Login from './components/Login';
 import { AppMode, UploadedFile, CaseData, CaseContext, TriageResult, UserProfile, UserRole } from './types';
-import { analyzeCaseFiles, fileToBase64, base64ToFile } from './services/geminiService';
+import { analyzeCaseFiles, fileToBase64, base64ToFile, mapApiError } from './services/geminiService';
 import { useLanguage } from './context/LanguageContext';
 
 const SAVE_KEY = 'justiceAlly_save_v1';
@@ -29,6 +29,16 @@ const AppContent: React.FC = () => {
   const [analyzing, setAnalyzing] = useState(false);
   const [caseContext, setCaseContext] = useState<CaseContext | undefined>();
   const [triageResult, setTriageResult] = useState<TriageResult | null>(null);
+  
+  // Notification System
+  const [notification, setNotification] = useState<{message: string, type: 'success' | 'error'} | null>(null);
+
+  const showNotify = (messageKey: string, type: 'success' | 'error') => {
+      // Look up translation or use raw key if missing
+      const msg = t('alerts', messageKey) || messageKey;
+      setNotification({ message: msg, type });
+      setTimeout(() => setNotification(null), 5000);
+  };
 
   // Load User on Init
   useEffect(() => {
@@ -82,9 +92,16 @@ const AppContent: React.FC = () => {
       const result = await analyzeCaseFiles(files, description, language, caseContext);
       setCaseData(result);
       setMode(AppMode.WAR_ROOM); // Auto switch to War Room on success
-    } catch (error) {
+    } catch (error: any) {
       console.error("Analysis failed", error);
-      alert(t('alerts', 'analysisFailed'));
+      const errorKey = mapApiError(error);
+      
+      // If custom error message from validation
+      if (error?.message && error.message.startsWith("FILE_TOO_LARGE")) {
+         showNotify(`${t('uploader', 'fileTooLarge')} (${error.message.split(': ')[1]})`, 'error');
+      } else {
+         showNotify(errorKey, 'error');
+      }
     } finally {
       setAnalyzing(false);
     }
@@ -141,7 +158,7 @@ const AppContent: React.FC = () => {
         }
       }
     });
-    alert(t('alerts', 'demoLoaded'));
+    showNotify('demoLoaded', 'success');
   };
 
   const handleTriageComplete = (ctx: CaseContext, result: TriageResult) => {
@@ -183,7 +200,7 @@ const AppContent: React.FC = () => {
       
       try {
         localStorage.setItem(SAVE_KEY, json);
-        alert(t('alerts', 'saveSuccess'));
+        showNotify('saveSuccess', 'success');
       } catch (quotaError) {
         // If quota exceeded, try saving without heavy file content (but keep links)
         console.warn("Quota exceeded, saving Lite version.");
@@ -193,11 +210,11 @@ const AppContent: React.FC = () => {
         });
         const liteState = { ...stateToSave, files: liteFiles };
         localStorage.setItem(SAVE_KEY, JSON.stringify(liteState));
-        alert(t('alerts', 'saveLite'));
+        showNotify('saveLite', 'success');
       }
     } catch (err) {
       console.error("Save failed:", err);
-      alert(t('alerts', 'saveFail'));
+      showNotify('saveFail', 'error');
     }
   };
 
@@ -205,7 +222,7 @@ const AppContent: React.FC = () => {
     try {
       const json = localStorage.getItem(SAVE_KEY);
       if (!json) {
-        alert(t('alerts', 'noSavedCase'));
+        showNotify('noSavedCase', 'error');
         return;
       }
       const state = JSON.parse(json);
@@ -237,10 +254,10 @@ const AppContent: React.FC = () => {
         setFiles(restoredFiles);
       }
       
-      alert(t('alerts', 'loadSuccess'));
+      showNotify('loadSuccess', 'success');
     } catch (err) {
       console.error("Load failed:", err);
-      alert(t('alerts', 'loadFail'));
+      showNotify('loadFail', 'error');
     }
   };
 
@@ -257,6 +274,21 @@ const AppContent: React.FC = () => {
       user={user}
       onLogout={handleLogout}
     >
+      {/* GLOBAL NOTIFICATION BANNER */}
+      {notification && (
+        <div className={`fixed top-4 left-1/2 -translate-x-1/2 z-50 px-6 py-3 rounded-sm shadow-2xl border flex items-center gap-3 animate-in fade-in slide-in-from-top-4 duration-300 ${
+            notification.type === 'success' ? 'bg-slate-900 border-green-600 text-green-400' : 'bg-slate-900 border-red-600 text-red-400'
+        }`}>
+            {notification.type === 'success' ? (
+                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
+            ) : (
+                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+            )}
+            <span className="font-bold text-sm tracking-wide uppercase">{notification.message}</span>
+            <button onClick={() => setNotification(null)} className="ml-2 hover:text-white"><svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg></button>
+        </div>
+      )}
+
       {currentMode === AppMode.TRIAGE && (
         <Triage onComplete={handleTriageComplete} />
       )}
@@ -281,21 +313,17 @@ const AppContent: React.FC = () => {
           onLoadDemo={handleLoadDemo}
         />
       )}
-      {currentMode === AppMode.CHAT && (
-        <ChatInterface 
-          files={files} 
-          onFilesAdded={handleFilesAdded}
-          onLinkAdded={handleLinkAdded}
-        />
-      )}
       {currentMode === AppMode.LIVE_STRATEGY && (
         <LiveSession />
       )}
       {currentMode === AppMode.FORMS && (
-        <FormsLibrary />
+        <FormsLibrary files={files} onFilesAdded={handleFilesAdded} />
       )}
       {currentMode === AppMode.JUVENILE && (
         <JuvenileJustice />
+      )}
+      {currentMode === AppMode.TRAFFIC && (
+        <TrafficDefense />
       )}
       {currentMode === AppMode.HELP && (
         <Help />

@@ -5,100 +5,69 @@
 ---
 
 ## 1. Executive Summary
-**JusticeAlly** is a high-fidelity legal navigation platform designed to bridge the "Access to Justice" gap. It functions not just as a chatbot, but as a **Senior Litigation Strategist** for Self-Represented Litigants (formerly "Pro Se") and a **Force Multiplier** for Junior Attorneys.
+**JusticeAlly** represents a paradigm shift in legal technology. It is not a generic chatbot; it is a **Structured Litigation Environment**. It addresses the "Justice Gap"—where 92% of civil legal needs for low-income Americans go unmet—by providing a "Digital Senior Partner" that guides Self-Represented Litigants (SRLs) through the complexity of the court system.
 
-By combining the reasoning power of **Gemini 3.0 Pro**, the real-time capabilities of **Gemini Live (Native Audio)**, and a strict "Black Letter Law" analytical framework, JusticeAlly moves users from a state of panic to a state of strategic action.
+Leveraging **Gemini 3.0 Pro** for reasoning and **Gemini Live** for voice interaction, JusticeAlly moves users from "Panic" to "Action" through a rigorous, modular workflow.
 
 ---
 
-## 2. User Architecture & Security
-The application features a secure, role-based entry point designed to establish privilege context and intent.
-
-### **Authentication & Roles**
-*   **Dual Login System:**
-    *   **Self-Represented Litigant:** Focuses on education, cost-saving, and procedural guidance.
-    *   **Attorney:** Focuses on rapid evidence review, strategy validation, and case management.
-*   **Session Persistence:** Utilizes LocalStorage to persist user sessions and case data securely within the browser sandbox.
-*   **Encryption Aesthetic:** The UI reinforces trust with "Bank-Level" visual cues and strict data boundaries.
-
-### **Safety Protocols**
-*   **Quick Exit:** A prominent safety button (often required in Domestic Violence cases) instantly redirects the browser to Google Weather.
-*   **Redaction Studio:** An integrated canvas tool allowing users to permanently blackout PII (Personally Identifiable Information) from images *before* they are sent to the AI for analysis.
+## 2. Accessibility & Inclusion (Bilingual Architecture)
+A critical barrier to justice is language. JusticeAlly features a **Deep Localization Engine**.
+*   **English/Spanish Toggle:** Instantly switches the entire UI, including complex legal terminology.
+*   **AI Context Injection:** The AI models are dynamically prompted to reason and respond in the user's selected language, ensuring that strategic advice (not just UI labels) is culturally and linguistically accurate.
+*   **Voice Dictation:** Supports real-time speech-to-text in both languages, allowing users to narrate their facts naturally.
 
 ---
 
 ## 3. Core Modules
 
 ### **Module A: Triage & Intake (The "Risk Test")**
-Before strategizing, the system assesses viability to prevent disastrous self-representation in complex cases.
-*   **Inputs:** Jurisdiction (50 States + Federal), Case Type (including Juvenile Justice), Budget, and Voice-Dictated Statement of Facts.
-*   **AI Assessment Engine (Gemini Flash):**
-    *   **Risk Score:** Green (Go), Yellow (Caution), Red (Stop/Seek Counsel).
-    *   **Wallet Reality Check:** Estimates filing fees, hidden costs (process servers, parking), and compares them against market rates for private counsel.
-    *   **Resource Routing:** Dynamically generates links to local Legal Aid, Bar Associations, and immigration EOIR lists.
+Before strategizing, the system acts as a gatekeeper.
+*   **Suitability Assessment:** Analyzes the case type (e.g., Medical Malpractice vs. Small Claims) to warn users when *not* to go Pro Se.
+*   **Financial Projection:** Calculates estimated filing fees and "hidden" costs (process servers, parking, lost wages) to provide a realistic budget.
 
 ### **Module B: Secure Evidence Vault (The "Docket")**
-A central repository for case assets, replacing the disorganized "Shoebox" method.
-*   **Multi-Modal Ingestion:** Supports PDF, Images, and **Video (MP4/MOV)**.
-*   **Video Understanding:** Leverages **Gemini 3 Pro** to watch bodycam or CCTV footage and extract timeline events.
-*   **External Citations:** Users can attach URLs (news articles, case law) which are injected into the analysis context.
-*   **Relevance Index:** A visual bar chart scoring every piece of evidence (1-10) based on its legal weight regarding the case claims.
-*   **Executive Brief:** Automatically generates a senior-partner level summary of the case status.
+*   **Chain of Custody:** A centralized, secure list of all case assets.
+*   **Redaction Studio:** A built-in canvas tool allowing users to draw black boxes over PII (Personally Identifiable Information) on images *before* AI processing, ensuring privacy compliance.
+*   **Video Analysis:** Utilizing Gemini 3 Pro's multimodal capabilities to analyze video evidence (e.g., dashcam footage) for timeline reconstruction.
 
 ### **Module C: Case Strategy & Planning (The "War Room")**
-The heart of the application, redesigned with a "Senior Partner's Desk" aesthetic.
-*   **Sun Tzu Analysis:** Applies "Art of War" principles to litigation (e.g., "The Empty Fort Strategy" for settlement leverage).
-*   **Black Letter Law Matrix:** A structured table mapping facts to specific legal elements (Duty, Breach, Causation, Damages) and identifying **Affirmative Defenses**.
-*   **Procedural Roadmap:** A timeline view of immediate next steps, statutory deadlines, and discovery tasks.
-*   **Opponent Profiling:** Analyzes opposing counsel's correspondence to determine if they are a "Bully," "Settler," or "Stickler."
-*   **Strategist Notepad:** A persistent memo pad with voice dictation for capturing non-documentary facts.
+*   **Strategic Doctrine:** Maps facts to "Black Letter Law" elements (e.g., proving *Duty, Breach, Causation, Damages* for negligence).
+*   **Opponent Profiling:** Analyzes the tone and content of opposing counsel's letters to suggest counter-tactics (e.g., "The Bully" vs. "The Settler").
+*   **Save/Load State:** Allows users to save their entire case strategy to their local device, preserving privilege without cloud database risks.
 
-### **Module D: Tactical Chat (AI Co-Counsel)**
-A context-aware chat interface for specific legal drafting and research.
-*   **Model:** Powered by **Gemini 3.0 Pro Preview**.
-*   **Research Mode:** Toggles **Google Search Grounding** to fetch real-time case law, statutes, and news verification.
-*   **Wargaming:** A dedicated mode to simulate the opponent's strongest arguments.
-*   **Attachments:** Users can inject new files or links directly into the conversation stream.
-*   **Text-to-Speech (TTS):** Uses **Gemini Flash TTS** to read complex legal advice aloud for accessibility.
+### **Module D: Specialized Justice Hubs**
+JusticeAlly moves beyond generic advice with tailored workflows for high-volume case types:
+*   **Traffic & Defense:** 
+    *   **DUI/DWI:** Checklists for DMV Administrative Hearings (saving licenses) vs. Criminal Court.
+    *   **Accidents:** Guidelines for establishing liability and "Comparative Negligence."
+*   **Juvenile Justice:**
+    *   **Interactive Flows:** Step-by-step guides for Emancipation, Delinquency, and Dependency.
+    *   **GAL Integration:** Explains the critical role of the *Guardian Ad Litem* and the "Best Interest of the Child" standard.
 
-### **Module E: Live Strategy (Voice)**
-A low-latency voice interface for oral argument preparation.
-*   **Tech:** Built on **Gemini Live API (Native Audio)** via WebSockets.
-*   **Function:** Allows users to have a fluid, interruptible conversation with the AI strategist.
-*   **Transcription:** Displays a real-time scrolling transcript of both User input and AI output for record-keeping.
-*   **Visualizer:** Interactive audio wave animation to indicate connection status.
+### **Module E: Forms Library & Repository**
+*   **Official Routing:** Connects users directly to state-specific judicial branch websites for forms (e.g., `courts.ca.gov`).
+*   **My Repository:** A secure local storage system for users to keep their filled forms organized and searchable.
 
-### **Module F: Forms Library**
-A repository of procedural templates.
-*   **State Routing:** Directs users to verified "Self-Help" court portals (avoiding broken deep links).
-*   **Generic Templates:** Provides standard structures for Answers, Fee Waivers, and Motions.
-*   **Juvenile Justice:** Specific section covering Expungement, Emancipation, and Sealing Records.
+### **Module F: Live Strategy (Voice)**
+*   **Simulated Oral Argument:** Users can speak with the AI to practice explaining their case to a judge.
+*   **Tech Stack:** Powered by **Gemini Live API** over WebSockets for ultra-low latency, human-like interruption handling, and emotional nuance.
 
 ---
 
-## 4. Technical Architecture
+## 4. Technical & Privacy Architecture
 
-### **AI Integration (@google/genai)**
-*   **Gemini 3.0 Pro Preview:** Used for "Deep Reasoned" tasks (Case Analysis, Video Understanding, Complex Chat).
-*   **Gemini 2.5 Flash:** Used for high-speed tasks (Triage JSON generation, Search Grounding).
-*   **Gemini Live (Native Audio):** Handles the WebSocket voice sessions.
-*   **Gemini TTS:** Handles text-to-speech synthesis.
+### **Client-Side Sovereignty**
+JusticeAlly is engineered for **Maximum Privacy**.
+*   **No Backend Database:** User data, case files, and strategies are stored exclusively in the browser's `LocalStorage`.
+*   **Ephemeral AI Analysis:** Data is sent to the Gemini API *only* for the duration of the analysis request and is not used to train models (via paid tier enterprise privacy standards).
 
 ### **Frontend Engineering**
 *   **Framework:** React 19 + TypeScript.
-*   **Styling:** TailwindCSS with a custom "Legal Docket" theme (Slate-950, Amber-600, Merriweather Serif).
-*   **State Management:** LocalStorage for Save/Load functionality, ensuring data stays on the client side.
-*   **Audio Processing:** Web Audio API for PCM encoding/decoding required by the Live API.
-
-### **UI/UX Design Language**
-*   **"The Docket":** Shifted from rounded tech-startup UI to sharp, double-bordered legal stationary aesthetics.
-*   **Typography:** Merriweather (Serif) for authority; Inter (Sans) for readability.
-*   **Iconography:** Custom SVG "Scales of Justice" branding and informative tooltips throughout.
+*   **Design System:** "Legal Docket" aesthetic using TailwindCSS (Slate-950, Merriweather Serif) to convey authority and reduce user anxiety.
+*   **Robust Error Handling:** Custom notification banners and graceful degradation for network or API interruptions.
 
 ---
 
-## 5. Disclaimer & Ethics
-JusticeAlly includes hard-coded guardrails:
-*   **Unauthorized Practice of Law (UPL):** Every output is stamped with a disclaimer that AI is not an attorney.
-*   **Hallucination Prevention:** The System Prompt explicitly instructs the model to refuse inventing case law and to prioritize official sources.
-*   **Privacy:** All analysis happens via API with no persistent cloud storage on our end (client-side persistence only).
+## 5. Conclusion
+JusticeAlly is not just a tool; it is an **Access to Justice** intervention. By combining the empathy of user-centric design with the raw intellectual power of Google's Gemini models, it empowers the unrepresented to navigate the complex machinery of the law with dignity and strategy.

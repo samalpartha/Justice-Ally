@@ -8,14 +8,58 @@ interface FileUploaderProps {
   onLinkAdded?: (link: UploadedFile) => void;
 }
 
+const MAX_FILE_SIZE_MB = 20;
+
 const FileUploader: React.FC<FileUploaderProps> = ({ onFilesSelected, onLinkAdded }) => {
   const { t } = useLanguage();
   const [url, setUrl] = useState('');
   const [linkName, setLinkName] = useState('');
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [recentUploads, setRecentUploads] = useState<{name: string, date: string}[]>(() => {
+      const saved = localStorage.getItem('recent_uploads');
+      return saved ? JSON.parse(saved) : [];
+  });
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setErrorMsg(null);
     if (e.target.files && e.target.files.length > 0) {
-      onFilesSelected(Array.from(e.target.files));
+      // Explicitly type the array to avoid 'unknown' inference
+      const selected: File[] = Array.from(e.target.files);
+      
+      // Validate
+      const validFiles: File[] = [];
+      let error = "";
+
+      for (const file of selected) {
+          if (file.size > MAX_FILE_SIZE_MB * 1024 * 1024) {
+              error = `${t('uploader', 'fileTooLarge')} (${file.name})`;
+              continue;
+          }
+          if (!['application/pdf', 'image/jpeg', 'image/png', 'video/mp4', 'video/quicktime', 'video/webm'].includes(file.type)) {
+              // Note: Quicktime is .mov
+              if (!file.name.endsWith('.mov')) { // basic fallback check
+                 error = `${t('uploader', 'unsupportedType')} (${file.name})`;
+                 continue;
+              }
+          }
+          validFiles.push(file);
+      }
+
+      if (error) {
+          setErrorMsg(error);
+      }
+
+      if (validFiles.length > 0) {
+          onFilesSelected(validFiles);
+          
+          // Update Recent History
+          const newHistory = [
+              ...validFiles.map(f => ({ name: f.name, date: new Date().toLocaleDateString() })),
+              ...recentUploads
+          ].slice(0, 5);
+          setRecentUploads(newHistory);
+          localStorage.setItem('recent_uploads', JSON.stringify(newHistory));
+      }
     }
   };
 
@@ -35,13 +79,14 @@ const FileUploader: React.FC<FileUploaderProps> = ({ onFilesSelected, onLinkAdde
   return (
     <div className="w-full space-y-6">
       {/* File Dropzone */}
-      <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-slate-800 border-dashed rounded-sm cursor-pointer bg-slate-950 hover:bg-slate-900 hover:border-amber-600 transition-all group" title="Drag and drop or click to select files. Supports PDF, Images, and Video.">
+      <label className={`flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-sm cursor-pointer transition-all group ${errorMsg ? 'border-red-500 bg-red-950/10' : 'border-slate-800 bg-slate-950 hover:bg-slate-900 hover:border-amber-600'}`} title="Drag and drop or click to select files. Supports PDF, Images, and Video.">
         <div className="flex flex-col items-center justify-center pt-5 pb-6">
-          <svg className="w-8 h-8 mb-3 text-slate-500 group-hover:text-amber-600 transition-colors" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 16">
+          <svg className={`w-8 h-8 mb-3 transition-colors ${errorMsg ? 'text-red-500' : 'text-slate-500 group-hover:text-amber-600'}`} aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 16">
             <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2"/>
           </svg>
-          <p className="mb-1 text-sm text-slate-400 font-serif"><span className="font-bold text-slate-200 group-hover:text-amber-500">{t('uploader', 'dropzoneMain')}</span> {t('uploader', 'dropzoneSub')}</p>
+          <p className="mb-1 text-sm text-slate-400 font-serif"><span className={`font-bold ${errorMsg ? 'text-red-400' : 'text-slate-200 group-hover:text-amber-500'}`}>{t('uploader', 'dropzoneMain')}</span> {t('uploader', 'dropzoneSub')}</p>
           <p className="text-[10px] text-slate-600 uppercase tracking-widest font-bold">{t('uploader', 'formats')}</p>
+          {errorMsg && <p className="text-[10px] text-red-500 font-bold uppercase mt-2 bg-red-950/50 px-2 py-1 border border-red-900 rounded">{errorMsg}</p>}
         </div>
         <input 
           type="file" 
@@ -51,6 +96,21 @@ const FileUploader: React.FC<FileUploaderProps> = ({ onFilesSelected, onLinkAdde
           onChange={handleFileChange}
         />
       </label>
+
+      {/* Recent Uploads (Local History) */}
+      {recentUploads.length > 0 && (
+          <div className="px-4">
+              <p className="text-[9px] text-slate-500 font-bold uppercase tracking-widest mb-2">Recent Session Uploads</p>
+              <ul className="space-y-1">
+                  {recentUploads.map((file, idx) => (
+                      <li key={idx} className="flex justify-between text-xs text-slate-400 font-mono border-b border-slate-800/50 pb-1">
+                          <span className="truncate max-w-[200px]">{file.name}</span>
+                          <span className="text-slate-600">{file.date}</span>
+                      </li>
+                  ))}
+              </ul>
+          </div>
+      )}
 
       {/* OR Divider */}
       <div className="flex items-center gap-4">

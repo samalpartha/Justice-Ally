@@ -1,7 +1,6 @@
-
 import React, { useState, useRef, useEffect } from 'react';
 import { ChatMessage, UploadedFile } from '../types';
-import { sendChatMessage, textToSpeech } from '../services/geminiService';
+import { sendChatMessage, textToSpeech, decodeAudio } from '../services/geminiService';
 import { GenerateContentResponse } from '@google/genai';
 import DictationButton from './DictationButton';
 import { useLanguage } from '../context/LanguageContext';
@@ -141,8 +140,23 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ files, onFilesAdded, onLi
   const playTTS = async (text: string) => {
     try {
       const base64Audio = await textToSpeech(text);
-      const audio = new Audio(`data:audio/mp3;base64,${base64Audio}`);
-      audio.play();
+      if (!base64Audio) return;
+
+      const audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)({sampleRate: 24000});
+      const audioBytes = decodeAudio(base64Audio);
+      
+      const buffer = audioCtx.createBuffer(1, audioBytes.length / 2, 24000);
+      const channel = buffer.getChannelData(0);
+      const int16 = new Int16Array(audioBytes.buffer);
+      for (let i = 0; i < int16.length; i++) {
+        channel[i] = int16[i] / 32768.0;
+      }
+      
+      const source = audioCtx.createBufferSource();
+      source.buffer = buffer;
+      source.connect(audioCtx.destination);
+      source.start();
+
     } catch (e) {
       console.error("TTS Failed", e);
       alert("Could not generate speech.");

@@ -18,6 +18,7 @@ const WarRoom: React.FC<WarRoomProps> = ({ caseData, onFilesAdded, onLinkAdded, 
   const [showLinkInput, setShowLinkInput] = useState(false);
   const [linkUrl, setLinkUrl] = useState('');
   const [linkName, setLinkName] = useState('');
+  const [saveStatus, setSaveStatus] = useState<string>('');
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0 && onFilesAdded) {
@@ -37,6 +38,12 @@ const WarRoom: React.FC<WarRoomProps> = ({ caseData, onFilesAdded, onLinkAdded, 
       setLinkUrl('');
       setLinkName('');
     }
+  };
+
+  const handleManualSave = () => {
+    // Visual feedback simulation since data is auto-synced to App state
+    setSaveStatus('SAVED TO VAULT');
+    setTimeout(() => setSaveStatus(''), 2000);
   };
 
   const EmptyState = () => (
@@ -89,7 +96,7 @@ const WarRoom: React.FC<WarRoomProps> = ({ caseData, onFilesAdded, onLinkAdded, 
                <button
                  onClick={() => setShowLinkInput(!showLinkInput)}
                  className="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-slate-300 text-[10px] font-bold uppercase rounded-sm border border-slate-700 flex items-center gap-2 transition-colors tracking-wider"
-                 title="Add an external URL (Case Law, News Article) to the strategy context."
+                 title="Add Citation"
                >
                  <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" /></svg>
                  {t('warroom', 'addCitation')}
@@ -120,7 +127,7 @@ const WarRoom: React.FC<WarRoomProps> = ({ caseData, onFilesAdded, onLinkAdded, 
             <button 
               onClick={() => fileInputRef.current?.click()}
               className="px-4 py-2 bg-amber-700 hover:bg-amber-600 text-white text-[10px] font-bold uppercase rounded-sm border border-amber-600 flex items-center gap-2 transition-colors tracking-wider shadow-lg"
-              title="Upload new evidence directly to this view."
+              title="Quick Add Evidence"
             >
               <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /></svg>
               {t('warroom', 'quickAdd')}
@@ -150,15 +157,27 @@ const WarRoom: React.FC<WarRoomProps> = ({ caseData, onFilesAdded, onLinkAdded, 
               placeholder={t('warroom', 'memoPlaceholder')}
               className="w-full bg-slate-950/50 text-slate-200 text-sm p-6 outline-none min-h-[120px] resize-none font-serif leading-7"
             />
+            {/* Save Entry Button */}
+            <div className="px-6 pb-4 bg-slate-950/50 border-t border-slate-800/50 flex justify-between items-center">
+                <span className={`text-[10px] font-bold uppercase tracking-widest transition-opacity duration-300 ${saveStatus ? 'text-green-500 opacity-100' : 'opacity-0'}`}>
+                  {saveStatus}
+                </span>
+                <button 
+                  onClick={handleManualSave}
+                  className="text-[10px] font-bold uppercase bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white px-4 py-2 rounded-sm border border-slate-700 hover:border-slate-500 transition-all shadow-md active:transform active:scale-95 flex items-center gap-2"
+                >
+                  <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" /></svg>
+                  SAVE ENTRY
+                </button>
+            </div>
           </div>
 
           {!caseData || !caseData.strategy ? (
              <EmptyState />
           ) : (
             <>
-              {/* Executive Strategy Tier */}
+              {/* Strategy Content Renders Here */}
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                {/* Core Theory */}
                 <div className="lg:col-span-2 bg-slate-900 rounded-sm border-l-4 border-amber-600 p-8 shadow-md relative overflow-hidden">
                    <div className="absolute top-0 right-0 p-8 opacity-5 pointer-events-none">
                       <svg className="w-32 h-32 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zm0 9l2.5-1.25L12 8.5l-2.5 1.25L12 11zm0 2.5l-5-2.5-5 2.5 10 5 10-5-5-2.5-5 2.5z"/></svg>
@@ -182,7 +201,6 @@ const WarRoom: React.FC<WarRoomProps> = ({ caseData, onFilesAdded, onLinkAdded, 
                    </div>
                 </div>
 
-                {/* Opponent Profile */}
                 <div className="bg-slate-900 rounded-sm border border-slate-800 p-6 shadow-md flex flex-col">
                   <h3 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-4 flex items-center gap-2 border-b border-slate-800 pb-2">
                     <svg className="w-4 h-4 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
@@ -196,7 +214,6 @@ const WarRoom: React.FC<WarRoomProps> = ({ caseData, onFilesAdded, onLinkAdded, 
                 </div>
               </div>
 
-              {/* Claims Matrix (Black Letter Law) */}
               <div className="bg-slate-900 rounded-sm border border-slate-800 shadow-md overflow-hidden">
                 <div className="px-6 py-4 border-b border-slate-800 bg-slate-950 flex justify-between items-center">
                   <h3 className="text-sm font-serif font-bold text-slate-200 flex items-center gap-2">
@@ -205,7 +222,7 @@ const WarRoom: React.FC<WarRoomProps> = ({ caseData, onFilesAdded, onLinkAdded, 
                   <div className="flex gap-2">
                     {caseData.strategy.blackLetter.affirmativeDefenses.map((def, idx) => (
                         <span key={idx} className="text-[9px] bg-slate-900 border border-slate-700 text-slate-400 px-2 py-1 uppercase tracking-wider font-bold rounded-sm">
-                          Defense: {def}
+                          {def}
                         </span>
                     ))}
                   </div>
@@ -246,19 +263,16 @@ const WarRoom: React.FC<WarRoomProps> = ({ caseData, onFilesAdded, onLinkAdded, 
                 </div>
               </div>
 
-              {/* Procedural Roadmap */}
               <div className="grid md:grid-cols-2 gap-8">
                 <div className="bg-slate-900 rounded-sm border border-slate-800 p-6 shadow-md">
                   <h3 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-4 flex items-center gap-2 border-b border-slate-800 pb-2">
                     <svg className="w-4 h-4 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
                     {t('warroom', 'deadlines')}
                   </h3>
-                  
                   <div className="bg-blue-950/10 border-l-2 border-blue-500 p-4 mb-6">
                      <span className="block text-[9px] text-blue-500 uppercase font-bold mb-1">{t('warroom', 'immediateAction')}</span>
                      <p className="text-sm text-slate-200 font-serif font-medium">{caseData.strategy.procedural.nextStep}</p>
                   </div>
-
                   <ul className="space-y-3">
                     {caseData.strategy.procedural.deadlines.map((d, i) => (
                       <li key={i} className="flex items-center gap-3 text-xs text-slate-300 font-mono border-b border-slate-800/50 pb-2 last:border-0">
@@ -267,7 +281,6 @@ const WarRoom: React.FC<WarRoomProps> = ({ caseData, onFilesAdded, onLinkAdded, 
                     ))}
                   </ul>
                 </div>
-
                 <div className="bg-slate-900 rounded-sm border border-slate-800 p-6 shadow-md">
                   <h3 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-4 flex items-center gap-2 border-b border-slate-800 pb-2">
                     <svg className="w-4 h-4 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>

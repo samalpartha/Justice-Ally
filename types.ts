@@ -90,11 +90,11 @@ export enum AppMode {
   TRIAGE = 'TRIAGE',
   DASHBOARD = 'DASHBOARD',
   WAR_ROOM = 'WAR_ROOM',
-  CHAT = 'CHAT',
   LIVE_STRATEGY = 'LIVE_STRATEGY',
   FORMS = 'FORMS',
   HELP = 'HELP',
   JUVENILE = 'JUVENILE',
+  TRAFFIC = 'TRAFFIC',
 }
 
 export type Language = 'en' | 'es';
