@@ -10,6 +10,7 @@ import FormsLibrary from './components/FormsLibrary';
 import JuvenileJustice from './components/JuvenileJustice';
 import TrafficDefense from './components/TrafficDefense';
 import Login from './components/Login';
+import AboutModal from './components/AboutModal';
 import { AppMode, UploadedFile, CaseData, CaseContext, TriageResult, UserProfile, UserRole } from './types';
 import { analyzeCaseFiles, fileToBase64, base64ToFile, mapApiError } from './services/geminiService';
 import { useLanguage } from './context/LanguageContext';
@@ -29,6 +30,7 @@ const AppContent: React.FC = () => {
   const [analyzing, setAnalyzing] = useState(false);
   const [caseContext, setCaseContext] = useState<CaseContext | undefined>();
   const [triageResult, setTriageResult] = useState<TriageResult | null>(null);
+  const [showAbout, setShowAbout] = useState(false);
   
   // Notification System
   const [notification, setNotification] = useState<{message: string, type: 'success' | 'error'} | null>(null);
@@ -69,11 +71,12 @@ const AppContent: React.FC = () => {
   };
 
   const handleFilesAdded = (newFiles: File[]) => {
-    const uploaded: UploadedFile[] = newFiles.map(f => ({
+    const uploaded = newFiles.map(file => ({
       id: Math.random().toString(36).substr(2, 9),
-      file: f,
-      name: f.name,
-      type: f.type
+      file,
+      name: file.name,
+      type: file.type,
+      previewUrl: URL.createObjectURL(file)
     }));
     setFiles(prev => [...prev, ...uploaded]);
   };
@@ -83,194 +86,120 @@ const AppContent: React.FC = () => {
   };
 
   const handleFileUpdated = (updatedFile: UploadedFile) => {
-    setFiles(prev => prev.map(f => f.id === updatedFile.id ? updatedFile : f));
+      setFiles(prev => prev.map(f => f.id === updatedFile.id ? updatedFile : f));
   };
 
-  const handleAnalyze = async (description: string) => {
+  const handleFileDeleted = (fileId: string) => {
+    setFiles(prev => prev.filter(f => f.id !== fileId));
+    showNotify(t('common', 'delete') + " Successful", "success");
+  };
+
+  const handleAnalyze = async (desc: string) => {
+    if (!files.length && !desc) return;
     setAnalyzing(true);
+    
+    // Update context description if changed
+    if (caseContext && desc !== caseContext.description) {
+        setCaseContext({ ...caseContext, description: desc });
+    }
+
     try {
-      const result = await analyzeCaseFiles(files, description, language, caseContext);
-      setCaseData(result);
-      setMode(AppMode.WAR_ROOM); // Auto switch to War Room on success
+      const data = await analyzeCaseFiles(files, desc, language, caseContext);
+      setCaseData(data);
+      showNotify("Analysis Complete", "success");
+      setMode(AppMode.WAR_ROOM); // Auto-navigate to strategy
     } catch (error: any) {
-      console.error("Analysis failed", error);
+      console.error(error);
       const errorKey = mapApiError(error);
-      
-      // If custom error message from validation
-      if (error?.message && error.message.startsWith("FILE_TOO_LARGE")) {
-         showNotify(`${t('uploader', 'fileTooLarge')} (${error.message.split(': ')[1]})`, 'error');
-      } else {
-         showNotify(errorKey, 'error');
-      }
+      showNotify(errorKey, "error");
     } finally {
       setAnalyzing(false);
     }
   };
 
-  const handleUpdateNotes = (notes: string) => {
-    setCaseData(prev => prev ? { ...prev, notes } : { 
-      caseSummary: '', 
-      notes, 
-      documents: [], 
-      strategy: null, 
-      analyzed: false 
-    });
-  };
-
-  const handleLoadDemo = () => {
-    setCaseContext({
-      jurisdiction: 'New York',
-      caseType: 'Landlord/Tenant',
-      budget: 'Low Income',
-      description: 'Eviction notice received for non-payment due to lack of repairs (heating).'
-    });
-    
-    setCaseData({
-      analyzed: true,
-      caseSummary: "The tenant faces eviction for non-payment of rent but has a strong defense under the Warranty of Habitability due to documented lack of heating. The strategy focuses on withholding rent into an escrow account and filing a counterclaim for rent abatement.",
-      notes: "Client mentioned Landlord called on June 12th threatening to 'throw things on the street'. Need to verify if witness was present.",
-      timeline: [
-        { date: "2023-01-15", event: "Heating system failure reported to Landlord via text.", type: "fact" },
-        { date: "2023-02-10", event: "Follow-up email regarding cold temperatures (45°F indoors).", type: "comm" },
-        { date: "2023-03-01", event: "Tenant withheld rent and notified Landlord of escrow account.", type: "fact" },
-        { date: "2023-07-15", event: "3-Day Notice to Quit received via mail (Improper Service).", type: "filing" }
-      ],
-      entities: [
-        { name: "John Smith (Landlord)", role: "Plaintiff" },
-        { name: "Alex Citizen (Tenant)", role: "Defendant" },
-        { name: "NYC Housing Court", role: "Court" }
-      ],
-      documents: [
-        { fileName: "Eviction_Notice_July.pdf", relevanceScore: 10, summary: "3-Day Notice to Quit demanding $2,400.", redFlags: ["Service was by mail only, not personal delivery"], docType: "Legal Notice", date: "2023-07-15" },
-        { fileName: "Email_Thread_Heating.pdf", relevanceScore: 9, summary: "Thread showing 4 requests for heat repair between Jan-March.", redFlags: [], docType: "Evidence", date: "2023-02-10" }
-      ],
-      strategy: {
-        sunTzu: {
-          strategyName: "The Empty Fort",
-          quote: "Appear weak when you are strong, and strong when you are weak.",
-          application: "Do not aggressively fight the initial notice. Allow them to file. Once in court, present the 'Warranty of Habitability' evidence (heating emails) to blindside them with a counterclaim, forcing a settlement.",
-          opponentProfile: "The Landlord appears disorganized and is cutting corners on procedure (service by mail). Likely to settle if faced with legal complexity."
-        },
-        blackLetter: {
-          claimElements: [
-            { element: "Landlord-Tenant Relationship", evidence: "Lease Agreement", status: "strong" },
-            { element: "Non-Payment of Rent", evidence: "Admitted by Tenant", status: "weak" },
-            { element: "Warranty of Habitability", evidence: "Email thread regarding broken heater", status: "strong" }
-          ],
-          affirmativeDefenses: ["Breach of Warranty of Habitability", "Improper Service of Process", "Retaliatory Eviction"]
-        },
-        procedural: {
-          nextStep: "File 'Answer' with Counterclaims within 5 days of court service.",
-          discoveryQuestions: [
-            "Produce all maintenance records for the heating unit for the last 2 years.",
-            "Did you obtain a certificate of occupancy for the basement unit?"
-          ],
-          deadlines: ["Answer due: Aug 20th", "Court Hearing: Sept 5th"]
-        }
-      }
-    });
-    setMode(AppMode.DASHBOARD);
-    showNotify('demoLoaded', 'success');
-  };
-
-  const handleTriageComplete = (ctx: CaseContext, result: TriageResult) => {
-    setCaseContext(ctx);
-    setTriageResult(result);
-    setMode(AppMode.DASHBOARD);
-  };
-
-  const saveCase = async () => {
+  // --- SAVE / LOAD SYSTEM ---
+  const handleSaveState = async () => {
     try {
-      // 1. Convert files to base64 for storage
-      const serializedFiles = await Promise.all(files.map(async (f) => {
-        if (f.type === 'link') return f; // Links are simple objects, return as is
-        
-        if (f.base64) return { ...f, file: null }; // Already have base64
-        if (f.file) {
-          const b64 = await fileToBase64(f.file);
-          return {
-            id: f.id,
-            name: f.name,
-            type: f.type,
-            base64: b64,
-            file: null 
-          };
+        // Convert Files to Base64 for storage
+        const serializableFiles = await Promise.all(files.map(async f => {
+            if (f.type === 'link') return f;
+            if (f.file) {
+               try {
+                   const b64 = await fileToBase64(f.file);
+                   return { ...f, file: undefined, base64: b64, previewUrl: undefined };
+               } catch (e) {
+                   console.error("File skip", e);
+                   return null; 
+               }
+            }
+            return f;
+        }));
+
+        const state = {
+            files: serializableFiles.filter(f => f !== null),
+            caseData,
+            caseContext,
+            triageResult,
+            timestamp: Date.now()
+        };
+
+        try {
+            localStorage.setItem(SAVE_KEY, JSON.stringify(state));
+            showNotify('saveSuccess', 'success');
+        } catch (e) {
+            // Quota exceeded fallback
+            const liteState = {
+                ...state,
+                files: state.files.filter((f: any) => f.type === 'link') // Only save links
+            };
+            localStorage.setItem(SAVE_KEY, JSON.stringify(liteState));
+            showNotify('saveLite', 'success');
         }
-        return f;
-      }));
+    } catch (e) {
+        console.error(e);
+        showNotify('saveFail', 'error');
+    }
+  };
 
-      const stateToSave = {
-        timestamp: Date.now(),
-        currentMode,
-        caseContext,
-        triageResult,
-        caseData,
-        files: serializedFiles
-      };
-
-      const json = JSON.stringify(stateToSave);
-      
+  const handleLoadState = () => {
+      const saved = localStorage.getItem(SAVE_KEY);
+      if (!saved) {
+          showNotify('noSavedCase', 'error');
+          return;
+      }
       try {
-        localStorage.setItem(SAVE_KEY, json);
-        showNotify('saveSuccess', 'success');
-      } catch (quotaError) {
-        // If quota exceeded, try saving without heavy file content (but keep links)
-        console.warn("Quota exceeded, saving Lite version.");
-        const liteFiles = serializedFiles.map(f => {
-          if (f.type === 'link') return f;
-          return { ...f, base64: undefined };
-        });
-        const liteState = { ...stateToSave, files: liteFiles };
-        localStorage.setItem(SAVE_KEY, JSON.stringify(liteState));
-        showNotify('saveLite', 'success');
+          const state = JSON.parse(saved);
+          
+          // Rehydrate Files
+          const rehydratedFiles = state.files.map((f: any) => {
+              if (f.base64) {
+                  const fileObj = base64ToFile(f.base64, f.name, f.type);
+                  return { ...f, file: fileObj, previewUrl: URL.createObjectURL(fileObj) };
+              }
+              return f;
+          });
+
+          setFiles(rehydratedFiles);
+          setCaseData(state.caseData);
+          setCaseContext(state.caseContext);
+          setTriageResult(state.triageResult);
+          showNotify('loadSuccess', 'success');
+          setMode(AppMode.DASHBOARD);
+      } catch (e) {
+          console.error(e);
+          showNotify('loadFail', 'error');
       }
-    } catch (err) {
-      console.error("Save failed:", err);
-      showNotify('saveFail', 'error');
-    }
   };
 
-  const loadCase = () => {
-    try {
-      const json = localStorage.getItem(SAVE_KEY);
-      if (!json) {
-        showNotify('noSavedCase', 'error');
-        return;
-      }
-      const state = JSON.parse(json);
-
-      // Restore Mode & Data
-      if (state.currentMode) setMode(state.currentMode);
-      if (state.caseContext) setCaseContext(state.caseContext);
-      if (state.triageResult) setTriageResult(state.triageResult);
-      if (state.caseData) setCaseData(state.caseData);
-
-      // Restore Files
-      if (state.files && Array.isArray(state.files)) {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const restoredFiles = state.files.map((f: any) => {
-          if (f.type === 'link') return f; // Return links as is
-
-          let fileObj: File;
-          if (f.base64) {
-             fileObj = base64ToFile(f.base64, f.name, f.type);
-          } else {
-             fileObj = new File([""], f.name, { type: f.type });
-          }
-          return {
-            ...f,
-            file: fileObj,
-            base64: f.base64
-          } as UploadedFile;
-        });
-        setFiles(restoredFiles);
-      }
-      
-      showNotify('loadSuccess', 'success');
-    } catch (err) {
-      console.error("Load failed:", err);
-      showNotify('loadFail', 'error');
-    }
+  const loadDemoData = () => {
+      // Pre-fill with sample Landlord/Tenant data
+      setCaseContext({
+          jurisdiction: 'California',
+          caseType: 'Landlord/Tenant',
+          budget: 'Low',
+          description: 'Eviction defense for non-payment due to habitability issues (broken heater).'
+      });
+      showNotify('demoLoaded', 'success');
   };
 
   if (!user) {
@@ -280,73 +209,71 @@ const AppContent: React.FC = () => {
   return (
     <Layout 
       currentMode={currentMode} 
-      setMode={setMode}
-      onSave={saveCase}
-      onLoad={loadCase}
+      setMode={setMode} 
+      onSave={handleSaveState} 
+      onLoad={handleLoadState}
       user={user}
       onLogout={handleLogout}
+      onShowAbout={() => setShowAbout(true)}
     >
-      {/* GLOBAL NOTIFICATION BANNER */}
+      {showAbout && <AboutModal onClose={() => setShowAbout(false)} />}
+      
+      {/* Toast Notification */}
       {notification && (
-        <div className={`fixed top-4 left-1/2 -translate-x-1/2 z-50 px-6 py-3 rounded-sm shadow-2xl border flex items-center gap-3 animate-in fade-in slide-in-from-top-4 duration-300 ${
-            notification.type === 'success' ? 'bg-slate-900 border-green-600 text-green-400' : 'bg-slate-900 border-red-600 text-red-400'
-        }`}>
-            {notification.type === 'success' ? (
-                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
-            ) : (
-                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-            )}
-            <span className="font-bold text-sm tracking-wide uppercase">{notification.message}</span>
-            <button onClick={() => setNotification(null)} className="ml-2 hover:text-white"><svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg></button>
-        </div>
+          <div className={`fixed top-4 right-4 z-[100] px-6 py-4 rounded-sm shadow-2xl border-l-4 flex items-center gap-3 animate-in fade-in slide-in-from-top-2 ${notification.type === 'success' ? 'bg-slate-900 border-green-500 text-green-400' : 'bg-slate-900 border-red-500 text-red-400'}`}>
+              {notification.type === 'success' ? (
+                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
+              ) : (
+                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+              )}
+              <span className="font-bold text-xs uppercase tracking-wide">{notification.message}</span>
+          </div>
       )}
 
       {currentMode === AppMode.TRIAGE && (
-        <Triage onComplete={handleTriageComplete} />
+        <Triage onComplete={(ctx, res) => {
+            setCaseContext(ctx);
+            setTriageResult(res);
+            setMode(AppMode.DASHBOARD);
+        }} />
       )}
+      
       {currentMode === AppMode.DASHBOARD && (
         <Dashboard 
           files={files} 
           onFilesAdded={handleFilesAdded}
           onLinkAdded={handleLinkAdded}
           onFileUpdated={handleFileUpdated}
+          onFileDeleted={handleFileDeleted}
           caseData={caseData}
           analyzing={analyzing}
           onAnalyze={handleAnalyze}
           context={caseContext}
-          onLoadDemo={handleLoadDemo}
+          onLoadDemo={loadDemoData}
         />
       )}
+
       {currentMode === AppMode.WAR_ROOM && (
         <WarRoom 
-          caseData={caseData} 
-          onFilesAdded={handleFilesAdded}
-          onLinkAdded={handleLinkAdded}
-          onNotesChange={handleUpdateNotes}
-          onLoadDemo={handleLoadDemo}
+           caseData={caseData} 
+           onFilesAdded={handleFilesAdded}
+           onLinkAdded={handleLinkAdded}
+           onNotesChange={(notes) => setCaseData(prev => prev ? {...prev, notes} : null)}
+           onLoadDemo={loadDemoData}
         />
       )}
-      {currentMode === AppMode.LIVE_STRATEGY && (
-        <LiveSession />
-      )}
-      {currentMode === AppMode.FORMS && (
-        <FormsLibrary files={files} onFilesAdded={handleFilesAdded} />
-      )}
-      {currentMode === AppMode.JUVENILE && (
-        <JuvenileJustice />
-      )}
-      {currentMode === AppMode.TRAFFIC && (
-        <TrafficDefense />
-      )}
-      {currentMode === AppMode.HELP && (
-        <Help />
-      )}
+
+      {currentMode === AppMode.LIVE_STRATEGY && <LiveSession />}
+      {currentMode === AppMode.FORMS && <FormsLibrary files={files} onFilesAdded={handleFilesAdded} />}
+      {currentMode === AppMode.JUVENILE && <JuvenileJustice />}
+      {currentMode === AppMode.TRAFFIC && <TrafficDefense />}
+      {currentMode === AppMode.HELP && <Help />}
     </Layout>
   );
 };
 
 const App: React.FC = () => {
-    return <AppContent />;
+  return <AppContent />;
 };
 
 export default App;

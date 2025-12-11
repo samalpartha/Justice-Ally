@@ -60,23 +60,23 @@ export const RedactionTool: React.FC<RedactionToolProps> = ({ file, onSave, onCa
     });
   };
 
-  const getPos = (e: React.MouseEvent) => {
+  const getPos = (clientX: number, clientY: number) => {
     if (!canvasRef.current) return { x: 0, y: 0 };
     const rect = canvasRef.current.getBoundingClientRect();
     const scaleX = canvasRef.current.width / rect.width;
     const scaleY = canvasRef.current.height / rect.height;
     return {
-      x: (e.clientX - rect.left) * scaleX,
-      y: (e.clientY - rect.top) * scaleY
+      x: (clientX - rect.left) * scaleX,
+      y: (clientY - rect.top) * scaleY
     };
   };
 
-  const startDrawing = (e: React.MouseEvent) => {
+  const handleStart = (clientX: number, clientY: number) => {
     setIsDrawing(true);
-    setStartPos(getPos(e));
+    setStartPos(getPos(clientX, clientY));
   };
 
-  const draw = (e: React.MouseEvent) => {
+  const handleMove = (clientX: number, clientY: number) => {
     if (!isDrawing || !canvasRef.current || !image) return;
     
     // Redraw base state
@@ -85,7 +85,7 @@ export const RedactionTool: React.FC<RedactionToolProps> = ({ file, onSave, onCa
     const ctx = canvasRef.current.getContext('2d');
     if (!ctx) return;
 
-    const currentPos = getPos(e);
+    const currentPos = getPos(clientX, clientY);
     const w = currentPos.x - startPos.x;
     const h = currentPos.y - startPos.y;
     
@@ -99,10 +99,10 @@ export const RedactionTool: React.FC<RedactionToolProps> = ({ file, onSave, onCa
     ctx.strokeRect(startPos.x, startPos.y, w, h);
   };
 
-  const stopDrawing = (e: React.MouseEvent) => {
+  const handleEnd = (clientX: number, clientY: number) => {
     if (!isDrawing) return;
     setIsDrawing(false);
-    const currentPos = getPos(e);
+    const currentPos = getPos(clientX, clientY);
     const w = currentPos.x - startPos.x;
     const h = currentPos.y - startPos.y;
     
@@ -121,6 +121,27 @@ export const RedactionTool: React.FC<RedactionToolProps> = ({ file, onSave, onCa
         // Redraw to clear the preview rect if it was too small
         drawCanvas(); 
     }
+  };
+
+  // Mouse Events
+  const onMouseDown = (e: React.MouseEvent) => handleStart(e.clientX, e.clientY);
+  const onMouseMove = (e: React.MouseEvent) => handleMove(e.clientX, e.clientY);
+  const onMouseUp = (e: React.MouseEvent) => handleEnd(e.clientX, e.clientY);
+  
+  // Touch Events
+  const onTouchStart = (e: React.TouchEvent) => {
+      // Prevent default to stop scrolling while drawing
+      if (e.cancelable) e.preventDefault(); 
+      handleStart(e.touches[0].clientX, e.touches[0].clientY);
+  };
+  const onTouchMove = (e: React.TouchEvent) => {
+      if (e.cancelable) e.preventDefault();
+      handleMove(e.touches[0].clientX, e.touches[0].clientY);
+  };
+  const onTouchEnd = (e: React.TouchEvent) => {
+      if (e.cancelable) e.preventDefault();
+      const touch = e.changedTouches[0];
+      handleEnd(touch.clientX, touch.clientY);
   };
 
   const handleSave = () => {
@@ -173,14 +194,17 @@ export const RedactionTool: React.FC<RedactionToolProps> = ({ file, onSave, onCa
         </div>
         
         {/* Canvas Area */}
-        <div className="flex-1 overflow-auto bg-slate-950/50 relative cursor-crosshair flex items-center justify-center p-4">
+        <div className="flex-1 overflow-auto bg-slate-950/50 relative cursor-crosshair flex items-center justify-center p-4 touch-none">
            {!image && <div className="text-amber-500 animate-pulse font-mono text-sm">{t('redaction', 'loading')}</div>}
            <canvas 
              ref={canvasRef}
-             onMouseDown={startDrawing}
-             onMouseMove={draw}
-             onMouseUp={stopDrawing}
-             onMouseLeave={stopDrawing}
+             onMouseDown={onMouseDown}
+             onMouseMove={onMouseMove}
+             onMouseUp={onMouseUp}
+             onMouseLeave={onMouseUp}
+             onTouchStart={onTouchStart}
+             onTouchMove={onTouchMove}
+             onTouchEnd={onTouchEnd}
              className="border border-slate-800 shadow-xl max-w-full max-h-full object-contain"
            />
         </div>

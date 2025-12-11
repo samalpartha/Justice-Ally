@@ -1,15 +1,26 @@
 
 import React, { useEffect, useRef, useState } from 'react';
-import { LiveSessionClient } from '../services/geminiService';
+import { LiveSessionClient, generateSessionAnalysis } from '../services/geminiService';
 import { useLanguage } from '../context/LanguageContext';
+import { SessionRecord } from '../types';
+
+const SESSION_STORAGE_KEY = 'justiceAlly_sessions_v1';
 
 const LiveSession: React.FC = () => {
   const { t, language } = useLanguage();
   const [status, setStatus] = useState("Disconnected");
   const [isActive, setIsActive] = useState(false);
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [showReport, setShowReport] = useState(false);
   const [transcript, setTranscript] = useState<{role: string, text: string}[]>([]);
   const [scenario, setScenario] = useState("mock");
+  const [sessionHistory, setSessionHistory] = useState<SessionRecord[]>(() => {
+      const saved = localStorage.getItem(SESSION_STORAGE_KEY);
+      return saved ? JSON.parse(saved) : [];
+  });
+  const [currentRecord, setCurrentRecord] = useState<SessionRecord | null>(null);
+  const [showHistoryView, setShowHistoryView] = useState(false);
+
   const clientRef = useRef<LiveSessionClient | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
 
@@ -38,58 +49,158 @@ const LiveSession: React.FC = () => {
     }
   }, [transcript]);
 
+  // Persist history changes
+  useEffect(() => {
+      localStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(sessionHistory));
+  }, [sessionHistory]);
+
+  const saveSession = async () => {
+      if (transcript.length === 0) return;
+      
+      setIsAnalyzing(true);
+      setShowReport(true); // Show loader
+
+      try {
+          const analysis = await generateSessionAnalysis(transcript, language);
+          
+          const newRecord: SessionRecord = {
+              id: Date.now().toString(),
+              date: new Date().toLocaleString(),
+              transcript: [...transcript],
+              analysis: analysis,
+              scenario: scenario
+          };
+
+          setSessionHistory(prev => [newRecord, ...prev]);
+          setCurrentRecord(newRecord);
+      } catch (error) {
+          console.error("Failed to analyze session", error);
+      } finally {
+          setIsAnalyzing(false);
+      }
+  };
+
   const toggleConnection = async () => {
     if (isActive) {
       await clientRef.current?.disconnect();
       setIsActive(false);
-      // Show report if there was a conversation
-      if (transcript.length > 0) {
-          setShowReport(true);
-      }
+      await saveSession(); // Auto-save on disconnect
     } else {
       setTranscript([]); // Clear previous transcript
       setShowReport(false);
+      setCurrentRecord(null);
       await clientRef.current?.connect(language); // Pass current language
       setIsActive(true);
     }
   };
 
+  const handleDeleteSession = (id: string) => {
+      setSessionHistory(prev => prev.filter(s => s.id !== id));
+      if (currentRecord?.id === id) {
+          setCurrentRecord(null);
+          setShowReport(false);
+      }
+  };
+
+  const loadSession = (record: SessionRecord) => {
+      setCurrentRecord(record);
+      setTranscript(record.transcript);
+      setShowReport(true);
+      setShowHistoryView(false);
+  };
+
   return (
     <div className="h-full flex flex-col md:flex-row bg-slate-950 relative overflow-hidden">
       
-      {/* Left: Visualizer / Report */}
+      {/* Left: Visualizer / Report / History */}
       <div className="flex-1 flex flex-col items-center justify-center relative p-8">
         
-        {showReport ? (
+        {/* Gemini Badge */}
+        <div className="absolute top-6 left-6 z-20 flex gap-2">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-slate-900/80 rounded-full border border-blue-500/30 backdrop-blur-sm shadow-lg">
+                <div className={`w-2 h-2 rounded-full ${isActive ? 'bg-blue-500 animate-pulse' : 'bg-slate-600'}`}></div>
+                <span className="text-[9px] font-bold text-blue-300 uppercase tracking-wide">Powered by Gemini Live API</span>
+            </div>
+            
+            {!isActive && (
+                <button 
+                    onClick={() => setShowHistoryView(!showHistoryView)}
+                    className={`px-3 py-1 rounded-sm border text-[9px] font-bold uppercase tracking-wide transition-colors ${showHistoryView ? 'bg-amber-900/30 border-amber-500 text-amber-500' : 'bg-slate-900 border-slate-700 text-slate-400 hover:text-white'}`}
+                >
+                    {showHistoryView ? "Back to Live" : t('live', 'history')}
+                </button>
+            )}
+        </div>
+
+        {showHistoryView ? (
+            <div className="w-full max-w-lg h-[80%] bg-slate-900 border border-slate-800 rounded-sm p-6 shadow-2xl overflow-y-auto custom-scrollbar animate-in fade-in zoom-in-95">
+                <h3 className="text-xl font-serif font-black text-white mb-6 border-b border-slate-800 pb-4">{t('live', 'history')}</h3>
+                {sessionHistory.length === 0 ? (
+                    <p className="text-slate-500 text-sm text-center italic mt-10">{t('live', 'noHistory')}</p>
+                ) : (
+                    <div className="space-y-3">
+                        {sessionHistory.map(session => (
+                            <div key={session.id} className="p-4 bg-slate-950 border border-slate-800 rounded-sm hover:border-slate-600 transition-colors flex justify-between items-center group">
+                                <div onClick={() => loadSession(session)} className="cursor-pointer flex-1">
+                                    <div className="text-xs text-amber-600 font-bold uppercase tracking-widest mb-1">{session.scenario}</div>
+                                    <div className="text-slate-300 text-sm font-mono">{session.date}</div>
+                                </div>
+                                <button 
+                                    onClick={() => handleDeleteSession(session.id)}
+                                    className="p-2 text-slate-600 hover:text-red-500 transition-colors opacity-0 group-hover:opacity-100"
+                                    title={t('common', 'delete')}
+                                >
+                                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                                </button>
+                            </div>
+                        ))}
+                    </div>
+                )}
+            </div>
+        ) : showReport ? (
             <div className="w-full max-w-lg bg-slate-900 border border-slate-800 rounded-sm p-8 shadow-2xl animate-in fade-in zoom-in-95">
                 <div className="text-center mb-6">
                     <h3 className="text-2xl font-serif font-black text-white mb-2">Session Analysis</h3>
                     <p className="text-[10px] uppercase tracking-widest text-slate-500">Post-Simulation Feedback</p>
                 </div>
                 
-                <div className="space-y-6">
-                    <div className="p-4 bg-green-950/20 border-l-4 border-green-600 rounded-r-sm">
-                        <h4 className="text-xs font-bold text-green-500 uppercase tracking-wider mb-1">Strong Points</h4>
-                        <ul className="text-sm text-slate-300 space-y-1 list-disc list-inside font-serif">
-                            <li>Clear articulation of facts</li>
-                            <li>Maintained composure during questioning</li>
-                        </ul>
+                {isAnalyzing ? (
+                    <div className="py-12 flex flex-col items-center gap-4">
+                        <svg className="animate-spin h-8 w-8 text-amber-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        <p className="text-slate-400 text-xs uppercase tracking-widest animate-pulse">Consulting Strategy Core...</p>
                     </div>
-                    <div className="p-4 bg-amber-950/20 border-l-4 border-amber-600 rounded-r-sm">
-                        <h4 className="text-xs font-bold text-amber-500 uppercase tracking-wider mb-1">Areas to Improve</h4>
-                        <ul className="text-sm text-slate-300 space-y-1 list-disc list-inside font-serif">
-                            <li>Provide more direct evidence citations</li>
-                            <li>Avoid emotional arguments; focus on statutes</li>
-                        </ul>
+                ) : (
+                    <div className="space-y-6">
+                        <div className="p-4 bg-green-950/20 border-l-4 border-green-600 rounded-r-sm">
+                            <h4 className="text-xs font-bold text-green-500 uppercase tracking-wider mb-2">Strong Points</h4>
+                            <ul className="text-sm text-slate-300 space-y-1 list-disc list-inside font-serif">
+                                {currentRecord?.analysis?.strongPoints.map((point, idx) => (
+                                    <li key={idx}>{point}</li>
+                                )) || <li>Analysis unavailable.</li>}
+                            </ul>
+                        </div>
+                        <div className="p-4 bg-amber-950/20 border-l-4 border-amber-600 rounded-r-sm">
+                            <h4 className="text-xs font-bold text-amber-500 uppercase tracking-wider mb-2">Areas to Improve</h4>
+                            <ul className="text-sm text-slate-300 space-y-1 list-disc list-inside font-serif">
+                                {currentRecord?.analysis?.improvements.map((point, idx) => (
+                                    <li key={idx}>{point}</li>
+                                )) || <li>Analysis unavailable.</li>}
+                            </ul>
+                        </div>
                     </div>
-                </div>
+                )}
                 
-                <button 
-                    onClick={() => setShowReport(false)}
-                    className="w-full mt-8 py-3 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold uppercase text-xs tracking-wider rounded-sm transition-colors"
-                >
-                    Start New Session
-                </button>
+                {!isAnalyzing && (
+                    <button 
+                        onClick={() => { setShowReport(false); setTranscript([]); setCurrentRecord(null); }}
+                        className="w-full mt-8 py-3 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold uppercase text-xs tracking-wider rounded-sm transition-colors"
+                    >
+                        Start New Session
+                    </button>
+                )}
             </div>
         ) : (
             <>
@@ -170,7 +281,7 @@ const LiveSession: React.FC = () => {
          <div className="px-6 py-4 border-b border-slate-800 bg-slate-900">
             <h3 className="font-serif font-bold text-slate-200 text-sm flex items-center gap-2">
                <svg className="w-4 h-4 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" /></svg>
-               {t('live', 'transcript')}
+               {currentRecord ? `Transcript: ${currentRecord.date}` : t('live', 'transcript')}
             </h3>
          </div>
          <div ref={scrollRef} className="flex-1 overflow-y-auto p-6 space-y-6 custom-scrollbar bg-slate-950">

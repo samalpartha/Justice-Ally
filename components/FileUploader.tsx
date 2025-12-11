@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { UploadedFile } from '../types';
 import { useLanguage } from '../context/LanguageContext';
@@ -80,7 +79,7 @@ const FileUploader: React.FC<FileUploaderProps> = ({ onFilesSelected, onLinkAdde
     <div className="w-full space-y-6">
       {/* File Dropzone */}
       <label className={`flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-sm cursor-pointer transition-all group ${errorMsg ? 'border-red-500 bg-red-950/10' : 'border-slate-800 bg-slate-950 hover:bg-slate-900 hover:border-amber-600'}`} title="Drag and drop or click to select files. Supports PDF, Images, and Video.">
-        <div className="flex flex-col items-center justify-center pt-5 pb-6">
+        <div className="flex flex-col items-center justify-center pt-5 pb-6 text-center px-4">
           <svg className={`w-8 h-8 mb-3 transition-colors ${errorMsg ? 'text-red-500' : 'text-slate-500 group-hover:text-amber-600'}`} aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 16">
             <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2"/>
           </svg>
@@ -129,7 +128,7 @@ const FileUploader: React.FC<FileUploaderProps> = ({ onFilesSelected, onLinkAdde
              onChange={(e) => setLinkName(e.target.value)}
              className="bg-slate-950 border-b border-slate-700 rounded-none px-2 py-2 text-sm text-white focus:border-amber-600 outline-none font-serif placeholder:text-slate-600"
            />
-           <div className="flex gap-3">
+           <div className="flex flex-col md:flex-row gap-3">
              <input 
                type="text" 
                placeholder={t('uploader', 'urlPlaceholder')}
@@ -140,7 +139,7 @@ const FileUploader: React.FC<FileUploaderProps> = ({ onFilesSelected, onLinkAdde
              <button 
                onClick={handleAddLink}
                disabled={!url || !linkName}
-               className="bg-slate-800 hover:bg-slate-700 text-slate-300 px-6 rounded-sm border border-slate-700 text-[10px] font-bold uppercase tracking-wider transition-colors disabled:opacity-50"
+               className="bg-slate-800 hover:bg-slate-700 text-slate-300 px-6 py-3 md:py-0 rounded-sm border border-slate-700 text-[10px] font-bold uppercase tracking-wider transition-colors disabled:opacity-50"
              >
                {t('uploader', 'attachBtn')}
              </button>

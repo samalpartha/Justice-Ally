@@ -51,7 +51,7 @@ const Help: React.FC = () => {
                   Real-time consultation loop. Rehearse oral arguments and receive immediate strategic feedback from the AI core.
                 </p>
              </div>
-             <div className="shrink-0 bg-slate-950 p-6 border border-slate-800 w-full md:w-auto">
+             <div className="shrink-0 bg-slate-950 p-6 border border-slate-800 w-full md:w-auto rounded-sm">
                <div className="text-[10px] font-bold uppercase text-amber-600 tracking-widest mb-2">Protocol</div>
                <div className="text-slate-300 font-serif text-sm">Low-Latency Audio Stream</div>
              </div>

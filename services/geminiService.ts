@@ -1,6 +1,6 @@
 
 import { GoogleGenAI, Type, Schema, Part, Modality, LiveServerMessage } from "@google/genai";
-import { UploadedFile, CaseData, CaseContext, TriageResult, Language } from "../types";
+import { UploadedFile, CaseData, CaseContext, TriageResult, Language, SessionAnalysis } from "../types";
 
 // --- CONSTANTS ---
 const MAX_FILE_SIZE = 20 * 1024 * 1024; // 20MB
@@ -96,6 +96,7 @@ Mission: Democratize access to justice. Move users from "Panic" to "Action."
 - Use specific search queries for forms if direct links aren't known.
 - **Document/Video Analysis:** Analyze uploaded files deeply.
 - **Language Enforcement:** JSON Keys = English. String Values = ${language === 'es' ? 'Spanish' : 'English'}.
+- **Audio Processing:** STRICTLY transcribe and respond in ${language === 'es' ? 'Spanish' : 'English'} ONLY. Do NOT use Hindi script or other alphabets. If the accent is heavy, map it to the closest standard ${language === 'es' ? 'Spanish' : 'English'} words.
 `;
 
 const TRIAGE_SCHEMA: Schema = {
@@ -390,6 +391,44 @@ export const transcribeAudio = async (audioBlob: Blob, language: Language = 'en'
   return response.text || "";
 }
 
+export const generateSessionAnalysis = async (transcript: {role: string, text: string}[], language: Language = 'en'): Promise<SessionAnalysis> => {
+  if (!process.env.API_KEY) throw new Error("API Key missing");
+  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+  const model = "gemini-2.5-flash";
+
+  const transcriptText = transcript.map(t => `${t.role}: ${t.text}`).join('\n');
+
+  const prompt = `
+    Analyze this legal consultation transcript between a user (litigant) and an AI assistant.
+    Target Audience: Self-represented litigant.
+    Goal: Provide constructive feedback on their communication, fact presentation, and emotional control.
+
+    Transcript:
+    ${transcriptText}
+
+    Output JSON with two arrays of strings: 'strongPoints' and 'improvements'.
+    Language: ${language === 'es' ? 'Spanish' : 'English'}.
+  `;
+
+  const response = await ai.models.generateContent({
+    model,
+    contents: [{ role: "user", parts: [{ text: prompt }] }],
+    config: {
+      responseMimeType: "application/json",
+      responseSchema: {
+        type: Type.OBJECT,
+        properties: {
+          strongPoints: { type: Type.ARRAY, items: { type: Type.STRING } },
+          improvements: { type: Type.ARRAY, items: { type: Type.STRING } },
+        },
+        required: ["strongPoints", "improvements"],
+      }
+    },
+  });
+
+  return JSON.parse(response.text || "{ \"strongPoints\": [], \"improvements\": [] }");
+};
+
 // --- LIVE & DICTATION CLASSES ---
 export class LiveSessionClient {
   private session: any; 
@@ -521,7 +560,7 @@ export class StreamingDictationClient {
         config: { 
           responseModalities: [Modality.AUDIO], 
           inputAudioTranscription: {},
-          systemInstruction: `Dictation Mode. Language: ${language}.` 
+          systemInstruction: `Dictation Mode. Transcribe speech strictly into ${language === 'es' ? 'Spanish' : 'English'}. Do not output Hindi script or mixed languages. Use standard ${language === 'es' ? 'Spanish' : 'English'} orthography.` 
         },
         callbacks: {
           onopen: () => this.streamAudio(),

@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { AppMode, UserProfile } from '../types';
 import { useLanguage } from '../context/LanguageContext';
 import { useTheme } from '../context/ThemeContext';
@@ -11,16 +11,21 @@ interface LayoutProps {
   onLoad?: () => void;
   user: UserProfile | null;
   onLogout: () => void;
+  onShowAbout?: () => void;
   children: React.ReactNode;
 }
 
-const Layout: React.FC<LayoutProps> = ({ currentMode, setMode, onSave, onLoad, user, onLogout, children }) => {
+const Layout: React.FC<LayoutProps> = ({ currentMode, setMode, onSave, onLoad, user, onLogout, onShowAbout, children }) => {
   const { language, setLanguage, t } = useLanguage();
   const { theme, toggleTheme } = useTheme();
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   const NavItem = ({ mode, icon, label, sub }: { mode: AppMode, icon: React.ReactNode, label: string, sub?: string }) => (
     <button
-      onClick={() => setMode(mode)}
+      onClick={() => {
+        setMode(mode);
+        setIsSidebarOpen(false); // Close sidebar on mobile when item clicked
+      }}
       className={`w-full text-left px-6 py-4 flex items-center gap-4 transition-all border-l-4 group ${
         currentMode === mode
           ? 'bg-slate-900 border-amber-600 text-amber-500'
@@ -38,9 +43,36 @@ const Layout: React.FC<LayoutProps> = ({ currentMode, setMode, onSave, onLoad, u
   );
 
   return (
-    <div className="flex h-screen bg-slate-950 text-slate-200 font-sans selection:bg-amber-900/50 selection:text-amber-100 transition-colors duration-300">
+    <div className="flex h-screen bg-slate-950 text-slate-200 font-sans selection:bg-amber-900/50 selection:text-amber-100 transition-colors duration-300 overflow-hidden">
+      
+      {/* Mobile Menu Button & Header */}
+      <div className="md:hidden fixed top-0 left-0 right-0 z-30 bg-slate-950 border-b border-slate-800 p-4 flex justify-between items-center shadow-lg">
+         <div className="flex items-center gap-3">
+            <button onClick={() => setIsSidebarOpen(true)} className="text-slate-400 hover:text-white">
+               <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" /></svg>
+            </button>
+            <h1 className="font-serif font-black text-lg text-slate-100 tracking-tight leading-none">{t('common', 'appName')}<span className="text-amber-600">{t('common', 'appSuffix')}</span></h1>
+         </div>
+         <div className="w-8 h-8 rounded-full flex items-center justify-center font-serif font-bold text-xs border bg-slate-800 border-slate-600 text-slate-300">
+            {user?.name.charAt(0)}
+         </div>
+      </div>
+
+      {/* Mobile Backdrop */}
+      {isSidebarOpen && (
+        <div 
+          className="fixed inset-0 bg-black/50 z-40 md:hidden backdrop-blur-sm transition-opacity"
+          onClick={() => setIsSidebarOpen(false)}
+        ></div>
+      )}
+
       {/* Sidebar - Legal Binder Spine Aesthetic */}
-      <aside className="w-72 bg-slate-950 border-r-4 border-double border-slate-800 flex flex-col shrink-0 z-20 shadow-[4px_0_24px_rgba(0,0,0,0.5)] relative transition-colors duration-300">
+      <aside className={`
+        fixed inset-y-0 left-0 z-50 w-72 bg-slate-950 border-r-4 border-double border-slate-800 flex flex-col shrink-0 shadow-[4px_0_24px_rgba(0,0,0,0.5)] transition-transform duration-300 ease-in-out
+        md:relative md:translate-x-0
+        ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}
+        no-print
+      `} id="sidebar">
         
         {/* Toggles - Absolute Positioned to Avoid Overlap */}
         <div className="absolute top-4 right-4 z-30 flex gap-2">
@@ -148,8 +180,14 @@ const Layout: React.FC<LayoutProps> = ({ currentMode, setMode, onSave, onLoad, u
            />
         </nav>
 
-        {/* Footer Actions */}
+        {/* About / Footer Actions */}
         <div className="bg-slate-950 p-6 border-t border-slate-800 space-y-3 transition-colors duration-300">
+           {onShowAbout && (
+             <button onClick={onShowAbout} className="w-full py-2 flex items-center justify-center gap-2 text-[10px] font-bold uppercase text-blue-400 hover:text-blue-300 border border-blue-900/30 hover:bg-blue-900/10 rounded-sm transition-all mb-2">
+                 <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                 About Project
+             </button>
+           )}
           <div className="grid grid-cols-2 gap-2">
             <button onClick={onSave} className="flex flex-col items-center justify-center p-2 bg-slate-900 border border-slate-800 hover:border-amber-600 rounded-sm group transition-all">
               <svg className="w-4 h-4 text-slate-500 group-hover:text-amber-500 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" /></svg>
@@ -166,8 +204,8 @@ const Layout: React.FC<LayoutProps> = ({ currentMode, setMode, onSave, onLoad, u
         </div>
       </aside>
 
-      {/* Main Content Area */}
-      <main className="flex-1 min-w-0 bg-slate-950 relative z-10 transition-colors duration-300">
+      {/* Main Content Area - Added margin-top for mobile header spacing */}
+      <main className="flex-1 min-w-0 bg-slate-950 relative z-10 transition-colors duration-300 print:overflow-visible print:h-auto print:block print:bg-white pt-16 md:pt-0">
         {children}
       </main>
     </div>

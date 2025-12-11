@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -55,6 +56,66 @@
       }
       ::-webkit-scrollbar-thumb:hover {
         background: var(--s-600); 
+      }
+
+      /* Print Styles */
+      @media print {
+        @page { margin: 0.5in; size: auto; }
+        
+        /* Hide Sidebar and UI Chrome */
+        .no-print, aside, #sidebar, nav { display: none !important; }
+        
+        /* Aggressive Layout Reset */
+        html, body, #root, main {
+          height: auto !important;
+          width: 100% !important;
+          overflow: visible !important;
+          position: static !important;
+          display: block !important;
+          background: white !important;
+          margin: 0 !important;
+          padding: 0 !important;
+        }
+
+        /* Reset nested flex/scroll containers */
+        div[class*="overflow-"], div[class*="h-full"], div[class*="flex-col"] {
+          display: block !important;
+          height: auto !important;
+          overflow: visible !important;
+        }
+
+        /* Force Visibility of Content */
+        * { 
+          -webkit-print-color-adjust: exact !important; 
+          print-color-adjust: exact !important; 
+        }
+
+        /* Dark Mode Color Reset for Print */
+        .bg-slate-900, .bg-slate-950 { 
+          background-color: white !important; 
+          border: 1px solid #ccc !important;
+          color: black !important;
+          box-shadow: none !important;
+        }
+        
+        /* Text Color Resets */
+        .text-slate-100, .text-slate-200, .text-slate-300, .text-white { 
+          color: black !important; 
+        }
+        .text-slate-400, .text-slate-500 {
+          color: #555 !important;
+        }
+        
+        /* Preserve semantic colors slightly adjusted for print */
+        .text-amber-500, .text-amber-600 { color: #d97706 !important; }
+        .text-red-500 { color: #dc2626 !important; }
+        .text-blue-500 { color: #2563eb !important; }
+        .text-green-500 { color: #16a34a !important; }
+
+        /* Borders */
+        .border-slate-800, .border-slate-700 {
+          border-color: #ddd !important;
+        }
       }
     </style>
     <script>

@@ -78,6 +78,19 @@ export interface TriageResult {
   };
 }
 
+export interface SessionAnalysis {
+  strongPoints: string[];
+  improvements: string[];
+}
+
+export interface SessionRecord {
+  id: string;
+  date: string;
+  transcript: {role: string, text: string}[];
+  analysis?: SessionAnalysis;
+  scenario: string;
+}
+
 export type UserRole = 'litigant' | 'attorney';
 
 export interface UserProfile {

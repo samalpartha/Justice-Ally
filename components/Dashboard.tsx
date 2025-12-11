@@ -4,7 +4,6 @@ import { UploadedFile, CaseData, DocumentAnalysis, CaseContext } from '../types'
 import FileUploader from './FileUploader';
 import DictationButton from './DictationButton';
 import { RedactionTool } from './RedactionTool';
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 import { useLanguage } from '../context/LanguageContext';
 
 interface DashboardProps {
@@ -12,6 +11,7 @@ interface DashboardProps {
   onFilesAdded: (files: File[]) => void;
   onLinkAdded: (link: UploadedFile) => void;
   onFileUpdated?: (file: UploadedFile) => void;
+  onFileDeleted?: (fileId: string) => void;
   caseData: CaseData | null;
   analyzing: boolean;
   onAnalyze: (desc: string) => void;
@@ -19,10 +19,11 @@ interface DashboardProps {
   onLoadDemo?: () => void;
 }
 
-const Dashboard: React.FC<DashboardProps> = ({ files, onFilesAdded, onLinkAdded, onFileUpdated, caseData, analyzing, onAnalyze, context, onLoadDemo }) => {
+const Dashboard: React.FC<DashboardProps> = ({ files, onFilesAdded, onLinkAdded, onFileUpdated, onFileDeleted, caseData, analyzing, onAnalyze, context, onLoadDemo }) => {
   const { t } = useLanguage();
   const [caseDesc, setCaseDesc] = useState('');
   const [redactingFile, setRedactingFile] = useState<UploadedFile | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
 
   // Pre-fill description from context if available
   useEffect(() => {
@@ -30,12 +31,6 @@ const Dashboard: React.FC<DashboardProps> = ({ files, onFilesAdded, onLinkAdded,
       setCaseDesc(context.description);
     }
   }, [context]);
-
-  const relevanceData = caseData?.documents.map(doc => ({
-    name: doc.fileName.length > 15 ? doc.fileName.substring(0, 12) + '...' : doc.fileName,
-    score: doc.relevanceScore,
-    fullDoc: doc
-  })) || [];
 
   const handleRedactionSave = (newFile: File, base64: string) => {
     if (redactingFile && onFileUpdated) {
@@ -50,6 +45,12 @@ const Dashboard: React.FC<DashboardProps> = ({ files, onFilesAdded, onLinkAdded,
     }
   };
 
+  const handleDeleteRequest = (id: string) => {
+      if (window.confirm(t('common', 'confirmDelete'))) {
+          onFileDeleted?.(id);
+      }
+  };
+
   const isImage = (file: UploadedFile) => {
      return file.type.startsWith('image/');
   };
@@ -58,8 +59,13 @@ const Dashboard: React.FC<DashboardProps> = ({ files, onFilesAdded, onLinkAdded,
   const hasContent = files.length > 0 || caseDesc.trim().length > 3;
   const isButtonEnabled = !analyzing && hasContent;
 
+  const filteredFiles = files.filter(f => 
+    f.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    f.type.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
   return (
-    <div className="h-full overflow-y-auto p-8 custom-scrollbar bg-slate-950">
+    <div className="h-full overflow-y-auto p-4 md:p-8 custom-scrollbar bg-slate-950">
       {redactingFile && (
         <RedactionTool 
           file={redactingFile} 
@@ -68,19 +74,19 @@ const Dashboard: React.FC<DashboardProps> = ({ files, onFilesAdded, onLinkAdded,
         />
       )}
       
-      <div className="max-w-[1400px] mx-auto space-y-12">
+      <div className="max-w-[1400px] mx-auto space-y-8 md:space-y-12">
         
         {/* Header Section with Context */}
-        <div className="flex justify-between items-end border-b-2 border-slate-800 pb-6">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-end border-b-2 border-slate-800 pb-6 gap-4">
           <div>
-            <h2 className="text-3xl font-serif font-black text-slate-100 mb-2 flex items-center gap-3 tracking-tight">
+            <h2 className="text-2xl md:text-3xl font-serif font-black text-slate-100 mb-2 flex items-center gap-3 tracking-tight">
               {t('dashboard', 'header')}
             </h2>
             <p className="text-amber-600 text-xs uppercase tracking-[0.2em] font-bold">{t('dashboard', 'subHeader')}</p>
           </div>
-          <div className="text-right flex flex-col items-end gap-3">
+          <div className="w-full md:w-auto text-left md:text-right flex flex-col items-start md:items-end gap-3">
             {context && (
-              <div className="hidden sm:block">
+              <div className="w-full md:w-auto">
                 <span className="block text-[10px] text-slate-500 uppercase tracking-widest font-bold mb-1">{t('dashboard', 'matterRef')}</span>
                 <div className="bg-slate-900 px-4 py-2 border-l-2 border-amber-600">
                   <span className="text-slate-200 font-serif font-bold text-sm block">{context.caseType}</span>
@@ -101,64 +107,95 @@ const Dashboard: React.FC<DashboardProps> = ({ files, onFilesAdded, onLinkAdded,
         </div>
 
         {/* Input Section */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 md:gap-10">
           <div className="lg:col-span-2 bg-slate-900 border border-slate-800 rounded-sm shadow-xl p-0 overflow-hidden">
-            <div className="bg-slate-950 border-b border-slate-800 px-6 py-4 flex justify-between items-center">
+            <div className="bg-slate-950 border-b border-slate-800 px-4 md:px-6 py-4 flex justify-between items-center">
                <h3 className="text-sm font-bold text-slate-300 uppercase tracking-widest flex items-center gap-2">
                  <span className="text-amber-600">§</span> {t('dashboard', 'ingest')}
                </h3>
                <span className="text-[10px] text-slate-500 font-mono">{files.length} {t('dashboard', 'itemsLogged')}</span>
             </div>
             
-            <div className="p-6 space-y-8">
+            <div className="p-4 md:p-6 space-y-6 md:space-y-8">
               <FileUploader onFilesSelected={onFilesAdded} onLinkAdded={onLinkAdded} />
               
               {files.length > 0 && (
-                <div className="border border-slate-800 rounded-sm">
-                  <table className="w-full text-left border-collapse">
-                    <thead>
-                      <tr className="bg-slate-950 border-b border-slate-800">
-                        <th className="p-3 text-[10px] font-bold text-slate-500 uppercase tracking-widest w-16">{t('dashboard', 'id')}</th>
-                        <th className="p-3 text-[10px] font-bold text-slate-500 uppercase tracking-widest">{t('dashboard', 'exhibitName')}</th>
-                        <th className="p-3 text-[10px] font-bold text-slate-500 uppercase tracking-widest w-24">{t('dashboard', 'type')}</th>
-                        <th className="p-3 text-[10px] font-bold text-slate-500 uppercase tracking-widest w-24 text-right">{t('dashboard', 'action')}</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-slate-800">
-                      {files.map((f, idx) => (
-                        <tr key={f.id} className="hover:bg-slate-800/50 transition-colors group">
-                          <td className="p-3 text-[10px] font-mono text-slate-600">{(idx + 1).toString().padStart(3, '0')}</td>
-                          <td className="p-3">
-                             <div className="flex items-center gap-3">
-                                {f.type === 'link' ? (
-                                  <svg className="w-4 h-4 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" /></svg>
-                                ) : isImage(f) ? (
-                                  <svg className="w-4 h-4 text-purple-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
-                                ) : (
-                                  <svg className="w-4 h-4 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
-                                )}
-                                <span className="text-sm text-slate-300 font-serif truncate max-w-[200px]">{f.name}</span>
-                             </div>
-                          </td>
-                          <td className="p-3">
-                             <span className="text-[9px] font-bold uppercase tracking-wider text-slate-500 border border-slate-700 px-1.5 py-0.5 rounded-sm">
-                               {f.type.split('/')[1] || 'LINK'}
-                             </span>
-                          </td>
-                          <td className="p-3 text-right">
-                             {isImage(f) && (
-                               <button 
-                                 onClick={() => setRedactingFile(f)}
-                                 className="text-[10px] font-bold uppercase tracking-wider text-amber-600 hover:text-white transition-colors opacity-0 group-hover:opacity-100"
-                               >
-                                 {t('dashboard', 'redact')}
-                               </button>
-                             )}
-                          </td>
+                <div className="space-y-4">
+                  {/* Search Bar */}
+                  <div className="relative">
+                    <input 
+                      type="text" 
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      placeholder={t('dashboard', 'searchFiles')}
+                      className="w-full bg-slate-950 border border-slate-800 rounded-sm px-4 py-2 pl-10 text-xs text-white focus:border-amber-600 outline-none"
+                    />
+                    <svg className="w-4 h-4 text-slate-500 absolute left-3 top-2.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
+                  </div>
+
+                  <div className="border border-slate-800 rounded-sm overflow-x-auto">
+                    <table className="w-full text-left border-collapse min-w-[500px]">
+                      <thead>
+                        <tr className="bg-slate-950 border-b border-slate-800">
+                          <th className="p-3 text-[10px] font-bold text-slate-500 uppercase tracking-widest w-16">{t('dashboard', 'id')}</th>
+                          <th className="p-3 text-[10px] font-bold text-slate-500 uppercase tracking-widest">{t('dashboard', 'exhibitName')}</th>
+                          <th className="p-3 text-[10px] font-bold text-slate-500 uppercase tracking-widest w-24">{t('dashboard', 'type')}</th>
+                          <th className="p-3 text-[10px] font-bold text-slate-500 uppercase tracking-widest w-24 text-right">{t('dashboard', 'action')}</th>
                         </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                      </thead>
+                      <tbody className="divide-y divide-slate-800">
+                        {filteredFiles.map((f, idx) => (
+                          <tr key={f.id} className="hover:bg-slate-800/50 transition-colors group">
+                            <td className="p-3 text-[10px] font-mono text-slate-600">{(idx + 1).toString().padStart(3, '0')}</td>
+                            <td className="p-3">
+                              <div className="flex items-center gap-3">
+                                  {f.type === 'link' ? (
+                                    <svg className="w-4 h-4 text-blue-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" /></svg>
+                                  ) : isImage(f) ? (
+                                    <svg className="w-4 h-4 text-purple-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                                  ) : f.name.toLowerCase().endsWith('.txt') ? (
+                                    <svg className="w-4 h-4 text-amber-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+                                  ) : (
+                                    <svg className="w-4 h-4 text-slate-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+                                  )}
+                                  <span className="text-sm text-slate-300 font-serif truncate max-w-[200px]">{f.name}</span>
+                              </div>
+                            </td>
+                            <td className="p-3">
+                              <span className="text-[9px] font-bold uppercase tracking-wider text-slate-500 border border-slate-700 px-1.5 py-0.5 rounded-sm whitespace-nowrap">
+                                {f.type.split('/')[1] || (f.name.toLowerCase().endsWith('.txt') ? 'TEXT' : 'LINK')}
+                              </span>
+                            </td>
+                            <td className="p-3 text-right">
+                              <div className="flex justify-end gap-2">
+                                {isImage(f) && (
+                                  <button 
+                                    onClick={() => setRedactingFile(f)}
+                                    className="text-[10px] font-bold uppercase tracking-wider text-amber-600 hover:text-white transition-colors opacity-0 group-hover:opacity-100"
+                                  >
+                                    {t('dashboard', 'redact')}
+                                  </button>
+                                )}
+                                {onFileDeleted && (
+                                  <button
+                                    onClick={() => handleDeleteRequest(f.id)}
+                                    className="text-[10px] font-bold uppercase tracking-wider text-red-600 hover:text-red-400 transition-colors opacity-0 group-hover:opacity-100"
+                                    title={t('common', 'delete')}
+                                  >
+                                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                    </svg>
+                                  </button>
+                                )}
+                              </div>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
                 </div>
               )}
 
@@ -211,23 +248,23 @@ const Dashboard: React.FC<DashboardProps> = ({ files, onFilesAdded, onLinkAdded,
              </div>
              <div className="p-6">
                 {caseData ? (
-                  <div className="h-[300px]">
-                    <ResponsiveContainer width="100%" height="100%">
-                      <BarChart data={relevanceData} layout="vertical" margin={{ left: 0, right: 20 }}>
-                         <XAxis type="number" domain={[0, 10]} hide />
-                         <YAxis dataKey="name" type="category" width={80} tick={{fill: '#64748b', fontSize: 10, fontFamily: 'serif'}} />
-                         <Tooltip 
-                            contentStyle={{ backgroundColor: '#0f172a', borderColor: '#334155', fontFamily: 'serif' }}
-                            itemStyle={{ color: '#fbbf24' }}
-                            cursor={{fill: '#1e293b'}}
-                         />
-                         <Bar dataKey="score" barSize={12}>
-                            {relevanceData.map((entry, index) => (
-                              <Cell key={`cell-${index}`} fill={entry.score > 7 ? '#d97706' : '#475569'} />
-                            ))}
-                         </Bar>
-                      </BarChart>
-                    </ResponsiveContainer>
+                  <div className="space-y-4">
+                     {caseData.documents.map((doc, idx) => (
+                        <div key={idx} className="group">
+                           <div className="flex justify-between items-center mb-1">
+                              <span className="text-xs text-slate-300 font-serif truncate max-w-[150px]">{doc.fileName}</span>
+                              <span className={`text-[10px] font-bold ${doc.relevanceScore > 7 ? 'text-amber-500' : 'text-slate-500'}`}>
+                                 {doc.relevanceScore}/10
+                              </span>
+                           </div>
+                           <div className="w-full bg-slate-950 h-2 rounded-full overflow-hidden border border-slate-800">
+                              <div 
+                                className={`h-full rounded-full transition-all duration-500 ${doc.relevanceScore > 7 ? 'bg-amber-600' : 'bg-slate-700'}`}
+                                style={{ width: `${doc.relevanceScore * 10}%` }}
+                              ></div>
+                           </div>
+                        </div>
+                     ))}
                   </div>
                 ) : (
                   <div className="py-20 flex flex-col items-center justify-center text-slate-600 space-y-4">
@@ -243,12 +280,12 @@ const Dashboard: React.FC<DashboardProps> = ({ files, onFilesAdded, onLinkAdded,
 
         {/* Executive Summary */}
         {caseData && caseData.caseSummary && (
-          <div className="bg-slate-900 border-t-4 border-amber-600 rounded-sm p-8 shadow-xl">
+          <div className="bg-slate-900 border-t-4 border-amber-600 rounded-sm p-6 md:p-8 shadow-xl">
              <h3 className="text-xl font-serif font-black text-slate-100 mb-4 flex items-center gap-3">
                {t('dashboard', 'execBrief')}
                <svg className="w-5 h-5 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
              </h3>
-             <div className="text-slate-300 leading-8 text-sm bg-slate-950 p-8 border-l-2 border-slate-700 font-serif">
+             <div className="text-slate-300 leading-8 text-sm bg-slate-950 p-6 md:p-8 border-l-2 border-slate-700 font-serif">
                {caseData.caseSummary}
              </div>
           </div>

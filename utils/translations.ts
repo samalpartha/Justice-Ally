@@ -11,6 +11,10 @@ export const translations = {
     attorney: { en: "Attorney at Law", es: "Abogado" },
     litigant: { en: "Self-Represented Litigant", es: "Litigante Autorrepresentado" },
     loading: { en: "Loading...", es: "Cargando..." },
+    delete: { en: "Delete", es: "Eliminar" },
+    cancel: { en: "Cancel", es: "Cancelar" },
+    search: { en: "Search...", es: "Buscar..." },
+    confirmDelete: { en: "Are you sure you want to delete this item?", es: "¿Está seguro de que desea eliminar este elemento?" },
   },
   sidebar: {
     intake: { en: "Case Intake", es: "Admisión del Caso" },
@@ -20,7 +24,7 @@ export const translations = {
     evidenceVault: { en: "Evidence Vault", es: "Bóveda de Pruebas" },
     docket: { en: "Docket & Discovery", es: "Expediente y Descubrimiento" },
     strategyRoom: { en: "Strategy Room", es: "Sala de Estrategia" },
-    casePlanning: { en: "Planificación del Caso", es: "Planificación del Caso" },
+    casePlanning: { en: "Case Planning", es: "Planificación del Caso" },
     counselTools: { en: "Counsel & Tools", es: "Asesoría y Herramientas" },
     liveStrategy: { en: "Live Strategy", es: "Estrategia en Vivo" },
     voiceConsult: { en: "Voice Consultation", es: "Consulta de Voz" },
@@ -96,6 +100,7 @@ export const translations = {
     timeline: { en: "Fact Timeline", es: "Línea de Tiempo de Hechos" },
     entities: { en: "Extracted Parties", es: "Partes Extraídas" },
     loadSample: { en: "Load Sample Evidence", es: "Cargar Evidencia de Muestra" },
+    searchFiles: { en: "Search Evidence...", es: "Buscar Evidencia..." },
   },
   warroom: {
     header: { en: "CASE STRATEGY & PLANNING", es: "ESTRATEGIA Y PLANIFICACIÓN" },
@@ -131,6 +136,10 @@ export const translations = {
     scenarioMock: { en: "Mock Trial (Judge)", es: "Juicio Simulado (Juez)" },
     scenarioConsult: { en: "Strategic Consultation", es: "Consulta Estratégica" },
     scenarioNeg: { en: "Settlement Negotiation", es: "Negociación de Acuerdo" },
+    history: { en: "Session History", es: "Historial de Sesiones" },
+    noHistory: { en: "No recorded sessions.", es: "No hay sesiones grabadas." },
+    viewTranscript: { en: "View Transcript", es: "Ver Transcripción" },
+    saveSession: { en: "Save Session", es: "Guardar Sesión" },
   },
   help: {
     title: { en: "Operational Manual", es: "Manual Operativo" },

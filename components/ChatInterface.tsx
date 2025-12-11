@@ -1,3 +1,4 @@
+
 import React, { useState, useRef, useEffect } from 'react';
 import { ChatMessage, UploadedFile } from '../types';
 import { sendChatMessage, textToSpeech, decodeAudio } from '../services/geminiService';
@@ -202,10 +203,10 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ files, onFilesAdded, onLi
         <div className="flex-1 overflow-y-auto p-8 space-y-8 custom-scrollbar bg-slate-950">
           {messages.map((msg) => (
             <div key={msg.id} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-              <div className={`max-w-[85%] border shadow-md p-6 relative ${
+              <div className={`max-w-[85%] border shadow-md p-6 relative rounded-sm ${
                 msg.role === 'user' 
-                  ? 'bg-slate-900 border-amber-900/50 text-slate-100 rounded-tr-none rounded-sm' 
-                  : 'bg-slate-900 border-slate-800 text-slate-200 rounded-tl-none rounded-sm'
+                  ? 'bg-slate-900 border-amber-900/50 text-slate-100 rounded-tr-none' 
+                  : 'bg-slate-900 border-slate-800 text-slate-200 rounded-tl-none'
               }`}>
                 <div className={`absolute top-0 w-4 h-4 border-t bg-slate-900 ${
                     msg.role === 'user' 
