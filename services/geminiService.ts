@@ -1,3 +1,4 @@
+
 import { GoogleGenAI, Type, Schema, Part, Modality, LiveServerMessage } from "@google/genai";
 import { UploadedFile, CaseData, CaseContext, TriageResult, Language } from "../types";
 
@@ -486,8 +487,14 @@ export class LiveSessionClient {
   async disconnect() {
     this.active = false;
     this.stream?.getTracks().forEach(t => t.stop());
-    this.inputCtx?.close();
-    this.outputCtx?.close();
+    
+    if (this.inputCtx && this.inputCtx.state !== 'closed') {
+        try { await this.inputCtx.close(); } catch(e) { console.warn(e); }
+    }
+    if (this.outputCtx && this.outputCtx.state !== 'closed') {
+        try { await this.outputCtx.close(); } catch(e) { console.warn(e); }
+    }
+    
     this.onStatus("Disconnected");
   }
 }
@@ -554,6 +561,9 @@ export class StreamingDictationClient {
   stop() {
     this.active = false;
     this.stream?.getTracks().forEach(t => t.stop());
-    this.ctx?.close();
+    
+    if (this.ctx && this.ctx.state !== 'closed') {
+        try { this.ctx.close(); } catch(e) { console.warn(e); }
+    }
   }
 }

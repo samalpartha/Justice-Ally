@@ -42,6 +42,8 @@ export interface CaseData {
   documents: DocumentAnalysis[];
   strategy: StrategicAnalysis | null;
   analyzed: boolean;
+  timeline?: { date: string; event: string; type: 'fact' | 'filing' | 'comm' }[];
+  entities?: { name: string; role: string }[];
 }
 
 export interface ChatMessage {

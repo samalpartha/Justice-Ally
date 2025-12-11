@@ -26,6 +26,14 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
     }, 1500);
   };
 
+  const startDemo = () => {
+      setRole('litigant');
+      setEmail('demo@justiceally.ai');
+      setPassword('demo');
+      const name = 'Alex Citizen (Demo)';
+      onLogin('litigant', name, 'demo@justiceally.ai');
+  };
+
   return (
     <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center p-6 relative overflow-hidden">
       {/* Background Elements */}
@@ -45,14 +53,20 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
 
       <div className="max-w-md w-full bg-slate-900 border border-slate-800 shadow-2xl rounded-sm relative z-10 overflow-hidden">
         {/* Header */}
-        <div className="p-8 text-center border-b border-slate-800 bg-slate-950">
-          <div className="w-16 h-16 flex items-center justify-center border-2 border-amber-700 rounded-sm bg-slate-900 shadow-inner mx-auto mb-6">
+        <div className="p-8 text-center border-b border-slate-800 bg-slate-950 flex flex-col items-center">
+          <div className="w-16 h-16 flex items-center justify-center border-2 border-amber-700 rounded-sm bg-slate-900 shadow-inner mb-4">
              <svg className="w-8 h-8 text-amber-600" fill="currentColor" viewBox="0 0 24 24">
                <path d="M12 2c-1.1 0-2 .9-2 2h-3v2h2.55c-.6 2.3-2.65 4-5.05 4-1.3 0-2.5-.35-3.5-1l-1 1.75c1.3.85 2.85 1.25 4.5 1.25 2.5 0 4.8-1.15 6.35-3h6.3c1.55 1.85 3.85 3 6.35 3 1.65 0 3.2-.4 4.5-1.25l-1-1.75c-1 .65-2.2 1-3.5 1-2.4 0-4.45-1.7-5.05-4h2.55V4h-3c0-1.1-.9-2-2-2zm-6 12c-2.2 0-4 1.8-4 4s1.8 4 4 4 4-1.8 4-4-1.8-4-4-4zm12 0c-2.2 0-4 1.8-4 4s1.8 4 4 4 4-1.8 4-4-1.8-4-4-4z"/>
              </svg>
           </div>
-          <h1 className="font-serif font-black text-3xl text-slate-100 tracking-tight mb-2">{t('common', 'appName')}<span className="text-amber-600">{t('common', 'appSuffix')}</span></h1>
-          <p className="text-[10px] text-slate-500 uppercase tracking-[0.3em] font-bold">{t('login', 'subtitle')}</p>
+          <h1 className="font-serif font-black text-3xl text-slate-100 tracking-tight mb-1">{t('common', 'appName')}<span className="text-amber-600">{t('common', 'appSuffix')}</span></h1>
+          <p className="text-[10px] text-slate-500 uppercase tracking-[0.3em] font-bold mb-4">{t('login', 'subtitle')}</p>
+          
+          {/* Gemini Badge */}
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-gradient-to-r from-slate-800 to-slate-900 border border-slate-700 rounded-full mb-2">
+             <svg className="w-3 h-3 text-purple-400" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm0 18a8 8 0 1 1 8-8 8 8 0 0 1-8 8z"/><path d="M12 6a1 1 0 0 0-1 1v4H7a1 1 0 0 0 0 2h4v4a1 1 0 0 0 2 0v-4h4a1 1 0 0 0 0-2h-4V7a1 1 0 0 0-1-1z"/></svg>
+             <span className="text-[9px] font-bold text-slate-300 uppercase tracking-wide bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-blue-400">{t('login', 'poweredBy')}</span>
+          </div>
         </div>
 
         {/* Role Toggles */}
@@ -105,42 +119,50 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
             />
           </div>
 
-          <button 
-            type="submit" 
-            disabled={isLoading}
-            className={`w-full py-4 rounded-sm font-bold text-xs uppercase tracking-[0.2em] transition-all shadow-lg flex items-center justify-center gap-2 ${
-              role === 'attorney'
-                ? 'bg-blue-900 hover:bg-blue-800 text-blue-100 border border-blue-700'
-                : 'bg-amber-700 hover:bg-amber-600 text-white border border-amber-600'
-            }`}
-          >
-            {isLoading ? (
-              <>
-                <svg className="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                </svg>
-                {t('login', 'authenticating')}
-              </>
-            ) : (
-              <>
-                <span>{t('login', 'authButton')}</span>
-                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" /></svg>
-              </>
-            )}
-          </button>
+          <div className="space-y-3">
+            <button 
+                type="submit" 
+                disabled={isLoading}
+                className={`w-full py-4 rounded-sm font-bold text-xs uppercase tracking-[0.2em] transition-all shadow-lg flex items-center justify-center gap-2 ${
+                role === 'attorney'
+                    ? 'bg-blue-900 hover:bg-blue-800 text-blue-100 border border-blue-700'
+                    : 'bg-amber-700 hover:bg-amber-600 text-white border border-amber-600'
+                }`}
+            >
+                {isLoading ? (
+                <>
+                    <svg className="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    {t('login', 'authenticating')}
+                </>
+                ) : (
+                <>
+                    <span>{t('login', 'authButton')}</span>
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" /></svg>
+                </>
+                )}
+            </button>
+            <button
+               type="button"
+               onClick={startDemo}
+               className="w-full py-3 bg-slate-900 hover:bg-slate-800 text-slate-400 hover:text-white border border-slate-700 rounded-sm font-bold text-[10px] uppercase tracking-widest transition-colors flex items-center justify-center gap-2"
+            >
+                <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                Start Quick Tour (Demo)
+            </button>
+          </div>
         </form>
 
         {/* Footer */}
         <div className="px-8 py-4 bg-slate-950 border-t border-slate-800 text-center">
+          <p className="text-[10px] text-amber-600 font-bold uppercase mb-2">
+             {t('login', 'impactStat')}
+          </p>
           <p className="text-[10px] text-slate-600 font-serif italic">
             {t('login', 'footer')}
           </p>
-          <div className="mt-4 flex gap-2 justify-center">
-             <button onClick={() => { setRole('litigant'); setEmail('client@demo.com'); setPassword('demo'); }} className="text-[9px] text-amber-600 uppercase font-bold hover:underline">{t('login', 'demoLitigant')}</button>
-             <span className="text-slate-700">|</span>
-             <button onClick={() => { setRole('attorney'); setEmail('counsel@firm.law'); setPassword('demo'); }} className="text-[9px] text-blue-600 uppercase font-bold hover:underline">{t('login', 'demoAttorney')}</button>
-          </div>
         </div>
       </div>
     </div>

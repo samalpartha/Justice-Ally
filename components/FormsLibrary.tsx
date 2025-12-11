@@ -90,16 +90,42 @@ const FormsLibrary: React.FC<FormsLibraryProps> = ({ files = [], onFilesAdded })
     f.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
+  const handleAutoFill = () => {
+      alert("Auto-fill simulated: Extracted case data applied to form template.");
+  };
+
   return (
     <div className="h-full overflow-y-auto custom-scrollbar p-8 bg-slate-950">
       <div className="max-w-5xl mx-auto space-y-10">
         
         {/* Header */}
-        <div className="text-center space-y-4 border-b-2 border-slate-800 pb-8">
+        <div className="text-center space-y-4 border-b-2 border-slate-800 pb-8 relative">
           <h1 className="text-4xl font-serif font-black text-slate-100 tracking-tight">{t('forms', 'title')}</h1>
           <p className="text-amber-600 uppercase tracking-[0.2em] font-bold text-xs">
             {t('forms', 'subtitle')}
           </p>
+          
+          {/* Progress Indicator */}
+          <div className="absolute right-0 top-0 hidden md:block w-48">
+             <div className="flex justify-between text-[9px] uppercase font-bold text-slate-500 mb-1">
+                <span>{t('forms', 'progress')}</span>
+                <span>40%</span>
+             </div>
+             <div className="w-full h-1.5 bg-slate-900 rounded-full overflow-hidden mb-2">
+                <div className="h-full bg-amber-600 w-[40%] rounded-full"></div>
+             </div>
+             
+             {/* Deadline Calculator Widget */}
+             <div className="bg-slate-900 border border-slate-800 p-2 rounded-sm flex items-center gap-2">
+                <div className="p-1 bg-red-900/20 rounded text-red-500">
+                   <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                </div>
+                <div>
+                   <div className="text-[9px] text-slate-400 font-bold uppercase">Response Deadline</div>
+                   <div className="text-[10px] text-slate-200 font-mono">Typically <span className="text-red-500">within 14 days</span></div>
+                </div>
+             </div>
+          </div>
         </div>
 
         {/* Search Bar */}
@@ -137,7 +163,16 @@ const FormsLibrary: React.FC<FormsLibraryProps> = ({ files = [], onFilesAdded })
           <div className="space-y-10 animate-in fade-in slide-in-from-top-4 duration-300">
             {/* State Selector */}
             <div className="bg-slate-900 border border-slate-800 rounded-sm p-8 shadow-lg">
-               <label className="block text-[10px] font-bold text-slate-500 uppercase mb-3 tracking-widest">{t('forms', 'selector')}</label>
+               <div className="flex justify-between items-center mb-3">
+                  <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-widest">{t('forms', 'selector')}</label>
+                  <button 
+                    onClick={handleAutoFill}
+                    className="text-[10px] font-bold uppercase text-amber-500 hover:text-white flex items-center gap-1 transition-colors border border-amber-900/30 px-3 py-1.5 rounded-sm bg-amber-950/10 hover:bg-amber-950/30"
+                  >
+                    <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+                    {t('forms', 'autoFill')}
+                  </button>
+               </div>
                <div className="flex gap-4">
                  <div className="relative flex-1">
                    <select 

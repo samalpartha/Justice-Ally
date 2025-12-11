@@ -129,6 +129,17 @@ const AppContent: React.FC = () => {
       analyzed: true,
       caseSummary: "The tenant faces eviction for non-payment of rent but has a strong defense under the Warranty of Habitability due to documented lack of heating. The strategy focuses on withholding rent into an escrow account and filing a counterclaim for rent abatement.",
       notes: "Client mentioned Landlord called on June 12th threatening to 'throw things on the street'. Need to verify if witness was present.",
+      timeline: [
+        { date: "2023-01-15", event: "Heating system failure reported to Landlord via text.", type: "fact" },
+        { date: "2023-02-10", event: "Follow-up email regarding cold temperatures (45°F indoors).", type: "comm" },
+        { date: "2023-03-01", event: "Tenant withheld rent and notified Landlord of escrow account.", type: "fact" },
+        { date: "2023-07-15", event: "3-Day Notice to Quit received via mail (Improper Service).", type: "filing" }
+      ],
+      entities: [
+        { name: "John Smith (Landlord)", role: "Plaintiff" },
+        { name: "Alex Citizen (Tenant)", role: "Defendant" },
+        { name: "NYC Housing Court", role: "Court" }
+      ],
       documents: [
         { fileName: "Eviction_Notice_July.pdf", relevanceScore: 10, summary: "3-Day Notice to Quit demanding $2,400.", redFlags: ["Service was by mail only, not personal delivery"], docType: "Legal Notice", date: "2023-07-15" },
         { fileName: "Email_Thread_Heating.pdf", relevanceScore: 9, summary: "Thread showing 4 requests for heat repair between Jan-March.", redFlags: [], docType: "Evidence", date: "2023-02-10" }
@@ -158,6 +169,7 @@ const AppContent: React.FC = () => {
         }
       }
     });
+    setMode(AppMode.DASHBOARD);
     showNotify('demoLoaded', 'success');
   };
 
@@ -302,6 +314,7 @@ const AppContent: React.FC = () => {
           analyzing={analyzing}
           onAnalyze={handleAnalyze}
           context={caseContext}
+          onLoadDemo={handleLoadDemo}
         />
       )}
       {currentMode === AppMode.WAR_ROOM && (

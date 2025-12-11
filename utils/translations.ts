@@ -43,6 +43,8 @@ export const translations = {
     footer: { en: "By accessing this system, you acknowledge that communications are protected by end-to-end encryption.", es: "Al acceder a este sistema, usted reconoce que las comunicaciones están protegidas por cifrado de extremo a extremo." },
     demoLitigant: { en: "Demo Litigant", es: "Demo Litigante" },
     demoAttorney: { en: "Demo Attorney", es: "Demo Abogado" },
+    impactStat: { en: "Bridging the Justice Gap for 92% of Americans", es: "Cerrando la brecha de justicia para el 92% de los estadounidenses" },
+    poweredBy: { en: "Powered by Gemini 3.0 Pro", es: "Impulsado por Gemini 3.0 Pro" },
   },
   triage: {
     header: { en: "Preliminary Case Intake", es: "Admisión Preliminar del Caso" },
@@ -91,6 +93,9 @@ export const translations = {
     execBrief: { en: "Executive Case Brief", es: "Resumen Ejecutivo del Caso" },
     exhibitsAnalysis: { en: "Exhibits & Analysis", es: "Anexos y Análisis" },
     risksDetected: { en: "Risks Detected", es: "Riesgos Detectados" },
+    timeline: { en: "Fact Timeline", es: "Línea de Tiempo de Hechos" },
+    entities: { en: "Extracted Parties", es: "Partes Extraídas" },
+    loadSample: { en: "Load Sample Evidence", es: "Cargar Evidencia de Muestra" },
   },
   warroom: {
     header: { en: "CASE STRATEGY & PLANNING", es: "ESTRATEGIA Y PLANIFICACIÓN" },
@@ -113,6 +118,7 @@ export const translations = {
     deadlines: { en: "Statutory Deadlines & Next Steps", es: "Plazos Legales y Siguientes Pasos" },
     immediateAction: { en: "Immediate Action", es: "Acción Inmediata" },
     discoveryPlan: { en: "Discovery Plan (Interrogatories)", es: "Plan de Descubrimiento (Interrogatorios)" },
+    exportPdf: { en: "Export Strategy PDF", es: "Exportar Estrategia PDF" },
   },
   live: {
     header: { en: "Live Strategy Session", es: "Sesión de Estrategia en Vivo" },
@@ -121,6 +127,10 @@ export const translations = {
     terminate: { en: "Terminate Connection", es: "Terminar Conexión" },
     transcript: { en: "Live Transcript", es: "Transcripción en Vivo" },
     listening: { en: "Listening for audio input...", es: "Escuchando entrada de audio..." },
+    selectScenario: { en: "Select Simulation Scenario", es: "Seleccionar Escenario de Simulación" },
+    scenarioMock: { en: "Mock Trial (Judge)", es: "Juicio Simulado (Juez)" },
+    scenarioConsult: { en: "Strategic Consultation", es: "Consulta Estratégica" },
+    scenarioNeg: { en: "Settlement Negotiation", es: "Negociación de Acuerdo" },
   },
   help: {
     title: { en: "Operational Manual", es: "Manual Operativo" },
@@ -146,6 +156,8 @@ export const translations = {
     categoryCivil: { en: "Civil Litigation", es: "Litigio Civil" },
     searchPlaceholder: { en: "Search forms by keyword...", es: "Buscar formularios por palabra clave..." },
     performGlobal: { en: "Perform Global Search", es: "Realizar Búsqueda Global" },
+    autoFill: { en: "Auto-Fill Forms (Simulated)", es: "Autocompletar Formularios (Simulado)" },
+    progress: { en: "Case Completion", es: "Finalización del Caso" },
   },
   juvenile: {
     header: { en: "Juvenile Justice Hub", es: "Centro de Justicia Juvenil" },

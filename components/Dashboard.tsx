@@ -16,9 +16,10 @@ interface DashboardProps {
   analyzing: boolean;
   onAnalyze: (desc: string) => void;
   context?: CaseContext;
+  onLoadDemo?: () => void;
 }
 
-const Dashboard: React.FC<DashboardProps> = ({ files, onFilesAdded, onLinkAdded, onFileUpdated, caseData, analyzing, onAnalyze, context }) => {
+const Dashboard: React.FC<DashboardProps> = ({ files, onFilesAdded, onLinkAdded, onFileUpdated, caseData, analyzing, onAnalyze, context, onLoadDemo }) => {
   const { t } = useLanguage();
   const [caseDesc, setCaseDesc] = useState('');
   const [redactingFile, setRedactingFile] = useState<UploadedFile | null>(null);
@@ -77,15 +78,26 @@ const Dashboard: React.FC<DashboardProps> = ({ files, onFilesAdded, onLinkAdded,
             </h2>
             <p className="text-amber-600 text-xs uppercase tracking-[0.2em] font-bold">{t('dashboard', 'subHeader')}</p>
           </div>
-          {context && (
-            <div className="text-right hidden sm:block">
-              <span className="block text-[10px] text-slate-500 uppercase tracking-widest font-bold mb-1">{t('dashboard', 'matterRef')}</span>
-              <div className="bg-slate-900 px-4 py-2 border-l-2 border-amber-600">
-                <span className="text-slate-200 font-serif font-bold text-sm block">{context.caseType}</span>
-                <span className="block text-xs text-slate-500 font-mono mt-0.5">{context.jurisdiction}</span>
+          <div className="text-right flex flex-col items-end gap-3">
+            {context && (
+              <div className="hidden sm:block">
+                <span className="block text-[10px] text-slate-500 uppercase tracking-widest font-bold mb-1">{t('dashboard', 'matterRef')}</span>
+                <div className="bg-slate-900 px-4 py-2 border-l-2 border-amber-600">
+                  <span className="text-slate-200 font-serif font-bold text-sm block">{context.caseType}</span>
+                  <span className="block text-xs text-slate-500 font-mono mt-0.5">{context.jurisdiction}</span>
+                </div>
               </div>
-            </div>
-          )}
+            )}
+            {onLoadDemo && !caseData && (
+                <button 
+                    onClick={onLoadDemo} 
+                    className="text-[9px] font-bold uppercase text-blue-500 hover:text-white flex items-center gap-1 border border-blue-900/50 bg-blue-900/10 px-2 py-1 rounded-sm hover:bg-blue-900/30 transition-colors"
+                >
+                    <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" /></svg>
+                    {t('dashboard', 'loadSample')}
+                </button>
+            )}
+          </div>
         </div>
 
         {/* Input Section */}
@@ -240,6 +252,53 @@ const Dashboard: React.FC<DashboardProps> = ({ files, onFilesAdded, onLinkAdded,
                {caseData.caseSummary}
              </div>
           </div>
+        )}
+
+        {/* Extracted Data Row: Timeline & Entities */}
+        {caseData && (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                {/* Timeline */}
+                <div className="bg-slate-900 border border-slate-800 rounded-sm p-6 shadow-lg">
+                    <h3 className="text-sm font-bold text-slate-300 uppercase tracking-widest mb-6 flex items-center gap-2 border-b border-slate-800 pb-3">
+                        <svg className="w-4 h-4 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                        {t('dashboard', 'timeline')}
+                    </h3>
+                    <div className="space-y-6 relative border-l border-slate-800 ml-3 pl-6 py-2">
+                        {caseData.timeline && caseData.timeline.map((event, idx) => (
+                            <div key={idx} className="relative">
+                                <div className={`absolute -left-[29px] top-1.5 w-3 h-3 rounded-full border-2 ${
+                                    event.type === 'filing' ? 'bg-red-900 border-red-500' : 
+                                    event.type === 'comm' ? 'bg-blue-900 border-blue-500' : 'bg-slate-900 border-slate-500'
+                                }`}></div>
+                                <span className="text-[10px] font-mono text-slate-500 uppercase block mb-1">{event.date}</span>
+                                <p className="text-sm text-slate-300 font-serif leading-snug">{event.event}</p>
+                            </div>
+                        ))}
+                        {(!caseData.timeline || caseData.timeline.length === 0) && (
+                            <p className="text-xs text-slate-600 italic">No specific timeline events extracted.</p>
+                        )}
+                    </div>
+                </div>
+
+                {/* Extracted Entities */}
+                <div className="bg-slate-900 border border-slate-800 rounded-sm p-6 shadow-lg">
+                    <h3 className="text-sm font-bold text-slate-300 uppercase tracking-widest mb-6 flex items-center gap-2 border-b border-slate-800 pb-3">
+                        <svg className="w-4 h-4 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
+                        {t('dashboard', 'entities')}
+                    </h3>
+                    <div className="space-y-3">
+                        {caseData.entities && caseData.entities.map((entity, idx) => (
+                            <div key={idx} className="flex justify-between items-center p-3 bg-slate-950 border border-slate-800 rounded-sm">
+                                <span className="text-sm font-serif font-bold text-slate-200">{entity.name}</span>
+                                <span className="text-[10px] uppercase font-bold tracking-widest text-slate-500 bg-slate-900 px-2 py-1 rounded border border-slate-800">{entity.role}</span>
+                            </div>
+                        ))}
+                         {(!caseData.entities || caseData.entities.length === 0) && (
+                            <p className="text-xs text-slate-600 italic">No key parties identified.</p>
+                        )}
+                    </div>
+                </div>
+            </div>
         )}
 
         {/* Document Grid */}
