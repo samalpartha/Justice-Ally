@@ -15,10 +15,12 @@ const JuvenileJustice: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'emancipation' | 'delinquency' | 'dependency'>('delinquency');
   const [selectedState, setSelectedState] = useState("California");
   const [checkedItems, setCheckedItems] = useState<Record<string, boolean>>({});
+  const [selectedStep, setSelectedStep] = useState<number | null>(null);
 
-  // Reset checklist when tab changes to ensure separation
+  // Reset check state when tab changes
   useEffect(() => {
     setCheckedItems({});
+    setSelectedStep(null);
   }, [activeTab]);
 
   const toggleCheck = (itemKey: string) => {
@@ -55,10 +57,10 @@ const JuvenileJustice: React.FC = () => {
                 { key: 'checkEmp5', text: t('juvenile', 'checkEmp5') }
             ],
             flow: [
-                { title: t('juvenile', 'flowEmp1Title'), desc: t('juvenile', 'flowEmp1Desc') },
-                { title: t('juvenile', 'flowEmp2Title'), desc: t('juvenile', 'flowEmp2Desc') },
-                { title: t('juvenile', 'flowEmp3Title'), desc: t('juvenile', 'flowEmp3Desc') },
-                { title: t('juvenile', 'flowEmp4Title'), desc: t('juvenile', 'flowEmp4Desc') }
+                { title: t('juvenile', 'flowEmp1Title'), desc: t('juvenile', 'flowEmp1Desc'), detail: t('juvenile', 'flowEmp1Detail') },
+                { title: t('juvenile', 'flowEmp2Title'), desc: t('juvenile', 'flowEmp2Desc'), detail: t('juvenile', 'flowEmp2Detail') },
+                { title: t('juvenile', 'flowEmp3Title'), desc: t('juvenile', 'flowEmp3Desc'), detail: t('juvenile', 'flowEmp3Detail') },
+                { title: t('juvenile', 'flowEmp4Title'), desc: t('juvenile', 'flowEmp4Desc'), detail: t('juvenile', 'flowEmp4Detail') }
             ],
             forms: [
                 { name: t('juvenile', 'formEmp1'), query: "petition for emancipation form" },
@@ -79,10 +81,10 @@ const JuvenileJustice: React.FC = () => {
                 { key: 'checkDep5', text: t('juvenile', 'checkDep5') }
             ],
             flow: [
-                { title: t('juvenile', 'flowDep1Title'), desc: t('juvenile', 'flowDep1Desc') },
-                { title: t('juvenile', 'flowDep2Title'), desc: t('juvenile', 'flowDep2Desc') },
-                { title: t('juvenile', 'flowDep3Title'), desc: t('juvenile', 'flowDep3Desc') },
-                { title: t('juvenile', 'flowDep4Title'), desc: t('juvenile', 'flowDep4Desc') }
+                { title: t('juvenile', 'flowDep1Title'), desc: t('juvenile', 'flowDep1Desc'), detail: t('juvenile', 'flowDep1Detail') },
+                { title: t('juvenile', 'flowDep2Title'), desc: t('juvenile', 'flowDep2Desc'), detail: t('juvenile', 'flowDep2Detail') },
+                { title: t('juvenile', 'flowDep3Title'), desc: t('juvenile', 'flowDep3Desc'), detail: t('juvenile', 'flowDep3Detail') },
+                { title: t('juvenile', 'flowDep4Title'), desc: t('juvenile', 'flowDep4Desc'), detail: t('juvenile', 'flowDep4Detail') }
             ],
             forms: [
                 { name: t('juvenile', 'formDep1'), query: "parental reunification plan template" },
@@ -104,10 +106,10 @@ const JuvenileJustice: React.FC = () => {
                 { key: 'checkDel5', text: t('juvenile', 'checkDel5') }
             ],
             flow: [
-                { title: t('juvenile', 'flowDel1Title'), desc: t('juvenile', 'flowDel1Desc') },
-                { title: t('juvenile', 'flowDel2Title'), desc: t('juvenile', 'flowDel2Desc') },
-                { title: t('juvenile', 'flowDel3Title'), desc: t('juvenile', 'flowDel3Desc') },
-                { title: t('juvenile', 'flowDel4Title'), desc: t('juvenile', 'flowDel4Desc') }
+                { title: t('juvenile', 'flowDel1Title'), desc: t('juvenile', 'flowDel1Desc'), detail: t('juvenile', 'flowDel1Detail') },
+                { title: t('juvenile', 'flowDel2Title'), desc: t('juvenile', 'flowDel2Desc'), detail: t('juvenile', 'flowDel2Detail') },
+                { title: t('juvenile', 'flowDel3Title'), desc: t('juvenile', 'flowDel3Desc'), detail: t('juvenile', 'flowDel3Detail') },
+                { title: t('juvenile', 'flowDel4Title'), desc: t('juvenile', 'flowDel4Desc'), detail: t('juvenile', 'flowDel4Detail') }
             ],
             forms: [
                 { name: t('juvenile', 'formDel1'), query: "motion to seal juvenile records form" },
@@ -221,30 +223,69 @@ const JuvenileJustice: React.FC = () => {
             <div className="bg-slate-900 border border-slate-800 p-8 rounded-sm shadow-lg">
                <h3 className="text-[10px] font-bold uppercase text-slate-500 tracking-[0.2em] mb-8 border-b border-slate-800 pb-2">{t('juvenile', 'proceduralFlow')}</h3>
                
-               <div className="relative">
+               <div className="relative mb-6">
                  {/* Connecting Line */}
                  <div className="absolute top-4 left-0 right-0 h-0.5 bg-slate-800 hidden md:block"></div>
                  
                  <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-                   {currentData.flow.map((step, idx) => (
-                     <div key={idx} className="relative group">
-                        {/* Number Badge */}
-                        <div className={`w-8 h-8 rounded-full bg-slate-900 border-2 flex items-center justify-center font-bold text-xs relative z-10 mx-auto md:mx-0 mb-4 transition-colors ${
-                          activeTab === 'emancipation' ? 'border-emerald-600 text-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.3)]' :
-                          activeTab === 'dependency' ? 'border-blue-600 text-blue-500 shadow-[0_0_10px_rgba(59,130,246,0.3)]' :
-                          'border-amber-600 text-amber-500 shadow-[0_0_10px_rgba(217,119,6,0.3)]'
-                        }`}>
-                          {idx + 1}
-                        </div>
-                        
-                        <div className="bg-slate-950 border border-slate-800 p-4 rounded-sm hover:border-slate-600 transition-colors h-full">
-                           <h4 className="font-serif font-bold text-slate-200 text-sm mb-2">{step.title}</h4>
-                           <p className="text-[10px] text-slate-500 leading-relaxed font-medium uppercase tracking-wide">{step.desc}</p>
-                        </div>
-                     </div>
-                   ))}
+                   {currentData.flow.map((step, idx) => {
+                     const isSelected = selectedStep === idx;
+                     return (
+                       <div key={idx} className="relative group">
+                          {/* Number Badge */}
+                          <button 
+                            onClick={() => setSelectedStep(idx)}
+                            className={`w-8 h-8 rounded-full border-2 flex items-center justify-center font-bold text-xs relative z-10 mx-auto md:mx-0 mb-4 transition-all duration-300 ${
+                              isSelected 
+                                ? (activeTab === 'emancipation' ? 'bg-emerald-600 border-emerald-400 text-white scale-110' : 
+                                   activeTab === 'dependency' ? 'bg-blue-600 border-blue-400 text-white scale-110' : 
+                                   'bg-amber-600 border-amber-400 text-white scale-110')
+                                : (activeTab === 'emancipation' ? 'bg-slate-900 border-emerald-900 text-emerald-700 hover:border-emerald-600' : 
+                                   activeTab === 'dependency' ? 'bg-slate-900 border-blue-900 text-blue-700 hover:border-blue-600' : 
+                                   'bg-slate-900 border-amber-900 text-amber-700 hover:border-amber-600')
+                          }`}>
+                            {idx + 1}
+                          </button>
+                          
+                          <button 
+                             onClick={() => setSelectedStep(idx)}
+                             className={`w-full text-left bg-slate-950 border p-4 rounded-sm transition-all h-full ${
+                               isSelected 
+                                 ? (activeTab === 'emancipation' ? 'border-emerald-500 ring-1 ring-emerald-500/50' : 
+                                    activeTab === 'dependency' ? 'border-blue-500 ring-1 ring-blue-500/50' : 
+                                    'border-amber-500 ring-1 ring-amber-500/50')
+                                 : 'border-slate-800 hover:border-slate-600'
+                             }`}
+                          >
+                             <h4 className={`font-serif font-bold text-sm mb-2 ${isSelected ? 'text-white' : 'text-slate-300'}`}>{step.title}</h4>
+                             <p className="text-[10px] text-slate-500 leading-relaxed font-medium uppercase tracking-wide">{step.desc}</p>
+                          </button>
+                       </div>
+                     );
+                   })}
                  </div>
                </div>
+
+               {/* Stage Detail View */}
+               {selectedStep !== null && (
+                 <div className="mt-8 bg-slate-950 border-t-2 border-slate-800 pt-6 animate-in fade-in slide-in-from-top-2 duration-300">
+                   <div className="flex items-start gap-4">
+                     <div className={`p-2 rounded-sm shrink-0 ${
+                        activeTab === 'emancipation' ? 'bg-emerald-900/20 text-emerald-500' : 
+                        activeTab === 'dependency' ? 'bg-blue-900/20 text-blue-500' : 
+                        'bg-amber-900/20 text-amber-500'
+                     }`}>
+                       <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                     </div>
+                     <div>
+                       <h4 className="text-sm font-bold text-slate-200 uppercase tracking-widest mb-2">Stage {selectedStep + 1}: {currentData.flow[selectedStep].title}</h4>
+                       <p className="text-slate-300 font-serif leading-7 text-sm">
+                         {currentData.flow[selectedStep].detail}
+                       </p>
+                     </div>
+                   </div>
+                 </div>
+               )}
             </div>
           </div>
 

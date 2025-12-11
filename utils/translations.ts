@@ -20,7 +20,7 @@ export const translations = {
     evidenceVault: { en: "Evidence Vault", es: "Bóveda de Pruebas" },
     docket: { en: "Docket & Discovery", es: "Expediente y Descubrimiento" },
     strategyRoom: { en: "Strategy Room", es: "Sala de Estrategia" },
-    casePlanning: { en: "Case Planning", es: "Planificación del Caso" },
+    casePlanning: { en: "Planificación del Caso", es: "Planificación del Caso" },
     counselTools: { en: "Counsel & Tools", es: "Asesoría y Herramientas" },
     tacticalChat: { en: "Tactical Chat", es: "Chat Táctico" },
     aiCoCounsel: { en: "AI Co-Counsel", es: "Co-Abogado IA" },
@@ -198,33 +198,54 @@ export const translations = {
     checkDep4: { en: "Maintain steady employment/income", es: "Mantener empleo/ingresos estables" },
     checkDep5: { en: "Drug testing compliance (if applicable)", es: "Cumplimiento de pruebas de drogas (si aplica)" },
 
-    // Procedural Flow Steps
+    // Procedural Flow Steps & Details
     flowEmp1Title: { en: "Petition", es: "Petición" },
     flowEmp1Desc: { en: "File request with Family Court.", es: "Presentar solicitud en Tribunal de Familia." },
+    flowEmp1Detail: { en: "You must file a petition (Form MC-300 in California) with the Superior Court in the county where you live. You will need to pay a filing fee or request a fee waiver.", es: "Debe presentar una petición (Formulario MC-300 en California) ante el Tribunal Superior del condado donde reside. Deberá pagar una tarifa de presentación o solicitar una exención." },
+    
     flowEmp2Title: { en: "Investigation", es: "Investigación" },
     flowEmp2Desc: { en: "Social services verifies living situation.", es: "Servicios sociales verifica situación de vivienda." },
+    flowEmp2Detail: { en: "The court will likely assign a social worker or probation officer to investigate your living situation. They will interview you and your parents to ensure you are truly independent.", es: "Probablemente el tribunal asignará un trabajador social o oficial de libertad condicional para investigar su situación de vivienda. Le entrevistarán a usted y a sus padres para asegurar su independencia." },
+
     flowEmp3Title: { en: "Hearing", es: "Audiencia" },
     flowEmp3Desc: { en: "Judge interviews minor & parents.", es: "Juez entrevista a menor y padres." },
+    flowEmp3Detail: { en: "You must appear before a judge. Your parents will be notified and can object. You must prove you have legal income, housing, and maturity.", es: "Debe comparecer ante un juez. Sus padres serán notificados y pueden objetar. Debe probar que tiene ingresos legales, vivienda y madurez." },
+
     flowEmp4Title: { en: "Decree", es: "Decreto" },
     flowEmp4Desc: { en: "Judge issues Declaration of Emancipation.", es: "Juez emite Declaración de Emancipación." },
+    flowEmp4Detail: { en: "If granted, you receive a Declaration of Emancipation. You can sign contracts, enroll in school, and keep your own wages. You lose the right to parental support.", es: "Si se otorga, recibe una Declaración de Emancipación. Puede firmar contratos, inscribirse en la escuela y conservar su salario. Pierde el derecho al apoyo de los padres." },
 
     flowDel1Title: { en: "Intake", es: "Admisión" },
     flowDel1Desc: { en: "Police custody & initial risk assessment.", es: "Custodia policial y evaluación de riesgo." },
+    flowDel1Detail: { en: "Law enforcement decides whether to cite and release or detain. If detained, a detention hearing must happen within 2-3 days. PRO TIP: Exercise your right to remain silent.", es: "La policía decide si citar y liberar o detener. Si se detiene, debe haber una audiencia de detención en 2-3 días. CONSEJO: Ejerza su derecho a permanecer en silencio." },
+
     flowDel2Title: { en: "Adjudication", es: "Adjudicación" },
     flowDel2Desc: { en: "Trial phase. Judge determines truth.", es: "Fase de juicio. Juez determina la verdad." },
+    flowDel2Detail: { en: "The 'Jurisdiction Hearing' is the trial. The D.A. must prove the case beyond a reasonable doubt. There are no juries in most juvenile courts; the judge decides.", es: "La 'Audiencia de Jurisdicción' es el juicio. El fiscal debe probar el caso más allá de una duda razonable. No hay jurados en la mayoría de los tribunales juveniles; el juez decide." },
+
     flowDel3Title: { en: "Disposition", es: "Disposición" },
     flowDel3Desc: { en: "Sentencing focused on rehabilitation.", es: "Sentencia enfocada en rehabilitación." },
+    flowDel3Detail: { en: "If the judge finds the allegations true, a Disposition Hearing sets the outcome: probation, home supervision, or placement in a facility. The goal is rehabilitation, not punishment.", es: "Si el juez considera que las acusaciones son ciertas, una Audiencia de Disposición establece el resultado: libertad condicional, supervisión en el hogar o colocación en una instalación. El objetivo es la rehabilitación, no el castigo." },
+
     flowDel4Title: { en: "Review", es: "Revisión" },
     flowDel4Desc: { en: "Monitoring progress & probation terms.", es: "Monitoreo de progreso y términos de libertad condicional." },
+    flowDel4Detail: { en: "The court reviews progress. Successful completion of probation terms (school, curfew, community service) leads to case dismissal and record sealing.", es: "El tribunal revisa el progreso. El cumplimiento exitoso de los términos de libertad condicional (escuela, toque de queda, servicio comunitario) conduce a la desestimación del caso y al sellado del registro." },
 
     flowDep1Title: { en: "Detention", es: "Detención" },
     flowDep1Desc: { en: "Initial removal decision (within 72hrs).", es: "Decisión inicial de remoción (en 72 hrs)." },
+    flowDep1Detail: { en: "CPS removes a child if imminent danger exists. A detention hearing occurs within 72 hours to decide if the child stays in custody or returns home pending trial.", es: "CPS retira a un niño si existe peligro inminente. Una audiencia de detención ocurre dentro de las 72 horas para decidir si el niño permanece bajo custodia o regresa a casa pendiente de juicio." },
+
     flowDep2Title: { en: "Jurisdiction", es: "Jurisdicción" },
     flowDep2Desc: { en: "Court determines if allegations are true.", es: "Tribunal determina si alegatos son ciertos." },
+    flowDep2Detail: { en: "The court determines if the allegations of abuse or neglect are true. If yes, the child becomes a 'dependent' of the court.", es: "El tribunal determina si las acusaciones de abuso o negligencia son ciertas. Si es así, el niño se convierte en 'dependiente' del tribunal." },
+
     flowDep3Title: { en: "Disposition", es: "Disposición" },
     flowDep3Desc: { en: "Reunification plan set for parents.", es: "Plan de reunificación para padres." },
+    flowDep3Detail: { en: "The court orders a Case Plan. Parents usually get 6-12 months of 'Reunification Services' (classes, drug testing) to get the child back.", es: "El tribunal ordena un Plan de Caso. Los padres generalmente reciben de 6 a 12 meses de 'Servicios de Reunificación' (clases, pruebas de drogas) para recuperar al niño." },
+
     flowDep4Title: { en: "Permanency", es: "Permanencia" },
     flowDep4Desc: { en: "Final decision: Return home or Adoption.", es: "Decisión final: Regreso a casa o Adopción." },
+    flowDep4Detail: { en: "If reunification fails, the court selects a permanent plan: Adoption (termination of parental rights), Legal Guardianship, or Long-term Foster Care.", es: "Si falla la reunificación, el tribunal selecciona un plan permanente: Adopción (terminación de derechos parentales), Tutela Legal o Cuidado de Crianza a largo plazo." },
 
     // Forms
     formEmp1: { en: "Petition for Emancipation", es: "Petición de Emancipación" },
