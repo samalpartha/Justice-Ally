@@ -168,6 +168,8 @@ export const translations = {
     readinessChecklist: { en: "Readiness Checklist", es: "Lista de Verificación" },
     reset: { en: "Reset", es: "Reiniciar" },
     extResearch: { en: "External Research", es: "Investigación Externa" },
+    galTitle: { en: "Guardian Ad Litem (GAL)", es: "Tutor Ad Litem (GAL)" },
+    galDesc: { en: "A GAL is an attorney appointed by the court solely to represent the child's best interests, not the parents. They investigate facts and report directly to the judge.", es: "Un GAL es un abogado designado por el tribunal únicamente para representar los mejores intereses del niño, no a los padres. Investigan los hechos e informan directamente al juez." },
     
     // Deep Content
     emancipationDesc: { en: "Legal mechanism for a minor to become an adult before age 18. Must prove financial independence and ability to manage affairs.", es: "Mecanismo legal para que un menor sea adulto antes de los 18. Debe probar independencia financiera y capacidad para manejar sus asuntos." },

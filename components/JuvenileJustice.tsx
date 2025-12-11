@@ -310,13 +310,13 @@ const JuvenileJustice: React.FC = () => {
             
             {/* GAL Card */}
             {currentData.showGal && (
-                <div className="bg-slate-950 border border-slate-700 p-5 rounded-sm relative overflow-hidden group">
+                <div className="bg-slate-900 border border-slate-700 p-5 rounded-sm relative overflow-hidden group">
                     <div className="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-indigo-500 to-purple-600"></div>
                     <h3 className="text-xs font-bold text-indigo-400 uppercase tracking-widest mb-2 flex items-center gap-2">
-                        Guardian Ad Litem (GAL)
+                        {t('juvenile', 'galTitle')}
                     </h3>
                     <p className="text-slate-400 text-xs leading-relaxed font-serif">
-                        A GAL is an attorney appointed by the court solely to represent the <strong>child's best interests</strong>, not the parents. They investigate facts and report directly to the judge.
+                        {t('juvenile', 'galDesc')}
                     </p>
                 </div>
             )}
