@@ -227,7 +227,7 @@ const Triage: React.FC<TriageProps> = ({ onComplete }) => {
              <ul className="space-y-6">
                <li>
                  <span className="text-[10px] text-slate-500 font-bold uppercase tracking-widest block mb-1">{t('triage', 'estFees')}</span>
-                 <span className="text-slate-200 font-mono text-xl border-b border-slate-700 pb-1 block w-max">{result?.estimatedCosts.filingFees}</span>
+                 <span className="text-slate-200 font-mono text-xl border-b border-slate-700 pb-1 block w-full whitespace-normal break-words">{result?.estimatedCosts.filingFees}</span>
                </li>
                <li>
                  <span className="text-[10px] text-slate-500 font-bold uppercase tracking-widest block mb-2">{t('triage', 'ancillary')}</span>

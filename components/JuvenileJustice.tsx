@@ -66,7 +66,9 @@ const JuvenileJustice: React.FC = () => {
                 { name: t('juvenile', 'formEmp1'), query: "petition for emancipation form" },
                 { name: t('juvenile', 'formEmp2'), query: "income and expense declaration form" },
                 { name: t('juvenile', 'formEmp3'), query: "notice of hearing juvenile form" }
-            ]
+            ],
+            showGal: false,
+            showBestInterest: false
         };
     } else if (activeTab === 'dependency') {
         return {
@@ -89,8 +91,12 @@ const JuvenileJustice: React.FC = () => {
             forms: [
                 { name: t('juvenile', 'formDep1'), query: "parental reunification plan template" },
                 { name: t('juvenile', 'formDep2'), query: "visitation log sheet child custody" },
-                { name: t('juvenile', 'formDep3'), query: "request for relative placement form" }
-            ]
+                { name: t('juvenile', 'formDep3'), query: "request for relative placement form" },
+                { name: "Financial Affidavit", query: "financial affidavit family law form" },
+                { name: "Child Support Worksheet", query: "child support guidelines worksheet form" }
+            ],
+            showGal: true,
+            showBestInterest: true
         };
     } else {
         // Delinquency
@@ -115,7 +121,9 @@ const JuvenileJustice: React.FC = () => {
                 { name: t('juvenile', 'formDel1'), query: "motion to seal juvenile records form" },
                 { name: t('juvenile', 'formDel2'), query: "character reference letter template court" },
                 { name: t('juvenile', 'formDel3'), query: "community service log sheet" }
-            ]
+            ],
+            showGal: true,
+            showBestInterest: false
         };
     }
   };
@@ -207,6 +215,14 @@ const JuvenileJustice: React.FC = () => {
                    {currentData.desc}
                  </p>
 
+                 {currentData.showBestInterest && (
+                    <div className="mb-6 p-4 bg-blue-900/10 border-l-4 border-blue-500 rounded-r-sm">
+                        <h4 className="text-[10px] font-bold uppercase text-blue-400 tracking-widest mb-1">Legal Doctrine</h4>
+                        <p className="text-blue-200 font-serif font-bold">"Best Interest of the Child"</p>
+                        <p className="text-xs text-blue-300/80 mt-1">The court must prioritize the physical safety and emotional well-being of the minor above all other interests, including parental rights.</p>
+                    </div>
+                 )}
+
                  <div className="bg-slate-950/40 border border-slate-800 rounded-sm p-5">
                     <h4 className="text-[10px] font-bold uppercase text-slate-500 tracking-widest mb-3">{t('juvenile', 'precedentLabel')}</h4>
                     <div className="flex items-start gap-4">
@@ -292,6 +308,19 @@ const JuvenileJustice: React.FC = () => {
           {/* RIGHT COLUMN: Action Items (Cols 4) */}
           <div className="lg:col-span-4 space-y-6">
             
+            {/* GAL Card */}
+            {currentData.showGal && (
+                <div className="bg-slate-950 border border-slate-700 p-5 rounded-sm relative overflow-hidden group">
+                    <div className="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-indigo-500 to-purple-600"></div>
+                    <h3 className="text-xs font-bold text-indigo-400 uppercase tracking-widest mb-2 flex items-center gap-2">
+                        Guardian Ad Litem (GAL)
+                    </h3>
+                    <p className="text-slate-400 text-xs leading-relaxed font-serif">
+                        A GAL is an attorney appointed by the court solely to represent the <strong>child's best interests</strong>, not the parents. They investigate facts and report directly to the judge.
+                    </p>
+                </div>
+            )}
+
             {/* State Resources Card */}
             <div className="bg-slate-900 border border-slate-800 p-6 rounded-sm shadow-lg">
                <div className="flex items-center gap-3 mb-6 border-b border-slate-800 pb-4">
