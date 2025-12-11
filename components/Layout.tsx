@@ -2,6 +2,7 @@
 import React from 'react';
 import { AppMode, UserProfile } from '../types';
 import { useLanguage } from '../context/LanguageContext';
+import { useTheme } from '../context/ThemeContext';
 
 interface LayoutProps {
   currentMode: AppMode;
@@ -15,6 +16,7 @@ interface LayoutProps {
 
 const Layout: React.FC<LayoutProps> = ({ currentMode, setMode, onSave, onLoad, user, onLogout, children }) => {
   const { language, setLanguage, t } = useLanguage();
+  const { theme, toggleTheme } = useTheme();
 
   const NavItem = ({ mode, icon, label, sub }: { mode: AppMode, icon: React.ReactNode, label: string, sub?: string }) => (
     <button
@@ -36,12 +38,23 @@ const Layout: React.FC<LayoutProps> = ({ currentMode, setMode, onSave, onLoad, u
   );
 
   return (
-    <div className="flex h-screen bg-slate-950 text-slate-200 font-sans selection:bg-amber-900/50 selection:text-amber-100">
+    <div className="flex h-screen bg-slate-950 text-slate-200 font-sans selection:bg-amber-900/50 selection:text-amber-100 transition-colors duration-300">
       {/* Sidebar - Legal Binder Spine Aesthetic */}
-      <aside className="w-72 bg-slate-950 border-r-4 border-double border-slate-800 flex flex-col shrink-0 z-20 shadow-[4px_0_24px_rgba(0,0,0,0.5)] relative">
+      <aside className="w-72 bg-slate-950 border-r-4 border-double border-slate-800 flex flex-col shrink-0 z-20 shadow-[4px_0_24px_rgba(0,0,0,0.5)] relative transition-colors duration-300">
         
-        {/* Language Toggle - Absolute Positioned to Avoid Overlap */}
-        <div className="absolute top-4 right-4 z-30">
+        {/* Toggles - Absolute Positioned to Avoid Overlap */}
+        <div className="absolute top-4 right-4 z-30 flex gap-2">
+            <button
+                onClick={toggleTheme}
+                className="flex items-center justify-center bg-slate-900 hover:bg-slate-800 border border-slate-700 w-8 h-8 rounded-sm transition-all shadow-sm group/theme"
+                title={theme === 'dark' ? "Switch to Light Mode" : "Switch to Dark Mode"}
+            >
+                {theme === 'dark' ? (
+                   <svg className="w-4 h-4 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" /></svg>
+                ) : (
+                   <svg className="w-4 h-4 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" /></svg>
+                )}
+            </button>
             <button 
                 onClick={() => setLanguage(language === 'en' ? 'es' : 'en')}
                 className="flex items-center gap-1 bg-slate-900 hover:bg-slate-800 border border-slate-700 px-2 py-1 rounded-sm transition-all shadow-sm group/lang"
@@ -54,9 +67,9 @@ const Layout: React.FC<LayoutProps> = ({ currentMode, setMode, onSave, onLoad, u
         </div>
 
         {/* Branding Area - Centered Layout */}
-        <div className="p-8 border-b border-slate-800 bg-slate-950 flex flex-col items-center text-center group mt-4">
+        <div className="p-8 border-b border-slate-800 bg-slate-950 flex flex-col items-center text-center group mt-4 transition-colors duration-300">
              {/* Centered Icon */}
-             <div className="w-14 h-14 flex items-center justify-center border-2 border-amber-700 rounded-sm bg-slate-900 shadow-inner mb-4">
+             <div className="w-14 h-14 flex items-center justify-center border-2 border-amber-700 rounded-sm bg-slate-900 shadow-inner mb-4 transition-colors duration-300">
                <svg className="w-8 h-8 text-amber-600" fill="currentColor" viewBox="0 0 24 24">
                  <path d="M12 2c-1.1 0-2 .9-2 2h-3v2h2.55c-.6 2.3-2.65 4-5.05 4-1.3 0-2.5-.35-3.5-1l-1 1.75c1.3.85 2.85 1.25 4.5 1.25 2.5 0 4.8-1.15 6.35-3h6.3c1.55 1.85 3.85 3 6.35 3 1.65 0 3.2-.4 4.5-1.25l-1-1.75c-1 .65-2.2 1-3.5 1-2.4 0-4.45-1.7-5.05-4h2.55V4h-3c0-1.1-.9-2-2-2zm-6 12c-2.2 0-4 1.8-4 4s1.8 4 4 4 4-1.8 4-4-1.8-4-4-4zm12 0c-2.2 0-4 1.8-4 4s1.8 4 4 4 4-1.8 4-4-1.8-4-4-4z"/>
                </svg>
@@ -71,7 +84,7 @@ const Layout: React.FC<LayoutProps> = ({ currentMode, setMode, onSave, onLoad, u
 
         {/* User Profile Badge */}
         {user && (
-          <div className="px-6 py-4 bg-slate-900/50 border-b border-slate-800 flex items-center gap-3">
+          <div className="px-6 py-4 bg-slate-900/50 border-b border-slate-800 flex items-center gap-3 transition-colors duration-300">
              <div className={`w-8 h-8 rounded-full flex items-center justify-center font-serif font-bold text-xs border ${user.role === 'attorney' ? 'bg-blue-900 border-blue-600 text-blue-200' : 'bg-amber-900 border-amber-600 text-amber-200'}`}>
                 {user.name.charAt(0)}
              </div>
@@ -126,7 +139,7 @@ const Layout: React.FC<LayoutProps> = ({ currentMode, setMode, onSave, onLoad, u
              sub={t('sidebar', 'youthLaw')}
              icon={<svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>}
            />
-           <div className="my-2 border-t border-slate-800 mx-6"></div>
+           <div className="my-2 border-t border-slate-800 mx-6 transition-colors duration-300"></div>
            <NavItem 
              mode={AppMode.HELP} 
              label={t('sidebar', 'manual')} 
@@ -136,7 +149,7 @@ const Layout: React.FC<LayoutProps> = ({ currentMode, setMode, onSave, onLoad, u
         </nav>
 
         {/* Footer Actions */}
-        <div className="bg-slate-950 p-6 border-t border-slate-800 space-y-3">
+        <div className="bg-slate-950 p-6 border-t border-slate-800 space-y-3 transition-colors duration-300">
           <div className="grid grid-cols-2 gap-2">
             <button onClick={onSave} className="flex flex-col items-center justify-center p-2 bg-slate-900 border border-slate-800 hover:border-amber-600 rounded-sm group transition-all">
               <svg className="w-4 h-4 text-slate-500 group-hover:text-amber-500 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" /></svg>
@@ -154,7 +167,7 @@ const Layout: React.FC<LayoutProps> = ({ currentMode, setMode, onSave, onLoad, u
       </aside>
 
       {/* Main Content Area */}
-      <main className="flex-1 min-w-0 bg-slate-950 relative z-10">
+      <main className="flex-1 min-w-0 bg-slate-950 relative z-10 transition-colors duration-300">
         {children}
       </main>
     </div>

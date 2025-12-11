@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { UserRole } from '../types';
 import { useLanguage } from '../context/LanguageContext';
+import { useTheme } from '../context/ThemeContext';
 
 interface LoginProps {
   onLogin: (role: UserRole, name: string, email: string) => void;
@@ -9,6 +10,7 @@ interface LoginProps {
 
 const Login: React.FC<LoginProps> = ({ onLogin }) => {
   const { t, setLanguage, language } = useLanguage();
+  const { theme, toggleTheme } = useTheme();
   const [role, setRole] = useState<UserRole>('litigant');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -35,14 +37,25 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center p-6 relative overflow-hidden">
+    <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center p-6 relative overflow-hidden transition-colors duration-300">
       {/* Background Elements */}
       <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-slate-900 via-amber-700 to-slate-900"></div>
       <div className="absolute -top-20 -right-20 w-96 h-96 bg-amber-600/5 rounded-full blur-3xl"></div>
       <div className="absolute bottom-0 left-0 w-full h-1/2 bg-gradient-to-t from-slate-900 to-transparent pointer-events-none"></div>
 
-      {/* Language Toggle */}
-      <div className="absolute top-6 right-6 z-20">
+      {/* Toggles */}
+      <div className="absolute top-6 right-6 z-20 flex gap-2">
+         <button
+            onClick={toggleTheme}
+            className="flex items-center justify-center bg-slate-900 hover:bg-slate-800 border border-slate-700 w-8 h-8 rounded-sm transition-all shadow-sm group/theme"
+            title={theme === 'dark' ? "Switch to Light Mode" : "Switch to Dark Mode"}
+        >
+            {theme === 'dark' ? (
+                <svg className="w-4 h-4 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" /></svg>
+            ) : (
+                <svg className="w-4 h-4 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" /></svg>
+            )}
+        </button>
          <button 
            onClick={() => setLanguage(language === 'en' ? 'es' : 'en')}
            className="text-xs font-bold uppercase text-slate-500 hover:text-amber-600 transition-colors border border-slate-800 px-3 py-1 rounded-sm bg-slate-900"
@@ -51,10 +64,10 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
          </button>
       </div>
 
-      <div className="max-w-md w-full bg-slate-900 border border-slate-800 shadow-2xl rounded-sm relative z-10 overflow-hidden">
+      <div className="max-w-md w-full bg-slate-900 border border-slate-800 shadow-2xl rounded-sm relative z-10 overflow-hidden transition-colors duration-300">
         {/* Header */}
-        <div className="p-8 text-center border-b border-slate-800 bg-slate-950 flex flex-col items-center">
-          <div className="w-16 h-16 flex items-center justify-center border-2 border-amber-700 rounded-sm bg-slate-900 shadow-inner mb-4">
+        <div className="p-8 text-center border-b border-slate-800 bg-slate-950 flex flex-col items-center transition-colors duration-300">
+          <div className="w-16 h-16 flex items-center justify-center border-2 border-amber-700 rounded-sm bg-slate-900 shadow-inner mb-4 transition-colors duration-300">
              <svg className="w-8 h-8 text-amber-600" fill="currentColor" viewBox="0 0 24 24">
                <path d="M12 2c-1.1 0-2 .9-2 2h-3v2h2.55c-.6 2.3-2.65 4-5.05 4-1.3 0-2.5-.35-3.5-1l-1 1.75c1.3.85 2.85 1.25 4.5 1.25 2.5 0 4.8-1.15 6.35-3h6.3c1.55 1.85 3.85 3 6.35 3 1.65 0 3.2-.4 4.5-1.25l-1-1.75c-1 .65-2.2 1-3.5 1-2.4 0-4.45-1.7-5.05-4h2.55V4h-3c0-1.1-.9-2-2-2zm-6 12c-2.2 0-4 1.8-4 4s1.8 4 4 4 4-1.8 4-4-1.8-4-4-4zm12 0c-2.2 0-4 1.8-4 4s1.8 4 4 4 4-1.8 4-4-1.8-4-4-4z"/>
              </svg>
@@ -103,7 +116,7 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="user@example.com"
-              className="w-full bg-slate-950 border border-slate-700 p-3 rounded-sm text-slate-200 text-sm focus:border-amber-600 focus:outline-none font-serif placeholder:text-slate-700"
+              className="w-full bg-slate-950 border border-slate-700 p-3 rounded-sm text-slate-200 text-sm focus:border-amber-600 focus:outline-none font-serif placeholder:text-slate-700 transition-colors"
             />
           </div>
           
@@ -115,7 +128,7 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="••••••••"
-              className="w-full bg-slate-950 border border-slate-700 p-3 rounded-sm text-slate-200 text-sm focus:border-amber-600 focus:outline-none font-serif placeholder:text-slate-700"
+              className="w-full bg-slate-950 border border-slate-700 p-3 rounded-sm text-slate-200 text-sm focus:border-amber-600 focus:outline-none font-serif placeholder:text-slate-700 transition-colors"
             />
           </div>
 
@@ -156,7 +169,7 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
         </form>
 
         {/* Footer */}
-        <div className="px-8 py-4 bg-slate-950 border-t border-slate-800 text-center">
+        <div className="px-8 py-4 bg-slate-950 border-t border-slate-800 text-center transition-colors duration-300">
           <p className="text-[10px] text-amber-600 font-bold uppercase mb-2">
              {t('login', 'impactStat')}
           </p>

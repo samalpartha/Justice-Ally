@@ -8,8 +8,58 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Merriweather:ital,wght@0,300;0,400;0,700;0,900;1,300;1,400&display=swap" rel="stylesheet">
+    <style>
+      :root {
+        /* Default Dark Mode Palette (Matches Original Slate Values) */
+        --s-950: #020617;
+        --s-900: #0f172a;
+        --s-850: #1e293b; /* Custom used in original */
+        --s-800: #1e293b;
+        --s-700: #334155;
+        --s-600: #475569;
+        --s-500: #64748b;
+        --s-400: #94a3b8;
+        --s-300: #cbd5e1;
+        --s-200: #e2e8f0;
+        --s-100: #f1f5f9;
+        --s-50:  #f8fafc;
+      }
+
+      :root.light {
+        /* Light Mode Inversion */
+        --s-950: #f8fafc; /* Background becomes off-white */
+        --s-900: #ffffff; /* Surface becomes white */
+        --s-850: #f1f5f9; 
+        --s-800: #cbd5e1; /* Borders become light grey */
+        --s-700: #94a3b8; /* Input borders */
+        --s-600: #64748b; 
+        --s-500: #475569; /* Muted text becomes darker for contrast on white */
+        --s-400: #334155; 
+        --s-300: #1e293b; 
+        --s-200: #0f172a; /* Main text becomes dark blue/black */
+        --s-100: #020617; 
+        --s-50:  #000000;
+      }
+
+      /* Custom scrollbar for dark theme (default) */
+      ::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+      }
+      ::-webkit-scrollbar-track {
+        background: var(--s-900); 
+      }
+      ::-webkit-scrollbar-thumb {
+        background: var(--s-700); 
+        border-radius: 4px;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: var(--s-600); 
+      }
+    </style>
     <script>
       tailwind.config = {
+        darkMode: 'class',
         theme: {
           extend: {
             fontFamily: {
@@ -18,9 +68,18 @@
             },
             colors: {
               slate: {
-                850: '#1e293b',
-                900: '#0f172a',
-                950: '#020617',
+                950: 'var(--s-950)',
+                900: 'var(--s-900)',
+                850: 'var(--s-850)',
+                800: 'var(--s-800)',
+                700: 'var(--s-700)',
+                600: 'var(--s-600)',
+                500: 'var(--s-500)',
+                400: 'var(--s-400)',
+                300: 'var(--s-300)',
+                200: 'var(--s-200)',
+                100: 'var(--s-100)',
+                50:  'var(--s-50)',
               },
               amber: {
                 450: '#d97706',
@@ -30,23 +89,6 @@
         }
       }
     </script>
-    <style>
-      /* Custom scrollbar for dark theme */
-      ::-webkit-scrollbar {
-        width: 8px;
-        height: 8px;
-      }
-      ::-webkit-scrollbar-track {
-        background: #0f172a; 
-      }
-      ::-webkit-scrollbar-thumb {
-        background: #334155; 
-        border-radius: 4px;
-      }
-      ::-webkit-scrollbar-thumb:hover {
-        background: #475569; 
-      }
-    </style>
   <script type="importmap">
 {
   "imports": {
@@ -59,7 +101,7 @@
 }
 </script>
 </head>
-  <body class="bg-slate-950 text-slate-200 antialiased overflow-hidden font-sans selection:bg-amber-500/30 selection:text-amber-200">
+  <body class="bg-slate-950 text-slate-200 antialiased overflow-hidden font-sans selection:bg-amber-500/30 selection:text-amber-200 transition-colors duration-300">
     <div id="root"></div>
   </body>
 </html>
