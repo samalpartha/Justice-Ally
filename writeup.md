@@ -2,6 +2,8 @@
 # JusticeAlly: The Universal Legal Navigator
 ### *Democratizing Access to Justice via AI-Powered Litigation Strategy*
 
+> **LIVE DEMO:** [https://justiceally-778149047860.us-west1.run.app](https://justiceally-778149047860.us-west1.run.app)
+
 ---
 
 ## 1. Executive Summary

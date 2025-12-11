@@ -5,6 +5,7 @@
 ![Status](https://img.shields.io/badge/Status-Production%20Ready-green.svg)
 ![AI Model](https://img.shields.io/badge/AI-Gemini%203.0%20Pro-purple)
 ![Language](https://img.shields.io/badge/Language-English%20%7C%20Español-orange)
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-Launch%20App-red)](https://justiceally-778149047860.us-west1.run.app)
 
 **JusticeAlly** is a high-fidelity legal navigation platform designed to bridge the "Access to Justice" gap. Acting as a **Senior Litigation Strategist** for Self-Represented Litigants (formerly "Pro Se") and a **Force Multiplier** for Junior Attorneys, it combines ruthless strategy with compassionate administrative guidance.
 
@@ -33,10 +34,10 @@
 
 ### 📝 5. Forms Library & Repository
 - **Official Resources:** Directs users to verified "Self-Help" court portals for 50 states.
-- **My Repository:** A local, secure storage area for users to upload and manage their filled forms.
+- **My Repository:** A secure local storage area for users to upload and manage their filled forms.
 - **Smart Search:** Filters forms by category (Family, Housing, Civil) and keyword.
 
-### 🚔 6. Specialized Justice Hubs
+### 6. Specialized Justice Hubs
 - **Traffic & Defense:** 
   - **Tracks:** DUI/DWI, Traffic Infractions, Accident Liability.
   - **Tools:** DMV Hearing checklists, "Trial by Declaration" guides.
