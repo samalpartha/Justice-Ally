@@ -15,33 +15,41 @@
 
 JusticeAlly operates on a **Client-Side Privacy First** architecture. No case data is stored on external servers; the Gemini API is used strictly as a stateless reasoning engine.
 
-```mermaid
-graph TD
-    User[User (Pro Se / Attorney)] --> Auth[Login / Role Selection]
-    Auth --> AppShell[Main Layout]
-    
-    subgraph "Core Modules"
-        AppShell --> Triage[Module A: Triage & Risk]
-        AppShell --> Dashboard[Module B: Evidence Vault]
-        AppShell --> Strategy[Module C: Strategy Room]
-        AppShell --> Forms[Module E: Forms Library]
-        AppShell --> Live[Module F: Live Strategy]
-    end
-    
-    subgraph "Secure Data Layer"
-        Triage --> LocalDB[(Browser LocalStorage\nEncrypted)]
-        Dashboard --> LocalDB
-        Strategy --> LocalDB
-        Forms --> LocalDB
-    end
-    
-    subgraph "Intelligence Layer (Stateless)"
-        Triage -- Case Context --> Gemini[Google Gemini API]
-        Dashboard -- Docs/Video/Audio --> Gemini
-        Strategy -- Facts & Laws --> Gemini
-        Live -- WebRTC Audio Stream --> Gemini
-        Gemini -- Strategic Output --> AppShell
-    end
+```text
++------------------------------+
+|   User (Pro Se / Attorney)   |
++--------------+---------------+
+               |
+               v
++--------------+---------------+
+|    Login / Role Selection    |
++--------------+---------------+
+               |
+               v
++--------------+---------------+
+|     AppShell (Main Layout)   |
++--------------+---------------+
+               |
+    +----------+----------+----------------+----------------+
+    |                     |                |                |
+    v                     v                v                v
++---+----------+   +------+-------+   +----+-----+   +------+-------+
+|  Module A:   |   |  Module B:   |   | Module C:|   |   Module F:  |
+| Triage & Risk|   |Evidence Vault|   | Strategy |   | Live Strategy|
++---+----------+   +------+-------+   +----+-----+   +------+-------+
+    |                     |                |                |
+    | (Data Persistence)  |                |                |
+    v                     v                v                v
++---+---------------------+----------------+----------------+-------+
+|          Secure Data Layer (LocalStorage + Encryption)            |
++---+---------------------+----------------+----------------+-------+
+    |                     |                |                |
+    | (Case Context)      | (Files)        | (Facts)        | (Audio)
+    v                     v                v                v
++---+---------------------+----------------+----------------+-------+
+|           Intelligence Layer (Google Gemini API)                  |
+|                 (Stateless Reasoning Engine)                      |
++-------------------------------------------------------------------+
 ```
 
 ---
