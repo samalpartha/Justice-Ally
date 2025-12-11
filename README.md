@@ -11,6 +11,78 @@
 
 ---
 
+## 🏗️ System Architecture
+
+JusticeAlly operates on a **Client-Side Privacy First** architecture. No case data is stored on external servers; the Gemini API is used strictly as a stateless reasoning engine.
+
+```mermaid
+graph TD
+    User[User (Pro Se / Attorney)] --> Auth[Login / Role Selection]
+    Auth --> AppShell[Main Layout]
+    
+    subgraph "Core Modules"
+        AppShell --> Triage[Module A: Triage & Risk]
+        AppShell --> Dashboard[Module B: Evidence Vault]
+        AppShell --> Strategy[Module C: Strategy Room]
+        AppShell --> Forms[Module E: Forms Library]
+        AppShell --> Live[Module F: Live Strategy]
+    end
+    
+    subgraph "Secure Data Layer"
+        Triage --> LocalDB[(Browser LocalStorage\nEncrypted)]
+        Dashboard --> LocalDB
+        Strategy --> LocalDB
+        Forms --> LocalDB
+    end
+    
+    subgraph "Intelligence Layer (Stateless)"
+        Triage -- Case Context --> Gemini[Google Gemini API]
+        Dashboard -- Docs/Video/Audio --> Gemini
+        Strategy -- Facts & Laws --> Gemini
+        Live -- WebRTC Audio Stream --> Gemini
+        Gemini -- Strategic Output --> AppShell
+    end
+```
+
+---
+
+## 💻 Installation & Setup
+
+Follow these instructions to set up the development environment.
+
+### Prerequisites
+*   **Node.js** (v18 or higher)
+*   **Google Gemini API Key** (Get one at [Google AI Studio](https://aistudio.google.com/))
+
+### 1. Clone the Repository
+```bash
+git clone https://github.com/your-username/justice-ally.git
+cd justice-ally
+```
+
+### 2. Install Dependencies
+```bash
+npm install
+# or
+yarn install
+```
+
+### 3. Environment Configuration
+Create a `.env` file in the root directory. You must add your Gemini API key here.
+```env
+# .env
+API_KEY=your_google_gemini_api_key_here
+```
+
+### 4. Run the Application
+Start the development server.
+```bash
+npm run dev
+```
+Open [http://localhost:5173](http://localhost:5173) (or the port shown in your terminal) to view the app.
+
+---
+
 ## 🚀 Key Features
 
 ### 🌍 1. Full Bilingual Support (EN / ES)
