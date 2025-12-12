@@ -1,4 +1,3 @@
-
 # JusticeAlly: The AI Litigation Strategist
 
 In the US, **92% of civil legal needs** for low-income Americans go unmet. Millions fail in court annually not from a lack of truth, but a crushing lack of procedure. **JusticeAlly** bridges this divide by transforming **Gemini 3.0 Pro** into an elite *AI Litigation Strategist*—an always-available, high-fidelity legal co-pilot that turns chaos into strategy and panic into decisive action.
