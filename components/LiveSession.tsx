@@ -11,6 +11,7 @@ const LiveSession: React.FC = () => {
   const [status, setStatus] = useState("Disconnected");
   const [isActive, setIsActive] = useState(false);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [connectionError, setConnectionError] = useState(false);
   const [showReport, setShowReport] = useState(false);
   const [transcript, setTranscript] = useState<{role: string, text: string}[]>([]);
   const [scenario, setScenario] = useState("mock");
@@ -26,7 +27,15 @@ const LiveSession: React.FC = () => {
 
   useEffect(() => {
     clientRef.current = new LiveSessionClient(
-      (s) => setStatus(s),
+      (s) => {
+          setStatus(s);
+          if (s.includes("Failed") || s.includes("Error")) {
+              setConnectionError(true);
+              setIsActive(false);
+          } else {
+              setConnectionError(false);
+          }
+      },
       (role, text) => {
         setTranscript(prev => {
           // Append if same role, else new entry
@@ -89,6 +98,7 @@ const LiveSession: React.FC = () => {
       setTranscript([]); // Clear previous transcript
       setShowReport(false);
       setCurrentRecord(null);
+      setConnectionError(false);
       await clientRef.current?.connect(language); // Pass current language
       setIsActive(true);
     }
@@ -217,7 +227,7 @@ const LiveSession: React.FC = () => {
                     <p className="text-amber-600 uppercase tracking-[0.2em] text-xs font-bold">{t('live', 'secureChannel')}</p>
                 </div>
 
-                <div className={`w-40 h-40 mx-auto rounded-full border-4 flex items-center justify-center relative shadow-2xl transition-all duration-500 ${isActive ? 'border-amber-600 bg-slate-900' : 'border-slate-800 bg-slate-950'}`}>
+                <div className={`w-40 h-40 mx-auto rounded-full border-4 flex items-center justify-center relative shadow-2xl transition-all duration-500 ${isActive ? 'border-amber-600 bg-slate-900' : connectionError ? 'border-red-600 bg-red-950/20' : 'border-slate-800 bg-slate-950'}`}>
                     {isActive ? (
                     <div className="flex gap-1.5 h-16 items-center">
                         <div className="w-1.5 bg-amber-600 h-8 animate-[bounce_1s_infinite]"></div>
@@ -226,6 +236,11 @@ const LiveSession: React.FC = () => {
                         <div className="w-1.5 bg-amber-600 h-12 animate-[bounce_1.1s_infinite]"></div>
                         <div className="w-1.5 bg-amber-600 h-8 animate-[bounce_0.9s_infinite]"></div>
                     </div>
+                    ) : connectionError ? (
+                        <div className="flex flex-col items-center">
+                            <svg className="w-10 h-10 text-red-500 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+                            <span className="text-[10px] uppercase font-bold text-red-400">Connection Failed</span>
+                        </div>
                     ) : (
                     <svg className="w-12 h-12 text-slate-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
@@ -255,7 +270,7 @@ const LiveSession: React.FC = () => {
                     )}
 
                     <div className="bg-slate-900 border border-slate-800 px-6 py-3 inline-block rounded-sm">
-                    <span className={`text-xs font-mono font-bold uppercase tracking-widest ${isActive ? 'text-green-500' : 'text-slate-500'}`}>
+                    <span className={`text-xs font-mono font-bold uppercase tracking-widest ${isActive ? 'text-green-500' : connectionError ? 'text-red-500' : 'text-slate-500'}`}>
                         Status: {status}
                     </span>
                     </div>
@@ -268,7 +283,7 @@ const LiveSession: React.FC = () => {
                         : 'bg-amber-700 hover:bg-amber-600 text-white border-amber-600'
                     }`}
                     >
-                    {isActive ? t('live', 'terminate') : t('live', 'initLink')}
+                    {isActive ? t('live', 'terminate') : connectionError ? t('live', 'connectError') : t('live', 'initLink')}
                     </button>
                 </div>
                 </div>

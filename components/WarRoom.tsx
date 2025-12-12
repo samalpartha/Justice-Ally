@@ -1,8 +1,8 @@
 
-import React, { useRef, useState } from 'react';
-import { CaseData, UploadedFile } from '../types';
-import DictationButton from './DictationButton';
-import { useLanguage } from '../context/LanguageContext';
+import React, { useRef, useState } from "react";
+import { CaseData, UploadedFile } from "../types";
+import DictationButton from "./DictationButton";
+import { useLanguage } from "../context/LanguageContext";
 
 interface WarRoomProps {
   caseData: CaseData | null;
@@ -47,7 +47,6 @@ const WarRoom: React.FC<WarRoomProps> = ({ caseData, onFilesAdded, onLinkAdded, 
         const file = new File([blob], `Counsel_Memo_${dateStr}.txt`, { type: 'text/plain' });
         onFilesAdded([file]);
     }
-
     setSaveStatus('SAVED TO VAULT');
     setTimeout(() => setSaveStatus(''), 2000);
   };
@@ -57,13 +56,13 @@ const WarRoom: React.FC<WarRoomProps> = ({ caseData, onFilesAdded, onLinkAdded, 
   };
 
   const EmptyState = () => (
-    <div className="h-full flex flex-col items-center justify-center p-8 text-center bg-slate-950 transition-colors duration-300 print:hidden">
-      <div className="w-20 h-20 border-2 border-slate-800 rounded-sm flex items-center justify-center mb-6 bg-slate-900 shadow-2xl transition-colors duration-300">
-         <svg className="w-10 h-10 text-slate-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <div className="flex flex-col items-center justify-center p-8 text-center bg-slate-900 border border-slate-800 rounded-sm mt-8 py-20 transition-colors duration-300 print:hidden">
+      <div className="w-16 h-16 border-2 border-slate-800 rounded-sm flex items-center justify-center mb-6 bg-slate-950 shadow-2xl transition-colors duration-300">
+         <svg className="w-8 h-8 text-slate-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
          </svg>
       </div>
-      <h2 className="text-3xl font-serif font-bold text-slate-200 tracking-tight mb-2 transition-colors duration-300">{t('warroom', 'unavailable')}</h2>
+      <h2 className="text-2xl font-serif font-bold text-slate-200 tracking-tight mb-2 transition-colors duration-300">{t('warroom', 'unavailable')}</h2>
       <p className="text-slate-500 mb-8 max-w-md font-serif text-sm leading-relaxed transition-colors duration-300">
         {t('warroom', 'unavailableDesc')}
       </p>
@@ -72,7 +71,7 @@ const WarRoom: React.FC<WarRoomProps> = ({ caseData, onFilesAdded, onLinkAdded, 
         <button 
           onClick={onLoadDemo}
           title="Populate with sample Landlord/Tenant case data."
-          className="px-6 py-3 bg-slate-900 hover:bg-slate-800 text-amber-600 font-bold rounded-sm transition-colors border border-amber-600/50 uppercase tracking-[0.1em] text-xs shadow-lg hover:border-amber-600 flex items-center gap-2"
+          className="px-6 py-3 bg-slate-800 hover:bg-slate-700 text-amber-600 font-bold rounded-sm transition-colors border border-amber-600/50 uppercase tracking-[0.1em] text-xs shadow-lg hover:border-amber-600 flex items-center gap-2"
         >
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
           {t('warroom', 'loadDemo')}
@@ -160,9 +159,7 @@ const WarRoom: React.FC<WarRoomProps> = ({ caseData, onFilesAdded, onLinkAdded, 
       <div className="flex-1 overflow-y-auto custom-scrollbar p-4 md:p-8 print:overflow-visible print:h-auto print:p-0">
         <div className="max-w-[1600px] mx-auto space-y-8 print:max-w-none print:space-y-6">
           
-          {/* Counsel's Notes (Always Visible but styled for print) */}
           <div className="bg-slate-900 border border-slate-800 rounded-sm shadow-lg relative overflow-hidden group transition-colors duration-300">
-            {/* Header Actions - Hidden in Print */}
             <div className="bg-slate-900 px-6 py-3 border-b border-slate-800 flex justify-between items-center transition-colors duration-300 no-print">
                <h3 className="text-[10px] font-bold text-slate-400 uppercase flex items-center gap-2 tracking-[0.2em]">
                  <svg className="w-3 h-3 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
@@ -176,7 +173,6 @@ const WarRoom: React.FC<WarRoomProps> = ({ caseData, onFilesAdded, onLinkAdded, 
                </div>
             </div>
             
-            {/* Editable Textarea - Hidden in Print */}
             <textarea
               value={caseData?.notes || ''}
               onChange={(e) => onNotesChange && onNotesChange(e.target.value)}
@@ -184,13 +180,11 @@ const WarRoom: React.FC<WarRoomProps> = ({ caseData, onFilesAdded, onLinkAdded, 
               className="w-full bg-slate-950 text-slate-200 text-sm p-6 outline-none min-h-[120px] resize-none font-serif leading-7 transition-colors duration-300 no-print"
             />
 
-            {/* Read-Only Print View for Notes */}
             <div className="hidden print:block p-6 text-black font-serif text-sm leading-relaxed whitespace-pre-wrap">
                 <h3 className="text-lg font-bold uppercase mb-2 border-b border-gray-300 pb-1">Counsel's Memorandum</h3>
                 {caseData?.notes || "No notes recorded."}
             </div>
 
-            {/* Save Entry Button - Hidden in Print */}
             <div className="px-6 pb-4 bg-slate-950 border-t border-slate-800 flex justify-between items-center transition-colors duration-300 no-print">
                 <span className={`text-[10px] font-bold uppercase tracking-widest transition-opacity duration-300 ${saveStatus ? 'text-green-500 opacity-100' : 'opacity-0'}`}>
                   {saveStatus}
@@ -209,7 +203,7 @@ const WarRoom: React.FC<WarRoomProps> = ({ caseData, onFilesAdded, onLinkAdded, 
              <EmptyState />
           ) : (
             <>
-              {/* Strategy Content Renders Here */}
+              {/* This section only renders if valid strategy data exists */}
               <div className="hidden print:block print:mb-6">
                  <h1 className="text-2xl font-serif font-black text-black">CASE STRATEGY REPORT</h1>
                  <p className="text-xs uppercase font-bold text-gray-500">Privileged & Confidential Work Product</p>
@@ -218,14 +212,12 @@ const WarRoom: React.FC<WarRoomProps> = ({ caseData, onFilesAdded, onLinkAdded, 
 
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 print:block print:gap-0 print:space-y-6">
                 <div className="lg:col-span-2 bg-slate-900 rounded-sm border-l-4 border-amber-600 p-8 shadow-md relative overflow-hidden transition-colors duration-300 print:break-inside-avoid">
-                   {/* Badge */}
                    <div className="absolute top-4 right-4 z-20 no-print">
                       <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-slate-950/80 rounded-full border border-purple-500/50 backdrop-blur-sm">
                          <svg className="w-3 h-3 text-purple-400" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm0 18a8 8 0 1 1 8-8 8 8 0 0 1-8 8z"/><path d="M12 6a1 1 0 0 0-1 1v4H7a1 1 0 0 0 0 2h4v4a1 1 0 0 0 2 0v-4h4a1 1 0 0 0 0-2h-4V7a1 1 0 0 0-1-1z"/></svg>
                          <span className="text-[9px] font-bold text-purple-300 uppercase tracking-wide">Powered by Gemini 3 Pro</span>
                       </div>
                    </div>
-
                    <div className="absolute top-0 right-0 p-8 opacity-5 pointer-events-none">
                       <svg className="w-32 h-32 text-slate-100" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zm0 9l2.5-1.25L12 8.5l-2.5 1.25L12 11zm0 2.5l-5-2.5-5 2.5 10 5 10-5-5-2.5-5 2.5z"/></svg>
                    </div>
@@ -262,7 +254,7 @@ const WarRoom: React.FC<WarRoomProps> = ({ caseData, onFilesAdded, onLinkAdded, 
               </div>
 
               <div className="bg-slate-900 rounded-sm border border-slate-800 shadow-md overflow-hidden transition-colors duration-300 print:break-inside-avoid">
-                <div className="px-6 py-4 border-b border-slate-800 bg-slate-950 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 transition-colors duration-300">
+                <div className="px-6 py-4 border-b border-slate-800 bg-slate-900 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 transition-colors duration-300">
                   <h3 className="text-sm font-serif font-bold text-slate-200 flex items-center gap-2 transition-colors duration-300">
                     <span className="text-amber-600">§</span> {t('warroom', 'matrix')}
                   </h3>

@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { UploadedFile } from '../types';
 import { useLanguage } from '../context/LanguageContext';
@@ -80,12 +81,20 @@ const FileUploader: React.FC<FileUploaderProps> = ({ onFilesSelected, onLinkAdde
       {/* File Dropzone */}
       <label className={`flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-sm cursor-pointer transition-all group ${errorMsg ? 'border-red-500 bg-red-950/10' : 'border-slate-800 bg-slate-950 hover:bg-slate-900 hover:border-amber-600'}`} title="Drag and drop or click to select files. Supports PDF, Images, and Video.">
         <div className="flex flex-col items-center justify-center pt-5 pb-6 text-center px-4">
-          <svg className={`w-8 h-8 mb-3 transition-colors ${errorMsg ? 'text-red-500' : 'text-slate-500 group-hover:text-amber-600'}`} aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 16">
-            <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2"/>
-          </svg>
+          {errorMsg ? (
+             <svg className="w-8 h-8 mb-3 text-red-500 animate-pulse" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+          ) : (
+             <svg className="w-8 h-8 mb-3 text-slate-500 group-hover:text-amber-600 transition-colors" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 16">
+               <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2"/>
+             </svg>
+          )}
           <p className="mb-1 text-sm text-slate-400 font-serif"><span className={`font-bold ${errorMsg ? 'text-red-400' : 'text-slate-200 group-hover:text-amber-500'}`}>{t('uploader', 'dropzoneMain')}</span> {t('uploader', 'dropzoneSub')}</p>
           <p className="text-[10px] text-slate-600 uppercase tracking-widest font-bold">{t('uploader', 'formats')}</p>
-          {errorMsg && <p className="text-[10px] text-red-500 font-bold uppercase mt-2 bg-red-950/50 px-2 py-1 border border-red-900 rounded">{errorMsg}</p>}
+          {errorMsg && (
+            <div className="mt-2 bg-red-950/80 px-3 py-1 border border-red-900 rounded-sm inline-flex items-center gap-2">
+                <span className="text-[9px] text-red-300 font-bold uppercase tracking-wider">{errorMsg}</span>
+            </div>
+          )}
         </div>
         <input 
           type="file" 

@@ -1,6 +1,6 @@
 
-import { GoogleGenAI, Type, Schema, Part, Modality, LiveServerMessage } from "@google/genai";
-import { UploadedFile, CaseData, CaseContext, TriageResult, Language, SessionAnalysis } from "../types";
+import { GoogleGenAI, Type, Schema, Modality, LiveServerMessage } from "@google/genai";
+import { UploadedFile, CaseData, CaseContext, TriageResult, Language, SessionAnalysis, SessionRecord, AppMode, UserProfile, UserRole } from "../types";
 
 // --- CONSTANTS ---
 const MAX_FILE_SIZE = 20 * 1024 * 1024; // 20MB
@@ -49,16 +49,22 @@ export const fileToGenerativePart = async (file: File): Promise<{ inlineData: { 
     };
   } catch (e) {
     console.error("Failed to process file", e);
-    return null;
+    throw new Error("FILE_READ_ERROR");
   }
 };
 
 export const mapApiError = (error: any): string => {
-  const msg = error?.message || "";
-  if (msg.includes("429")) return "apiError429";
-  if (msg.includes("500") || msg.includes("503")) return "apiError500";
-  if (msg.includes("API key")) return "apiErrorKey";
-  if (msg.includes("ContentUnion")) return "apiErrorContent";
+  const msg = error?.message || error?.toString() || "";
+  
+  if (msg.includes("429") || msg.includes("Resource has been exhausted")) return "apiError429";
+  if (msg.includes("500") || msg.includes("503") || msg.includes("Internal error") || msg.includes("unavailable")) return "apiError500";
+  if (msg.includes("API key") || msg.includes("403") || msg.includes("permission denied")) return "apiErrorKey";
+  if (msg.includes("ContentUnion") || msg.includes("must not be empty")) return "apiErrorContent";
+  if (msg.includes("SAFETY") || msg.includes("blocked")) return "apiErrorSafety";
+  if (msg.includes("Failed to fetch") || msg.includes("NetworkError") || msg.includes("connection")) return "apiErrorNetwork";
+  if (msg.includes("FILE_TOO_LARGE")) return "fileTooLarge"; 
+  if (msg.includes("FILE_READ_ERROR")) return "fileReadError";
+  
   return "analysisFailed"; // Generic fallback
 };
 
@@ -81,6 +87,44 @@ export function decodeAudio(base64: string) {
   return bytes;
 }
 
+// Helper to clean JSON strings from Markdown code blocks
+const cleanJsonString = (str: string): string => {
+  if (!str) return "{}";
+  // Remove ```json and ``` wrapping
+  let cleaned = str.replace(/```json/g, "").replace(/```/g, "");
+  return cleaned.trim();
+};
+
+// Helper for resampling audio if browser doesn't support 16kHz natively
+const downsampleBuffer = (buffer: Float32Array, inputRate: number, outputRate: number = 16000): Float32Array => {
+    if (inputRate === outputRate) return buffer;
+    if (inputRate < outputRate) return buffer; // Should not happen for 16k target
+    
+    const sampleRateRatio = inputRate / outputRate;
+    const newLength = Math.floor(buffer.length / sampleRateRatio);
+    const result = new Float32Array(newLength);
+    
+    for (let i = 0; i < newLength; i++) {
+        // Nearest neighbor interpolation for speed
+        result[i] = buffer[Math.floor(i * sampleRateRatio)];
+    }
+    return result;
+};
+
+// Simple retry wrapper for API calls
+async function withRetry<T>(fn: () => Promise<T>, retries = 2, delay = 1000): Promise<T> {
+  try {
+    return await fn();
+  } catch (err: any) {
+    if (retries > 0 && (err?.status === 503 || err?.message?.includes("503") || err?.message?.includes("unavailable"))) {
+      await new Promise(resolve => setTimeout(resolve, delay));
+      return withRetry(fn, retries - 1, delay * 2);
+    }
+    throw err;
+  }
+}
+
+// STRICT Language Enforcement System Prompt
 const getSystemInstruction = (language: Language) => `
 You are **JusticeAlly**, the Universal Legal Navigator and Senior Litigation Strategist.
 Mission: Democratize access to justice. Move users from "Panic" to "Action."
@@ -88,15 +132,20 @@ Mission: Democratize access to justice. Move users from "Panic" to "Action."
 # CORE IDENTITY
 - **Role:** Strategic Case Manager for pro-se litigants.
 - **Tone:** Professional, Empathetic, Authoritative, "Sun Tzu" Strategic.
-- **Language:** ${language === 'es' ? 'SPANISH (Español)' : 'ENGLISH'}.
+- **Active Language:** ${language === 'es' ? 'SPANISH (Español)' : 'ENGLISH'}.
 - **Guardrails:** NEVER invent laws. ALWAYS cite sources. ALWAYS warn "Review Required".
+
+# STRICT LANGUAGE RULES
+1. **Output Language:** You must ONLY speak in ${language === 'es' ? 'SPANISH' : 'ENGLISH'}.
+2. **Prohibited:** Do not use Hindi, Mandarin, Arabic, or any other script.
+3. **Accent:** If the user speaks with a heavy accent, interpret it to the best of your ability but respond in standard ${language === 'es' ? 'Spanish' : 'English'}.
 
 # OUTPUT RULES
 - Use **Bold** for emphasis.
 - Use specific search queries for forms if direct links aren't known.
 - **Document/Video Analysis:** Analyze uploaded files deeply.
-- **Language Enforcement:** JSON Keys = English. String Values = ${language === 'es' ? 'Spanish' : 'English'}.
-- **Audio Processing:** STRICTLY transcribe and respond in ${language === 'es' ? 'Spanish' : 'English'} ONLY. Do NOT use Hindi script or other alphabets. If the accent is heavy, map it to the closest standard ${language === 'es' ? 'Spanish' : 'English'} words.
+- **JSON Keys:** Always English.
+- **String Values:** ${language === 'es' ? 'Spanish' : 'English'}.
 `;
 
 const TRIAGE_SCHEMA: Schema = {
@@ -205,17 +254,18 @@ export const assessCaseSuitability = async (context: CaseContext, language: Lang
     Output JSON matching the schema. Language: ${language === 'es' ? 'Spanish' : 'English'}.
   `;
 
-  const response = await ai.models.generateContent({
-    model,
-    contents: [{ role: "user", parts: [{ text: prompt }] }],
-    config: {
-      systemInstruction: getSystemInstruction(language),
-      responseMimeType: "application/json",
-      responseSchema: TRIAGE_SCHEMA,
-    },
+  return withRetry(async () => {
+    const response = await ai.models.generateContent({
+      model,
+      contents: [{ role: "user", parts: [{ text: prompt }] }],
+      config: {
+        systemInstruction: getSystemInstruction(language),
+        responseMimeType: "application/json",
+        responseSchema: TRIAGE_SCHEMA,
+      },
+    });
+    return JSON.parse(cleanJsonString(response.text || "{}"));
   });
-
-  return JSON.parse(response.text || "{}");
 };
 
 export const analyzeCaseFiles = async (
@@ -237,7 +287,6 @@ export const analyzeCaseFiles = async (
       try {
           return await fileToGenerativePart(f.file!);
       } catch (e) {
-          // Rethrow known errors like size limits so UI can catch them
           throw e;
       }
   }));
@@ -246,7 +295,6 @@ export const analyzeCaseFiles = async (
   const contextStr = context ? `Context: ${context.jurisdiction}, ${context.caseType}` : "";
   const linksStr = links.length > 0 ? `Links: ${links.map(l => l.url).join(', ')}` : "";
 
-  // IMPORTANT: If no files and no description, allow description to carry the weight
   const descText = caseDescription.trim() || "Analyze the provided context.";
 
   const prompt = `
@@ -262,23 +310,24 @@ export const analyzeCaseFiles = async (
     Output JSON. Language: ${language === 'es' ? 'Spanish' : 'English'}.
   `;
 
-  const response = await ai.models.generateContent({
-    model,
-    contents: [
-      {
-        role: "user",
-        parts: [...validFileParts, { text: prompt }],
+  return withRetry(async () => {
+    const response = await ai.models.generateContent({
+      model,
+      contents: [
+        {
+          role: "user",
+          parts: [...validFileParts, { text: prompt }],
+        },
+      ],
+      config: {
+        systemInstruction: getSystemInstruction(language),
+        responseMimeType: "application/json",
+        responseSchema: CASE_ANALYSIS_SCHEMA,
       },
-    ],
-    config: {
-      systemInstruction: getSystemInstruction(language),
-      responseMimeType: "application/json",
-      responseSchema: CASE_ANALYSIS_SCHEMA,
-    },
+    });
+    const parsed = JSON.parse(cleanJsonString(response.text || "{}"));
+    return { ...parsed, analyzed: true };
   });
-
-  const parsed = JSON.parse(response.text || "{}");
-  return { ...parsed, analyzed: true };
 };
 
 // --- CHAT & TTS ---
@@ -288,18 +337,32 @@ export const sendChatMessage = async (
   message: string,
   language: Language = 'en',
   files: UploadedFile[] = [],
-  useSearch: boolean = false
+  useSearch: boolean = false,
+  location?: { latitude: number; longitude: number },
+  caseContext?: string
 ) => {
   if (!process.env.API_KEY) throw new Error("API Key missing");
   const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
   // Prepare tools
   const tools: any[] = [];
+  let toolConfig: any = undefined;
+
   if (useSearch) {
     tools.push({ googleSearch: {} });
+    tools.push({ googleMaps: {} });
+    
+    if (location) {
+      toolConfig = {
+        functionCallingConfig: { mode: 'AUTO' },
+        googleSearchRetrieval: {
+           dynamicRetrievalConfig: { mode: 'MODE_DYNAMIC', dynamicThreshold: 0.7 }
+        }
+      };
+    }
   }
 
-  // Handle files: Only convert non-link files to Parts
+  // Handle files
   const fileParts = [];
   for (const file of files) {
       if (file.type === 'link') continue;
@@ -321,24 +384,40 @@ export const sendChatMessage = async (
   // Construct contents
   const contents = [...history];
   
-  // Add new user message with files
   const newParts: any[] = fileParts.length > 0 ? [...fileParts] : [];
-  newParts.push({ text: message });
+  
+  let textPrompt = message;
+  if (location && useSearch) {
+      textPrompt += `\n[Context: User Location is Lat ${location.latitude}, Lng ${location.longitude}]`;
+  }
+  
+  newParts.push({ text: textPrompt });
 
   contents.push({
       role: 'user',
       parts: newParts
   });
 
-  const model = "gemini-2.5-flash";
+  // Use Gemini 2.5 Flash for better availability/stability in chat
+  const model = "gemini-2.5-flash"; 
+  
+  // Combine system instruction with case context if available
+  const baseInstruction = getSystemInstruction(language);
+  const combinedInstruction = caseContext 
+    ? `${baseInstruction}\n\n# CURRENT CASE CONTEXT\n${caseContext}\n\nUse this context to answer specific questions about the user's situation.` 
+    : baseInstruction;
 
-  return await ai.models.generateContentStream({
-    model,
-    contents: contents as any,
-    config: {
-      systemInstruction: getSystemInstruction(language),
-      tools: tools.length > 0 ? tools : undefined,
-    }
+  // Direct return for streaming, using retry if initial connection fails
+  return withRetry(async () => {
+      return await ai.models.generateContentStream({
+        model,
+        contents: contents as any,
+        config: {
+          systemInstruction: combinedInstruction,
+          tools: tools.length > 0 ? tools : undefined,
+          toolConfig: toolConfig
+        }
+      });
   });
 };
 
@@ -361,7 +440,6 @@ export const textToSpeech = async (text: string, language: Language = 'en'): Pro
     },
   });
 
-  // Returns base64 encoded PCM audio data
   return response.candidates?.[0]?.content?.parts?.[0]?.inlineData?.data || "";
 };
 
@@ -410,23 +488,24 @@ export const generateSessionAnalysis = async (transcript: {role: string, text: s
     Language: ${language === 'es' ? 'Spanish' : 'English'}.
   `;
 
-  const response = await ai.models.generateContent({
-    model,
-    contents: [{ role: "user", parts: [{ text: prompt }] }],
-    config: {
-      responseMimeType: "application/json",
-      responseSchema: {
-        type: Type.OBJECT,
-        properties: {
-          strongPoints: { type: Type.ARRAY, items: { type: Type.STRING } },
-          improvements: { type: Type.ARRAY, items: { type: Type.STRING } },
-        },
-        required: ["strongPoints", "improvements"],
-      }
-    },
+  return withRetry(async () => {
+    const response = await ai.models.generateContent({
+      model,
+      contents: [{ role: "user", parts: [{ text: prompt }] }],
+      config: {
+        responseMimeType: "application/json",
+        responseSchema: {
+          type: Type.OBJECT,
+          properties: {
+            strongPoints: { type: Type.ARRAY, items: { type: Type.STRING } },
+            improvements: { type: Type.ARRAY, items: { type: Type.STRING } },
+          },
+          required: ["strongPoints", "improvements"],
+        }
+      },
+    });
+    return JSON.parse(cleanJsonString(response.text || "{ \"strongPoints\": [], \"improvements\": [] }"));
   });
-
-  return JSON.parse(response.text || "{ \"strongPoints\": [], \"improvements\": [] }");
 };
 
 // --- LIVE & DICTATION CLASSES ---
@@ -437,6 +516,9 @@ export class LiveSessionClient {
   private stream: MediaStream | null = null;
   private active = false;
   private nextStartTime = 0;
+  
+  private processor: ScriptProcessorNode | null = null;
+  private source: MediaStreamAudioSourceNode | null = null;
 
   constructor(
     private onStatus: (s: string) => void,
@@ -452,6 +534,10 @@ export class LiveSessionClient {
     try {
       this.inputCtx = new (window.AudioContext || (window as any).webkitAudioContext)({sampleRate: 16000});
       this.outputCtx = new (window.AudioContext || (window as any).webkitAudioContext)({sampleRate: 24000});
+      
+      if (this.inputCtx && this.inputCtx.state === 'suspended') await this.inputCtx.resume();
+      if (this.outputCtx && this.outputCtx.state === 'suspended') await this.outputCtx.resume();
+
       this.stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       
       this.session = ai.live.connect({
@@ -460,6 +546,7 @@ export class LiveSessionClient {
           responseModalities: [Modality.AUDIO],
           inputAudioTranscription: {}, 
           outputAudioTranscription: {},
+          // PASS LANGUAGE TO SYSTEM INSTRUCTION HERE
           systemInstruction: getSystemInstruction(language)
         },
         callbacks: {
@@ -478,25 +565,32 @@ export class LiveSessionClient {
 
   private streamAudio() {
     if (!this.inputCtx || !this.stream) return;
-    const source = this.inputCtx.createMediaStreamSource(this.stream);
-    const processor = this.inputCtx.createScriptProcessor(4096, 1, 1);
+    this.source = this.inputCtx.createMediaStreamSource(this.stream);
+    this.processor = this.inputCtx.createScriptProcessor(4096, 1, 1);
     
-    processor.onaudioprocess = (e) => {
+    this.processor.onaudioprocess = (e) => {
       if (!this.active) return;
+      
       const input = e.inputBuffer.getChannelData(0);
-      const int16 = new Int16Array(input.length);
-      for (let i=0; i<input.length; i++) int16[i] = input[i] * 32768;
+      const outputRate = 16000;
+      let dataToSend = input;
+
+      if (this.inputCtx && this.inputCtx.sampleRate !== outputRate) {
+          dataToSend = downsampleBuffer(input, this.inputCtx.sampleRate, outputRate);
+      }
+
+      const int16 = new Int16Array(dataToSend.length);
+      for (let i=0; i<dataToSend.length; i++) int16[i] = dataToSend[i] * 32768;
       
       this.session.then((s: any) => s.sendRealtimeInput({
         media: { mimeType: 'audio/pcm;rate=16000', data: encodeAudio(new Uint8Array(int16.buffer)) }
       }));
     };
-    source.connect(processor);
-    processor.connect(this.inputCtx.destination);
+    this.source.connect(this.processor);
+    this.processor.connect(this.inputCtx.destination);
   }
 
   private async handleMessage(msg: LiveServerMessage) {
-    // Audio Playback
     const audioData = msg.serverContent?.modelTurn?.parts[0]?.inlineData?.data;
     if (audioData && this.outputCtx) {
         const audioBytes = decodeAudio(audioData);
@@ -514,7 +608,6 @@ export class LiveSessionClient {
         this.nextStartTime += buffer.duration;
     }
 
-    // Transcripts
     if (msg.serverContent?.inputTranscription?.text) {
         this.onTranscript?.('user', msg.serverContent.inputTranscription.text);
     }
@@ -526,14 +619,10 @@ export class LiveSessionClient {
   async disconnect() {
     this.active = false;
     this.stream?.getTracks().forEach(t => t.stop());
-    
-    if (this.inputCtx && this.inputCtx.state !== 'closed') {
-        try { await this.inputCtx.close(); } catch(e) { console.warn(e); }
-    }
-    if (this.outputCtx && this.outputCtx.state !== 'closed') {
-        try { await this.outputCtx.close(); } catch(e) { console.warn(e); }
-    }
-    
+    this.source?.disconnect();
+    this.processor?.disconnect();
+    if (this.inputCtx && this.inputCtx.state !== 'closed') try { await this.inputCtx.close(); } catch(e) {}
+    if (this.outputCtx && this.outputCtx.state !== 'closed') try { await this.outputCtx.close(); } catch(e) {}
     this.onStatus("Disconnected");
   }
 }
@@ -543,6 +632,8 @@ export class StreamingDictationClient {
   private ctx: AudioContext | null = null;
   private stream: MediaStream | null = null;
   private active = false;
+  private processor: ScriptProcessorNode | null = null;
+  private source: MediaStreamAudioSourceNode | null = null;
 
   constructor(private onText: (t: string) => void, private onError: (e: any) => void) {}
 
@@ -553,6 +644,7 @@ export class StreamingDictationClient {
 
     try {
       this.ctx = new (window.AudioContext || (window as any).webkitAudioContext)({sampleRate: 16000});
+      if (this.ctx && this.ctx.state === 'suspended') await this.ctx.resume();
       this.stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       
       this.session = ai.live.connect({
@@ -560,14 +652,12 @@ export class StreamingDictationClient {
         config: { 
           responseModalities: [Modality.AUDIO], 
           inputAudioTranscription: {},
-          systemInstruction: `Dictation Mode. Transcribe speech strictly into ${language === 'es' ? 'Spanish' : 'English'}. Do not output Hindi script or mixed languages. Use standard ${language === 'es' ? 'Spanish' : 'English'} orthography.` 
+          systemInstruction: `Dictation Mode. Transcribe speech strictly into ${language === 'es' ? 'Spanish' : 'English'}.` 
         },
         callbacks: {
           onopen: () => this.streamAudio(),
           onmessage: (m: LiveServerMessage) => {
-             if (m.serverContent?.inputTranscription?.text) {
-               this.onText(m.serverContent.inputTranscription.text);
-             }
+             if (m.serverContent?.inputTranscription?.text) this.onText(m.serverContent.inputTranscription.text);
           },
           onerror: (e) => { this.onError(e); this.stop(); },
           onclose: () => this.stop()
@@ -581,28 +671,33 @@ export class StreamingDictationClient {
 
   private streamAudio() {
     if (!this.ctx || !this.stream) return;
-    const source = this.ctx.createMediaStreamSource(this.stream);
-    const processor = this.ctx.createScriptProcessor(4096, 1, 1);
-    processor.onaudioprocess = (e) => {
+    this.source = this.ctx.createMediaStreamSource(this.stream);
+    this.processor = this.ctx.createScriptProcessor(4096, 1, 1);
+    
+    this.processor.onaudioprocess = (e) => {
       if (!this.active) return;
       const input = e.inputBuffer.getChannelData(0);
-      const int16 = new Int16Array(input.length);
-      for(let i=0; i<input.length; i++) int16[i] = input[i] * 32768;
+      const outputRate = 16000;
+      let dataToSend = input;
+      if (this.ctx && this.ctx.sampleRate !== outputRate) {
+          dataToSend = downsampleBuffer(input, this.ctx.sampleRate, outputRate);
+      }
+      const int16 = new Int16Array(dataToSend.length);
+      for (let i=0; i<dataToSend.length; i++) int16[i] = dataToSend[i] * 32768;
       
       this.session.then((s: any) => s.sendRealtimeInput({
         media: { mimeType: 'audio/pcm;rate=16000', data: encodeAudio(new Uint8Array(int16.buffer)) }
       }));
     };
-    source.connect(processor);
-    processor.connect(this.ctx.destination);
+    this.source.connect(this.processor);
+    this.processor.connect(this.ctx.destination);
   }
 
   stop() {
     this.active = false;
     this.stream?.getTracks().forEach(t => t.stop());
-    
-    if (this.ctx && this.ctx.state !== 'closed') {
-        try { this.ctx.close(); } catch(e) { console.warn(e); }
-    }
+    this.source?.disconnect();
+    this.processor?.disconnect();
+    if (this.ctx && this.ctx.state !== 'closed') try { this.ctx.close(); } catch(e) {}
   }
 }

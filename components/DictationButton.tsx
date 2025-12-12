@@ -1,81 +1,117 @@
 
-import React, { useState, useRef, useEffect } from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
+
+import { StreamingDictationClient } from "../services/geminiService";
+import { Language } from "../types";
 import { useLanguage } from '../context/LanguageContext';
-import { StreamingDictationClient } from '../services/geminiService';
 
-interface DictationButtonProps {
+type DictationButtonProps = {
   onTranscript: (text: string) => void;
+  ariaLabel?: string;
   className?: string;
-}
+} & React.ButtonHTMLAttributes<HTMLButtonElement>;
 
-const DictationButton: React.FC<DictationButtonProps> = ({ onTranscript, className }) => {
-  const { t, language } = useLanguage();
+const DictationButton: React.FC<DictationButtonProps> = ({
+  onTranscript,
+  ariaLabel,
+  className,
+  ...buttonProps
+}) => {
+  const { language } = useLanguage();
   const [isRecording, setIsRecording] = useState(false);
   const clientRef = useRef<StreamingDictationClient | null>(null);
+  const onTranscriptRef = useRef(onTranscript);
 
+  // keep latest callback to avoid stale closures
+  useEffect(() => {
+    onTranscriptRef.current = onTranscript;
+  }, [onTranscript]);
+
+  const stopRecording = useCallback(() => {
+    if (clientRef.current) {
+      try {
+        clientRef.current.stop();
+      } catch (err) {
+        console.error("Error stopping dictation:", err);
+      }
+      clientRef.current = null;
+    }
+    setIsRecording(false);
+  }, []);
+
+  const startRecording = useCallback(async () => {
+    try {
+      const client = new StreamingDictationClient(
+        (text: string) => {
+          const trimmed = text.trim();
+          if (!trimmed) return;
+          onTranscriptRef.current(trimmed);
+        },
+        (error: unknown) => {
+          console.error("Dictation error:", error);
+          stopRecording();
+        }
+      );
+
+      clientRef.current = client;
+      await client.start(language as Language); // use context language
+      setIsRecording(true);
+    } catch (error) {
+      console.error("Failed to start dictation:", error);
+      clientRef.current = null;
+      setIsRecording(false);
+    }
+  }, [stopRecording, language]);
+
+  const handleClick = useCallback(() => {
+    if (isRecording) {
+      stopRecording();
+    } else {
+      void startRecording();
+    }
+  }, [isRecording, startRecording, stopRecording]);
+
+  // cleanup on unmount
   useEffect(() => {
     return () => {
-      // Cleanup on unmount
-      clientRef.current?.stop();
+      if (clientRef.current) {
+        try {
+          clientRef.current.stop();
+        } catch {
+          // ignore
+        }
+      }
     };
   }, []);
 
-  const toggleRecording = async () => {
-    if (isRecording) {
-      clientRef.current?.stop();
-      setIsRecording(false);
-    } else {
-      setIsRecording(true);
-      clientRef.current = new StreamingDictationClient(
-        (text) => {
-          // Provide immediate feedback as text streams in
-          onTranscript(text + " ");
-        },
-        (err) => {
-          console.error("Dictation Error:", err);
-          setIsRecording(false);
-          // Optional: Visual error feedback could go here
-        }
-      );
-      await clientRef.current.start(language);
-    }
-  };
+  // Determine classes: if className provided, append recording state styles if active.
+  // If not provided, use a default icon-button style.
+  const baseClass = className ?? "p-2 text-slate-400 hover:text-white transition-colors rounded-full hover:bg-slate-800";
+  const activeClass = isRecording ? " text-red-500 animate-pulse" : "";
 
   return (
     <button
       type="button"
-      onClick={toggleRecording}
-      className={`relative px-3 py-2 rounded-sm transition-all flex items-center gap-2 overflow-hidden ${
-        isRecording 
-          ? 'bg-red-900/20 text-red-500 border border-red-500/50' 
-          : 'text-slate-500 hover:text-amber-500 hover:bg-slate-800'
-      } ${className}`}
-      title={isRecording ? "Stop Recording" : t('dictation', 'clickToDictate')}
+      aria-label={ariaLabel ?? (isRecording ? "Stop dictation" : "Start dictation")}
+      onClick={handleClick}
+      className={`${baseClass}${activeClass} flex items-center justify-center`}
+      title={isRecording ? "Stop Recording" : "Dictate"}
+      {...buttonProps}
     >
-      {/* Waveform Background Simulation */}
-      {isRecording && (
-          <div className="absolute inset-0 flex items-center justify-center gap-0.5 opacity-20 pointer-events-none">
-              <div className="w-1 bg-red-500 h-3 animate-[pulse_0.5s_infinite]"></div>
-              <div className="w-1 bg-red-500 h-6 animate-[pulse_0.7s_infinite]"></div>
-              <div className="w-1 bg-red-500 h-4 animate-[pulse_0.4s_infinite]"></div>
-              <div className="w-1 bg-red-500 h-7 animate-[pulse_0.6s_infinite]"></div>
-              <div className="w-1 bg-red-500 h-3 animate-[pulse_0.5s_infinite]"></div>
-          </div>
-      )}
-
       {isRecording ? (
-        <span className="relative flex h-3 w-3 shrink-0">
-          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
-          <span className="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
-        </span>
+        <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+          <rect x="6" y="6" width="12" height="12" rx="2" />
+        </svg>
       ) : (
-        <svg className="w-5 h-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
         </svg>
       )}
-      <span className={`text-[10px] font-bold uppercase ${isRecording ? 'text-red-400' : ''} hidden sm:inline relative z-10`}>
-          {isRecording ? t('dictation', 'recording') : ''}
-      </span>
     </button>
   );
 };

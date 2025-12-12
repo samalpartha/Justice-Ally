@@ -1,6 +1,7 @@
+
 import React, { useState, useEffect } from 'react';
 import { CaseContext, TriageResult } from '../types';
-import { assessCaseSuitability } from '../services/geminiService';
+import { assessCaseSuitability, mapApiError } from '../services/geminiService';
 import DictationButton from './DictationButton';
 import { useLanguage } from '../context/LanguageContext';
 
@@ -19,6 +20,7 @@ const STATES = [
 
 const Triage: React.FC<TriageProps> = ({ onComplete }) => {
   const { t, language } = useLanguage();
+  const [error, setError] = useState<string | null>(null);
   
   // Defined here to access 't'
   const CASE_TYPES = [
@@ -87,6 +89,7 @@ const Triage: React.FC<TriageProps> = ({ onComplete }) => {
 
   const handleAssess = async () => {
     if (!context.description) return;
+    setError(null);
     setStep('analyzing');
     
     // Simulate multi-step loading for better UX
@@ -109,20 +112,20 @@ const Triage: React.FC<TriageProps> = ({ onComplete }) => {
         setLoadingProgress(100);
         setLoadingText("Finalizing Strategy...");
         
-        setTimeout(() => {
-            setResult(assessment);
-            setStep('result');
-        }, 500);
+        setResult(assessment);
+        setStep('result');
 
-    } catch (error) {
+    } catch (error: any) {
       console.error(error);
-      alert(t('alerts', 'analysisFailed'));
+      const errKey = mapApiError(error);
+      setError(errKey);
       setStep('input');
     }
   };
 
   const loadDemo = (scenario: typeof DEMO_SCENARIOS[0]) => {
       setContext(scenario.data);
+      setError(null);
   };
 
   if (step === 'input') {
@@ -134,6 +137,13 @@ const Triage: React.FC<TriageProps> = ({ onComplete }) => {
             <h2 className="text-2xl md:text-4xl font-serif font-black text-slate-100 mb-3 tracking-tight uppercase">{t('triage', 'header')}</h2>
             <p className="text-amber-600 font-bold text-[10px] md:text-xs tracking-[0.3em] uppercase">{t('triage', 'confidential')}</p>
           </div>
+
+          {error && (
+            <div className="mb-6 p-4 bg-red-950/30 border border-red-500/50 rounded-sm flex items-center gap-3 animate-in fade-in slide-in-from-top-2">
+              <svg className="w-5 h-5 text-red-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+              <span className="text-sm text-red-200 font-serif">{t('alerts', error)}</span>
+            </div>
+          )}
 
           {/* Demo Buttons */}
           <div className="flex flex-wrap gap-3 mb-8 md:mb-12 justify-center">
@@ -158,16 +168,16 @@ const Triage: React.FC<TriageProps> = ({ onComplete }) => {
                    <svg className="w-5 h-5 text-slate-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                 </label>
                 <div className="relative">
-                  <select 
-                    value={context.jurisdiction}
-                    onChange={e => setContext({...context, jurisdiction: e.target.value})}
-                    className="w-full bg-slate-900 border-b-2 border-slate-700 text-slate-200 rounded-none p-3 focus:border-amber-600 outline-none appearance-none font-serif text-sm transition-colors cursor-pointer hover:bg-slate-800"
-                  >
-                    {STATES.map(s => <option key={s} value={s}>{s}</option>)}
-                  </select>
-                  <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-500">
-                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
-                  </div>
+                    <select 
+                        value={context.jurisdiction}
+                        onChange={e => setContext({...context, jurisdiction: e.target.value})}
+                        className="w-full bg-slate-900 border-b-2 border-slate-700 text-slate-200 rounded-none p-3 focus:border-amber-600 outline-none appearance-none font-serif text-sm transition-colors cursor-pointer hover:bg-slate-800"
+                    >
+                        {STATES.map(s => <option key={s} value={s}>{s}</option>)}
+                    </select>
+                    <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-500">
+                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
+                    </div>
                 </div>
               </div>
               <div className="group">
@@ -215,7 +225,10 @@ const Triage: React.FC<TriageProps> = ({ onComplete }) => {
                    {t('triage', 'facts')}
                  </label>
                  <DictationButton 
-                    onTranscript={(text) => setContext(prev => ({...prev, description: prev.description + text}))} 
+                    onTranscript={(text) => setContext(prev => {
+                        const spacer = prev.description && !prev.description.endsWith(' ') ? ' ' : '';
+                        return {...prev, description: prev.description + spacer + text};
+                    })} 
                     className="hover:bg-slate-800 bg-slate-950 border border-slate-800 text-amber-600"
                  />
               </div>

@@ -1,48 +1,54 @@
 
-import React, { useState, useEffect } from 'react';
-import Layout from './components/Layout';
-import Dashboard from './components/Dashboard';
-import WarRoom from './components/WarRoom';
-import Triage from './components/Triage';
-import Help from './components/Help';
-import LiveSession from './components/LiveSession';
-import FormsLibrary from './components/FormsLibrary';
-import JuvenileJustice from './components/JuvenileJustice';
-import TrafficDefense from './components/TrafficDefense';
-import Login from './components/Login';
-import AboutModal from './components/AboutModal';
-import { AppMode, UploadedFile, CaseData, CaseContext, TriageResult, UserProfile, UserRole } from './types';
+import React, { useCallback, useState, useEffect } from "react";
+
+import Layout from "./components/Layout";
+import Dashboard from "./components/Dashboard";
+import WarRoom from "./components/WarRoom";
+import Triage from "./components/Triage";
+import Help from "./components/Help";
+import LiveSession from "./components/LiveSession";
+import FormsLibrary from "./components/FormsLibrary";
+import JuvenileJustice from "./components/JuvenileJustice";
+import TrafficDefense from "./components/TrafficDefense";
+import Login from "./components/Login";
+import AboutModal from "./components/AboutModal";
+import ChatInterface from "./components/ChatInterface";
+
+import { AppMode, CaseData, UserProfile, UploadedFile, CaseContext, TriageResult, UserRole } from "./types";
 import { analyzeCaseFiles, fileToBase64, base64ToFile, mapApiError } from './services/geminiService';
 import { useLanguage } from './context/LanguageContext';
 
 const SAVE_KEY = 'justiceAlly_save_v1';
 const USER_KEY = 'justiceAlly_user_v1';
 
-const AppContent: React.FC = () => {
-  const { t, language } = useLanguage();
-  // User Session State
-  const [user, setUser] = useState<UserProfile | null>(null);
+const createEmptyCaseData = (notes: string = ""): CaseData => ({
+  caseSummary: "",
+  documents: [],
+  strategy: null,
+  analyzed: false,
+  notes,
+  timeline: [],
+  entities: []
+});
 
-  // App State
-  const [currentMode, setMode] = useState<AppMode>(AppMode.TRIAGE);
-  const [files, setFiles] = useState<UploadedFile[]>([]);
+const App: React.FC = () => {
+  const { t, language } = useLanguage();
+  const [mode, setMode] = useState<AppMode>(AppMode.DASHBOARD);
   const [caseData, setCaseData] = useState<CaseData | null>(null);
+  const [user, setUser] = useState<UserProfile | null>(null);
+  const [showAbout, setShowAbout] = useState(false);
+  const [files, setFiles] = useState<UploadedFile[]>([]);
   const [analyzing, setAnalyzing] = useState(false);
   const [caseContext, setCaseContext] = useState<CaseContext | undefined>();
   const [triageResult, setTriageResult] = useState<TriageResult | null>(null);
-  const [showAbout, setShowAbout] = useState(false);
-  
-  // Notification System
   const [notification, setNotification] = useState<{message: string, type: 'success' | 'error'} | null>(null);
 
   const showNotify = (messageKey: string, type: 'success' | 'error') => {
-      // Look up translation or use raw key if missing
       const msg = t('alerts', messageKey) || messageKey;
       setNotification({ message: msg, type });
       setTimeout(() => setNotification(null), 5000);
   };
 
-  // Load User on Init
   useEffect(() => {
     const savedUser = localStorage.getItem(USER_KEY);
     if (savedUser) {
@@ -64,11 +70,16 @@ const AppContent: React.FC = () => {
   const handleLogout = () => {
     setUser(null);
     localStorage.removeItem(USER_KEY);
-    // Optional: Clear case data on logout for privacy
     setFiles([]);
     setCaseData(null);
     setCaseContext(undefined);
   };
+
+  const handleNotesChange = useCallback((notes: string) => {
+    setCaseData((prev) =>
+      prev ? { ...prev, notes } : createEmptyCaseData(notes)
+    );
+  }, []);
 
   const handleFilesAdded = (newFiles: File[]) => {
     const uploaded = newFiles.map(file => ({
@@ -98,16 +109,18 @@ const AppContent: React.FC = () => {
     if (!files.length && !desc) return;
     setAnalyzing(true);
     
-    // Update context description if changed
     if (caseContext && desc !== caseContext.description) {
         setCaseContext({ ...caseContext, description: desc });
     }
 
     try {
       const data = await analyzeCaseFiles(files, desc, language, caseContext);
-      setCaseData(data);
+      setCaseData(prev => ({
+        ...data,
+        notes: prev?.notes || data.notes || ''
+      }));
       showNotify("Analysis Complete", "success");
-      setMode(AppMode.WAR_ROOM); // Auto-navigate to strategy
+      setMode(AppMode.WAR_ROOM);
     } catch (error: any) {
       console.error(error);
       const errorKey = mapApiError(error);
@@ -117,10 +130,8 @@ const AppContent: React.FC = () => {
     }
   };
 
-  // --- SAVE / LOAD SYSTEM ---
   const handleSaveState = async () => {
     try {
-        // Convert Files to Base64 for storage
         const serializableFiles = await Promise.all(files.map(async f => {
             if (f.type === 'link') return f;
             if (f.file) {
@@ -147,10 +158,9 @@ const AppContent: React.FC = () => {
             localStorage.setItem(SAVE_KEY, JSON.stringify(state));
             showNotify('saveSuccess', 'success');
         } catch (e) {
-            // Quota exceeded fallback
             const liteState = {
                 ...state,
-                files: state.files.filter((f: any) => f.type === 'link') // Only save links
+                files: state.files.filter((f: any) => f.type === 'link')
             };
             localStorage.setItem(SAVE_KEY, JSON.stringify(liteState));
             showNotify('saveLite', 'success');
@@ -169,8 +179,6 @@ const AppContent: React.FC = () => {
       }
       try {
           const state = JSON.parse(saved);
-          
-          // Rehydrate Files
           const rehydratedFiles = state.files.map((f: any) => {
               if (f.base64) {
                   const fileObj = base64ToFile(f.base64, f.name, f.type);
@@ -192,7 +200,6 @@ const AppContent: React.FC = () => {
   };
 
   const loadDemoData = () => {
-      // Pre-fill with sample Landlord/Tenant data
       setCaseContext({
           jurisdiction: 'California',
           caseType: 'Landlord/Tenant',
@@ -202,78 +209,80 @@ const AppContent: React.FC = () => {
       showNotify('demoLoaded', 'success');
   };
 
+  const renderContent = () => {
+    switch (mode) {
+      case AppMode.WAR_ROOM:
+        return (
+          <WarRoom
+            caseData={caseData}
+            onNotesChange={handleNotesChange}
+            onFilesAdded={handleFilesAdded}
+            onLinkAdded={handleLinkAdded}
+            onLoadDemo={loadDemoData}
+          />
+        );
+      case AppMode.CHAT:
+        return <ChatInterface caseData={caseData} />;
+      case AppMode.TRIAGE:
+        return <Triage onComplete={(ctx, res) => {
+            setCaseContext(ctx);
+            setTriageResult(res);
+            setMode(AppMode.DASHBOARD);
+        }} />;
+      case AppMode.LIVE_STRATEGY:
+        return <LiveSession />;
+      case AppMode.FORMS:
+        return <FormsLibrary files={files} onFilesAdded={handleFilesAdded} />;
+      case AppMode.JUVENILE:
+        return <JuvenileJustice />;
+      case AppMode.TRAFFIC:
+        return <TrafficDefense />;
+      case AppMode.HELP:
+        return <Help />;
+      case AppMode.DASHBOARD:
+      default:
+        return (
+          <Dashboard
+            files={files}
+            onFilesAdded={handleFilesAdded}
+            onLinkAdded={handleLinkAdded}
+            onFileUpdated={handleFileUpdated}
+            onFileDeleted={handleFileDeleted}
+            caseData={caseData}
+            analyzing={analyzing}
+            onAnalyze={handleAnalyze}
+            context={caseContext}
+            onLoadDemo={loadDemoData}
+          />
+        );
+    }
+  };
+
   if (!user) {
     return <Login onLogin={handleLogin} />;
   }
 
   return (
-    <Layout 
-      currentMode={currentMode} 
-      setMode={setMode} 
-      onSave={handleSaveState} 
-      onLoad={handleLoadState}
-      user={user}
-      onLogout={handleLogout}
-      onShowAbout={() => setShowAbout(true)}
-    >
-      {showAbout && <AboutModal onClose={() => setShowAbout(false)} />}
-      
-      {/* Toast Notification */}
-      {notification && (
+    <>
+      <Layout
+        currentMode={mode}
+        setMode={setMode}
+        onShowAbout={() => setShowAbout(true)}
+        user={user}
+        onSave={handleSaveState}
+        onLoad={handleLoadState}
+        onLogout={handleLogout}
+      >
+        {notification && (
           <div className={`fixed top-4 right-4 z-[100] px-6 py-4 rounded-sm shadow-2xl border-l-4 flex items-center gap-3 animate-in fade-in slide-in-from-top-2 ${notification.type === 'success' ? 'bg-slate-900 border-green-500 text-green-400' : 'bg-slate-900 border-red-500 text-red-400'}`}>
-              {notification.type === 'success' ? (
-                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
-              ) : (
-                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
-              )}
               <span className="font-bold text-xs uppercase tracking-wide">{notification.message}</span>
           </div>
-      )}
-
-      {currentMode === AppMode.TRIAGE && (
-        <Triage onComplete={(ctx, res) => {
-            setCaseContext(ctx);
-            setTriageResult(res);
-            setMode(AppMode.DASHBOARD);
-        }} />
-      )}
-      
-      {currentMode === AppMode.DASHBOARD && (
-        <Dashboard 
-          files={files} 
-          onFilesAdded={handleFilesAdded}
-          onLinkAdded={handleLinkAdded}
-          onFileUpdated={handleFileUpdated}
-          onFileDeleted={handleFileDeleted}
-          caseData={caseData}
-          analyzing={analyzing}
-          onAnalyze={handleAnalyze}
-          context={caseContext}
-          onLoadDemo={loadDemoData}
-        />
-      )}
-
-      {currentMode === AppMode.WAR_ROOM && (
-        <WarRoom 
-           caseData={caseData} 
-           onFilesAdded={handleFilesAdded}
-           onLinkAdded={handleLinkAdded}
-           onNotesChange={(notes) => setCaseData(prev => prev ? {...prev, notes} : null)}
-           onLoadDemo={loadDemoData}
-        />
-      )}
-
-      {currentMode === AppMode.LIVE_STRATEGY && <LiveSession />}
-      {currentMode === AppMode.FORMS && <FormsLibrary files={files} onFilesAdded={handleFilesAdded} />}
-      {currentMode === AppMode.JUVENILE && <JuvenileJustice />}
-      {currentMode === AppMode.TRAFFIC && <TrafficDefense />}
-      {currentMode === AppMode.HELP && <Help />}
-    </Layout>
+        )}
+        {renderContent()}
+      </Layout>
+      {showAbout && <AboutModal onClose={() => setShowAbout(false)} />}
+    </>
   );
-};
-
-const App: React.FC = () => {
-  return <AppContent />;
 };
 
 export default App;

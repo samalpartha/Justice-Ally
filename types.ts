@@ -105,6 +105,7 @@ export enum AppMode {
   TRIAGE = 'TRIAGE',
   DASHBOARD = 'DASHBOARD',
   WAR_ROOM = 'WAR_ROOM',
+  CHAT = 'CHAT', // Added for ChatInterface
   LIVE_STRATEGY = 'LIVE_STRATEGY',
   FORMS = 'FORMS',
   HELP = 'HELP',

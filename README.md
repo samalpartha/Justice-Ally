@@ -5,7 +5,6 @@
 ![Status](https://img.shields.io/badge/Status-Production%20Ready-green.svg)
 ![AI Model](https://img.shields.io/badge/AI-Gemini%203.0%20Pro-purple)
 ![Language](https://img.shields.io/badge/Language-English%20%7C%20Español-orange)
-[![Live Demo](https://img.shields.io/badge/Live%20Demo-Launch%20App-red)](https://justiceally-778149047860.us-west1.run.app)
 
 **JusticeAlly** is a high-fidelity legal navigation platform designed to bridge the "Access to Justice" gap. Acting as a **Senior Litigation Strategist** for Self-Represented Litigants (formerly "Pro Se") and a **Force Multiplier** for Junior Attorneys, it combines ruthless strategy with compassionate administrative guidance.
 
@@ -91,6 +90,30 @@ Open [http://localhost:5173](http://localhost:5173) (or the port shown in your t
 
 ---
 
+## 🐙 Deployment to GitHub
+
+To push this codebase to GitHub:
+
+1.  **Initialize Git:**
+    ```bash
+    git init
+    ```
+2.  **Add Remote:**
+    ```bash
+    git remote add origin https://github.com/your-username/justice-ally.git
+    ```
+3.  **Clean Up:**
+    *   Ensure `components/AttorneyMatch.tsx` and `components/App.tsx` are deleted if you are cleaning up the folder structure manually.
+    *   Ensure `.env` is in your `.gitignore` file to prevent leaking your API Key.
+4.  **Commit & Push:**
+    ```bash
+    git add .
+    git commit -m "Initial commit of JusticeAlly"
+    git push -u origin main
+    ```
+
+---
+
 ## 🚀 Key Features
 
 ### 🌍 1. Full Bilingual Support (EN / ES)
@@ -131,18 +154,6 @@ Open [http://localhost:5173](http://localhost:5173) (or the port shown in your t
 - **Streaming Dictation:** Real-time speech-to-text for drafting affidavits and notes.
 
 ---
-
-## 🛠️ Technology Stack
-
-- **Frontend:** React 19 + TypeScript + TailwindCSS.
-- **AI Core:** `@google/genai` SDK.
-  - **Reasoning/Vision:** `gemini-3-pro-preview`
-  - **Triage/Speed:** `gemini-2.5-flash`
-  - **Voice/Live:** `gemini-2.5-flash-native-audio-preview-09-2025`
-  - **TTS:** `gemini-2.5-flash-preview-tts`
-- **Privacy Architecture:** 
-  - **LocalStorage:** All case data persists only in the user's browser.
-  - **No Backend Database:** Maximizes privacy and reduces liability.
 
 ## ⚠️ Disclaimer
 **JusticeAlly is an automated educational tool.** It does not provide legal advice or create an attorney-client relationship. Users should always verify information with a qualified attorney or court clerk in their jurisdiction.
