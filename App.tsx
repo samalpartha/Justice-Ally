@@ -33,7 +33,7 @@ const createEmptyCaseData = (notes: string = ""): CaseData => ({
 
 const App: React.FC = () => {
   const { t, language } = useLanguage();
-  const [mode, setMode] = useState<AppMode>(AppMode.DASHBOARD);
+  const [mode, setMode] = useState<AppMode>(AppMode.TRIAGE);
   const [caseData, setCaseData] = useState<CaseData | null>(null);
   const [user, setUser] = useState<UserProfile | null>(null);
   const [showAbout, setShowAbout] = useState(false);
@@ -73,6 +73,7 @@ const App: React.FC = () => {
     setFiles([]);
     setCaseData(null);
     setCaseContext(undefined);
+    setMode(AppMode.TRIAGE);
   };
 
   const handleNotesChange = useCallback((notes: string) => {
