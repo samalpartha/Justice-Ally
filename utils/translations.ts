@@ -34,7 +34,7 @@ export const translations = {
     youthLaw: { en: "Youth Law", es: "Ley Juvenil" },
     traffic: { en: "Traffic & Defense", es: "Tráfico y Defensa" },
     dui: { en: "DUI • Tickets • Accidents", es: "DUI • Multas • Accidentes" },
-    manual: { en: "System Protocols", es: "Protocolos del Sistema" },
+    manual: { en: "Operational Manual", es: "Manual Operativo" },
   },
   login: {
     subtitle: { en: "Secure Legal Workspace", es: "Espacio Legal Seguro" },
@@ -147,7 +147,7 @@ export const translations = {
   },
   live: {
     header: { en: "Live Strategy Session", es: "Sesión de Estrategia en Vivo" },
-    secureChannel: { en: "Secure Voice Channel", es: "Canal de Voz Seguro" },
+    secureChannel: { en: "Canal de Voz Seguro", es: "Canal de Voz Seguro" },
     initLink: { en: "Initialize Voice Link", es: "Inicializar Enlace de Voz" },
     terminate: { en: "Terminate Connection", es: "Terminar Conexión" },
     transcript: { en: "Live Transcript", es: "Transcripción en Vivo" },

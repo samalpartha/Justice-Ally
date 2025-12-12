@@ -45,12 +45,6 @@ const Dashboard: React.FC<DashboardProps> = ({ files, onFilesAdded, onLinkAdded,
     }
   };
 
-  const handleDeleteRequest = (id: string) => {
-      if (window.confirm(t('common', 'confirmDelete'))) {
-          onFileDeleted?.(id);
-      }
-  };
-
   const isImage = (file: UploadedFile) => {
      return file.type.startsWith('image/');
   };
@@ -63,6 +57,11 @@ const Dashboard: React.FC<DashboardProps> = ({ files, onFilesAdded, onLinkAdded,
     f.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
     f.type.toLowerCase().includes(searchQuery.toLowerCase())
   );
+
+  // Compute Scored Documents for Relevance Index
+  const scoredDocs = caseData?.documents?.filter(
+    d => typeof d.relevanceScore === 'number' && !isNaN(d.relevanceScore)
+  ) || [];
 
   return (
     <div className="h-full overflow-y-auto p-4 md:p-8 custom-scrollbar bg-slate-950">
@@ -158,7 +157,7 @@ const Dashboard: React.FC<DashboardProps> = ({ files, onFilesAdded, onLinkAdded,
                                   ) : f.name.toLowerCase().endsWith('.txt') ? (
                                     <svg className="w-4 h-4 text-amber-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
                                   ) : (
-                                    <svg className="w-4 h-4 text-slate-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+                                    <svg className="w-4 h-4 text-slate-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
                                   )}
                                   <span className="text-sm text-slate-300 font-serif truncate max-w-[200px]">{f.name}</span>
                               </div>
@@ -169,20 +168,27 @@ const Dashboard: React.FC<DashboardProps> = ({ files, onFilesAdded, onLinkAdded,
                               </span>
                             </td>
                             <td className="p-3 text-right">
-                              <div className="flex justify-end gap-2">
+                              <div className="flex justify-end gap-2 items-center relative z-10">
                                 {isImage(f) && (
                                   <button 
-                                    onClick={() => setRedactingFile(f)}
-                                    className="text-[10px] font-bold uppercase tracking-wider text-amber-600 hover:text-white transition-colors opacity-0 group-hover:opacity-100"
+                                    type="button"
+                                    onClick={(e) => { e.preventDefault(); e.stopPropagation(); setRedactingFile(f); }}
+                                    className="text-[10px] font-bold uppercase tracking-wider text-slate-500 hover:text-amber-500 transition-colors p-2"
                                   >
                                     {t('dashboard', 'redact')}
                                   </button>
                                 )}
                                 {onFileDeleted && (
                                   <button
-                                    onClick={() => handleDeleteRequest(f.id)}
-                                    className="text-[10px] font-bold uppercase tracking-wider text-red-600 hover:text-red-400 transition-colors opacity-0 group-hover:opacity-100"
+                                    type="button"
+                                    onClick={(e) => { 
+                                      e.preventDefault(); 
+                                      e.stopPropagation(); 
+                                      onFileDeleted(f.id); 
+                                    }}
+                                    className="p-2 text-slate-500 hover:text-red-500 transition-colors rounded-sm hover:bg-slate-800/80 cursor-pointer"
                                     title={t('common', 'delete')}
+                                    aria-label="Delete file"
                                   >
                                     <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -223,11 +229,12 @@ const Dashboard: React.FC<DashboardProps> = ({ files, onFilesAdded, onLinkAdded,
               </div>
 
               <button
+                type="button"
                 onClick={() => onAnalyze(caseDesc)}
-                disabled={!isButtonEnabled}
+                disabled={analyzing || (!hasContent && !caseDesc.trim())}
                 title={isButtonEnabled ? "Run deep analysis on Vault contents." : "Please add evidence files or a case description."}
                 className={`w-full py-4 rounded-sm font-bold text-xs tracking-[0.2em] uppercase transition-all flex items-center justify-center gap-2 ${
-                  isButtonEnabled
+                  !analyzing && (hasContent || caseDesc.trim())
                     ? 'bg-amber-700 hover:bg-amber-600 text-white shadow-lg border border-amber-500 cursor-pointer'
                     : 'bg-slate-800 text-slate-500 cursor-not-allowed border border-slate-700'
                 }`}
@@ -247,9 +254,9 @@ const Dashboard: React.FC<DashboardProps> = ({ files, onFilesAdded, onLinkAdded,
                </h3>
              </div>
              <div className="p-6">
-                {caseData ? (
+                {scoredDocs.length > 0 ? (
                   <div className="space-y-4">
-                     {caseData.documents.map((doc, idx) => (
+                     {scoredDocs.map((doc, idx) => (
                         <div key={idx} className="group">
                            <div className="flex justify-between items-center mb-1">
                               <span className="text-xs text-slate-300 font-serif truncate max-w-[150px]">{doc.fileName}</span>

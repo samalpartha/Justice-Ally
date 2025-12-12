@@ -182,7 +182,7 @@ const Layout: React.FC<LayoutProps> = ({ currentMode, setMode, onSave, onLoad, u
            <NavItem 
              mode={AppMode.HELP} 
              label={t('sidebar', 'manual')} 
-             sub="V1.0.4"
+             sub="V1.0.5"
              icon={<svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>}
            />
         </nav>
@@ -197,7 +197,7 @@ const Layout: React.FC<LayoutProps> = ({ currentMode, setMode, onSave, onLoad, u
            )}
           <div className="grid grid-cols-2 gap-2">
             <button onClick={onSave} className="flex flex-col items-center justify-center p-2 bg-slate-900 border border-slate-800 hover:border-amber-600 rounded-sm group transition-all">
-              <svg className="w-4 h-4 text-slate-500 group-hover:text-amber-500 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" /></svg>
+              <svg className="w-4 h-4 text-slate-500 group-hover:text-amber-500 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" /></svg>
               <span className="text-[9px] font-bold uppercase text-slate-500 group-hover:text-slate-300">{t('common', 'save')}</span>
             </button>
             <button onClick={onLoad} className="flex flex-col items-center justify-center p-2 bg-slate-900 border border-slate-800 hover:border-blue-600 rounded-sm group transition-all">

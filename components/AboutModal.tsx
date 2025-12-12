@@ -56,6 +56,7 @@ const AboutModal: React.FC<AboutModalProps> = ({ onClose }) => {
                  {[
                    { title: "Gemini 3.0 Pro", desc: "Complex legal reasoning, strategy generation, and document analysis." },
                    { title: "Gemini 2.5 Flash", desc: "High-speed triage, risk scoring, and JSON extraction." },
+                   { title: "AI Counsel", desc: "Persistent chat assistant with integrated Voice Dictation." },
                    { title: "Gemini Live API", desc: "Real-time, low-latency voice consultation via WebSocket." },
                    { title: "Client-Side Privacy", desc: "Zero-retention architecture. All data stays in the browser." }
                  ].map((item, i) => (

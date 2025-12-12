@@ -1,5 +1,10 @@
 
-// FILE DEPRECATED
-// Please delete this file from your project structure to maintain a clean codebase.
-// It is no longer imported by the main application.
+// ---------------------------------------------------------
+// FILE MARKED FOR DELETION
+// ---------------------------------------------------------
+// This feature has been deprecated in favor of the Triage
+// and AI Counsel modules.
+//
+// You can safely delete this file to keep the project structure clean.
+// ---------------------------------------------------------
 export default function AttorneyMatch() { return null; }

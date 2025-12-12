@@ -10,12 +10,14 @@ const Help: React.FC = () => {
         
         {/* Header */}
         <div className="text-center space-y-6 border-b-2 border-slate-800 pb-12">
-          <div className="w-16 h-16 bg-slate-900 border-2 border-amber-700 flex items-center justify-center mx-auto shadow-2xl rounded-sm">
-            <span className="font-serif font-black text-amber-600 text-3xl">J</span>
+          <div className="w-16 h-16 flex items-center justify-center border-2 border-amber-700 rounded-sm bg-slate-900 shadow-2xl mx-auto">
+             <svg className="w-8 h-8 text-amber-600" fill="currentColor" viewBox="0 0 24 24">
+               <path d="M12 2c-1.1 0-2 .9-2 2h-3v2h2.55c-.6 2.3-2.65 4-5.05 4-1.3 0-2.5-.35-3.5-1l-1 1.75c1.3.85 2.85 1.25 4.5 1.25 2.5 0 4.8-1.15 6.35-3h6.3c1.55 1.85 3.85 3 6.35 3 1.65 0 3.2-.4 4.5-1.25l-1-1.75c-1 .65-2.2 1-3.5 1-2.4 0-4.45-1.7-5.05-4h2.55V4h-3c0-1.1-.9-2-2-2zm-6 12c-2.2 0-4 1.8-4 4s1.8 4 4 4 4-1.8 4-4-1.8-4-4-4zm12 0c-2.2 0-4 1.8-4 4s1.8 4 4 4 4-1.8 4-4-1.8-4-4-4z"/>
+             </svg>
           </div>
           <div>
              <h1 className="text-4xl md:text-5xl font-serif font-black text-white tracking-tight mb-4">{t('help', 'title')}</h1>
-             <p className="text-amber-600 font-bold uppercase tracking-[0.3em] text-xs">{t('help', 'subtitle')} <span className="text-slate-500">V1.0.4</span></p>
+             <p className="text-amber-600 font-bold uppercase tracking-[0.3em] text-xs">{t('help', 'subtitle')} <span className="text-slate-500">V1.0.5</span></p>
           </div>
         </div>
 
@@ -25,9 +27,10 @@ const Help: React.FC = () => {
             { id: "01", title: t('sidebar', 'triage'), desc: "Assess procedural risk and calculate financial exposure." },
             { id: "02", title: t('sidebar', 'evidenceVault'), desc: "Secure ingestion of PDFs, Images, and Video evidence." },
             { id: "03", title: t('sidebar', 'strategyRoom'), desc: "Apply strategic doctrine and map facts to Black Letter Law." },
-            { id: "04", title: t('sidebar', 'formsLib'), desc: "Access official state forms and manage your document repository." },
-            { id: "05", title: t('sidebar', 'traffic'), desc: "Defense strategies for DUI, infractions, and accident liability." },
-            { id: "06", title: t('sidebar', 'juvenile'), desc: "Guidance for Emancipation, Delinquency, and Dependency cases." }
+            { id: "04", title: "AI Counsel", desc: "Interactive chat assistant. Wargame strategies and draft motions with Voice Dictation." },
+            { id: "05", title: t('sidebar', 'formsLib'), desc: "Access official state forms and manage your document repository." },
+            { id: "06", title: t('sidebar', 'traffic'), desc: "Defense strategies for DUI, infractions, and accident liability." },
+            { id: "07", title: t('sidebar', 'juvenile'), desc: "Guidance for Emancipation, Delinquency, and Dependency cases." }
           ].map((item) => (
             <div key={item.id} className="bg-slate-900 p-8 border border-slate-800 hover:border-amber-600/50 transition-all group shadow-lg rounded-sm">
               <div className="flex items-center gap-4 mb-6 border-b border-slate-800 pb-4">
@@ -44,7 +47,7 @@ const Help: React.FC = () => {
           <div className="bg-slate-900 p-8 border border-slate-800 hover:border-amber-600/50 transition-all group col-span-full shadow-lg rounded-sm flex flex-col md:flex-row gap-8 items-center">
              <div className="flex-1">
                 <div className="flex items-center gap-4 mb-6 border-b border-slate-800 pb-4">
-                  <div className="text-xl font-mono font-bold text-slate-600 group-hover:text-amber-600">07</div>
+                  <div className="text-xl font-mono font-bold text-slate-600 group-hover:text-amber-600">08</div>
                   <h3 className="text-xl font-serif font-bold text-slate-100">{t('sidebar', 'liveStrategy')}</h3>
                 </div>
                 <p className="text-slate-400 text-sm leading-relaxed font-serif mb-4">

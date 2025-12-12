@@ -105,26 +105,41 @@ const App: React.FC = () => {
     showNotify(t('common', 'delete') + " Successful", "success");
   };
 
-  const handleAnalyze = async (desc: string) => {
-    if (!files.length && !desc) return;
-    setAnalyzing(true);
-    
-    if (caseContext && desc !== caseContext.description) {
-        setCaseContext({ ...caseContext, description: desc });
+  // Refactored handler to strictly manage loading state
+  const handleAnalyzeEvidence = async (statementOfFacts: string) => {
+    if ((!files || files.length === 0) && !statementOfFacts.trim()) {
+      showNotify("Please upload evidence or enter a statement of facts.", "error");
+      return;
     }
 
+    setAnalyzing(true);
     try {
-      const data = await analyzeCaseFiles(files, desc, language, caseContext);
+      // Update context description if provided
+      const currentContext = caseContext || {
+        jurisdiction: "Unknown",
+        caseType: "General",
+        budget: "Unknown",
+        description: statementOfFacts
+      };
+
+      if (statementOfFacts && statementOfFacts !== currentContext.description) {
+         currentContext.description = statementOfFacts;
+         setCaseContext(currentContext);
+      }
+
+      const result = await analyzeCaseFiles(files, statementOfFacts, language, currentContext);
+      
       setCaseData(prev => ({
-        ...data,
-        notes: prev?.notes || data.notes || ''
+        ...result,
+        notes: prev?.notes || result.notes || ''
       }));
+      
       showNotify("Analysis Complete", "success");
       setMode(AppMode.WAR_ROOM);
-    } catch (error: any) {
-      console.error(error);
-      const errorKey = mapApiError(error);
-      showNotify(errorKey, "error");
+    } catch (err: any) {
+      console.error("analyzeCaseFiles error:", err);
+      const key = mapApiError(err);
+      showNotify(key, "error");
     } finally {
       setAnalyzing(false);
     }
@@ -206,6 +221,15 @@ const App: React.FC = () => {
           budget: 'Low',
           description: 'Eviction defense for non-payment due to habitability issues (broken heater).'
       });
+      
+      const dummyLink: UploadedFile = {
+          id: 'demo_email',
+          name: 'Email_Thread_Repair_Request_Jan2024.pdf',
+          type: 'link',
+          url: 'https://mail.google.com/mail/u/0/#search/landlord'
+      };
+      
+      setFiles(prev => [...prev, dummyLink]);
       showNotify('demoLoaded', 'success');
   };
 
@@ -250,7 +274,7 @@ const App: React.FC = () => {
             onFileDeleted={handleFileDeleted}
             caseData={caseData}
             analyzing={analyzing}
-            onAnalyze={handleAnalyze}
+            onAnalyze={handleAnalyzeEvidence}
             context={caseContext}
             onLoadDemo={loadDemoData}
           />

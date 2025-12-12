@@ -1,17 +1,15 @@
 
-# JusticeAlly: Bridging the 92% Justice Gap with Gemini 3 Pro
+# JusticeAlly: The AI Litigation Strategist
 
-## The Crisis
-In the US, **92% of civil legal needs** for low-income Americans go unmet. Millions of "pro se" litigants lose meaningful cases every year—not because they lack facts, but because they lack procedure. The legal system is pay-to-play, and most cannot pay.
+In the US, **92% of civil legal needs** for low-income Americans go unmet. Millions fail in court annually not from a lack of truth, but a crushing lack of procedure. **JusticeAlly** bridges this divide by transforming **Gemini 3.0 Pro** into an elite *AI Litigation Strategist*—an always-available, high-fidelity legal co-pilot that turns chaos into strategy and panic into decisive action.
 
-## The Solution
-**JusticeAlly** is a Force Multiplier for the unrepresented. It transforms the **Gemini 3.0 Pro** API into a Senior Litigation Strategist. Unlike generic chatbots, JusticeAlly provides a structured, secure "War Room" for strategy, evidence management, and risk assessment, moving users from panic to action.
+## Multi-Model Architecture
+We orchestrate a symphony of specialized Gemini models to deliver institutional-grade legal reasoning:
+*   **Gemini 2.5 Flash (Triage):** Instantly calculates procedural risk scores, financial exposure, and jurisdictional viability—filtering unfit cases before they clog overburdened court dockets.
+*   **Gemini 3.0 Pro (War Room):** Deeply maps evidence and chaotic narratives to specific “Black Letter Law” elements (Duty, Breach, Causation), generating professional litigation strategies previously accessible only to the wealthy elite.
+*   **Gemini Live (Simulation):** Acts as a low-latency real-time voice adversary, enabling users to rehearse oral arguments and negotiation tactics under simulated courtroom pressure.
 
-## Powered by Gemini 3.0 Pro
-We leveraged Gemini 3.0 Pro’s advanced reasoning and massive context window to ingest state procedural codes and analyze complex multimodal evidence (PDFs, bodycam footage, audio).
-*   **Triage Module:** Uses Gemini 2.5 Flash for instant risk scoring, preventing futile lawsuits before they clog the courts.
-*   **War Room:** Uses **Gemini 3.0 Pro** to map chaotic facts to "Black Letter Law" elements (Duty, Breach, Causation), reducing case preparation time by **90%** (from weeks to minutes).
-*   **Live Strategy:** Uses **Gemini Live** for real-time oral argument simulation, allowing litigants to rehearse before stepping into court.
+## Engineering & Privacy
+Developed through the rapid **“Vibe Coding”** methodology in Google AI Studio, JusticeAlly compresses months of complex engineering into hours while maintaining enterprise-grade reliability. Crucially, it pioneers a **Local-First Privacy Architecture**, ensuring that all sensitive client data remains encrypted strictly within the browser and never persists on external servers.
 
-## Vibe-Coding with Google AI Studio
-This platform was built using **Google AI Studio**'s "Vibe Coding" methodology. By iterating via natural language prompts within the IDE, we bypassed weeks of boilerplate engineering. This allowed us to focus purely on high-fidelity UX and legal logic, proving that with Gemini, a single developer can build institutional-grade tools that democratize access to justice for the 50 million Americans navigating the courts alone annually.
+JusticeAlly embodies a bold new frontier—**AI-assisted procedural justice**—empowering the 50 million Americans who face the legal system without representation. By merging universal accessibility, profound reasoning depth, and ethical AI design, it proves that a single developer can engineer institutional-scale impact to dismantle one of society’s most persistent inequities.

@@ -3,6 +3,7 @@ import React, { useState, useRef, useEffect } from "react";
 import { CaseData } from "../types";
 import { sendChatMessage } from "../services/geminiService";
 import { useLanguage } from "../context/LanguageContext";
+import DictationButton from "./DictationButton";
 
 interface ChatInterfaceProps {
   caseData: CaseData | null;
@@ -153,14 +154,22 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ caseData }) => {
 
       <form
         onSubmit={handleSend}
-        className="border-t border-slate-800 p-4 bg-slate-900 flex gap-3"
+        className="border-t border-slate-800 p-4 bg-slate-900 flex gap-3 items-center"
       >
-        <input
-          className="flex-1 bg-slate-950 text-sm text-slate-100 px-4 py-3 rounded-sm border border-slate-700 focus:border-amber-600 outline-none font-serif placeholder:text-slate-600 transition-colors"
-          placeholder="Type a question or 'Wargame my next hearing'…"
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-        />
+        <div className="relative flex-1">
+          <input
+            className="w-full bg-slate-950 text-sm text-slate-100 px-4 py-3 pr-12 rounded-sm border border-slate-700 focus:border-amber-600 outline-none font-serif placeholder:text-slate-600 transition-colors"
+            placeholder="Type a question or 'Wargame my next hearing'…"
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+          />
+          <div className="absolute right-2 top-1/2 -translate-y-1/2">
+            <DictationButton 
+              onTranscript={(text) => setInput(prev => prev + (prev ? ' ' : '') + text)}
+              className="p-1.5 text-slate-500 hover:text-amber-500 transition-colors rounded-full hover:bg-slate-800"
+            />
+          </div>
+        </div>
         <button
           type="submit"
           disabled={isSending || !input.trim()}

@@ -1,6 +1,6 @@
 
 import { GoogleGenAI, Type, Schema, Modality, LiveServerMessage } from "@google/genai";
-import { UploadedFile, CaseData, CaseContext, TriageResult, Language, SessionAnalysis, SessionRecord, AppMode, UserProfile, UserRole } from "../types";
+import { UploadedFile, CaseData, CaseContext, TriageResult, Language, SessionAnalysis } from "../types";
 
 // --- CONSTANTS ---
 const MAX_FILE_SIZE = 20 * 1024 * 1024; // 20MB
