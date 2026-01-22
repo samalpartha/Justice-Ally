@@ -16,43 +16,43 @@
 
 ## 🏗️ System Architecture
 
-JusticeAlly operates on a **Client-Side Privacy First** architecture. No case data is stored on external servers; the Gemini API is used strictly as a stateless reasoning engine.
+```mermaid
+graph TD
+    User((User))
+    
+    subgraph ClientBox [Client-Side Privacy Boundary]
+        style ClientBox fill:#f9f9f9,stroke:#333,stroke-width:2px,stroke-dasharray: 5 5
+        
+        Login[Login / Role Selection]
+        AppShell[AppShell / Main Layout]
+        
+        subgraph Modules [Functional Modules]
+            direction TB
+            Triage[Module A: Triage & Risk]
+            Vault[Module B: Evidence Vault]
+            Strategy[Module C: Strategy Room]
+            Counsel[Module D: AI Counsel]
+            Hubs[Module E: Justice Hubs]
+            Live[Module F: Live Strategy]
+        end
+        
+        DataLayer[(Secure Data Layer<br/>LocalStorage + Encryption)]
+    end
+    
+    subgraph Cloud [Google Cloud]
+        style Cloud fill:#e8f0fe,stroke:#4285f4,stroke-width:2px
+        Gemini[<img src='https://upload.wikimedia.org/wikipedia/commons/8/8a/Google_Gemini_logo.svg' width='20' /> Gemini API<br/>Stateless Reasoning Engine]
+    end
 
-```text
-+------------------------------+
-|   User (Pro Se / Attorney)   |
-+--------------+---------------+
-               |
-               v
-+--------------+---------------+
-|    Login / Role Selection    |
-+--------------+---------------+
-               |
-               v
-+--------------+---------------+
-|     AppShell (Main Layout)   |
-+--------------+---------------+
-               |
-    +----------+----------+----------------+----------------+----------------+
-    |                     |                |                |                |
-    v                     v                v                v                v
-+---+----------+   +------+-------+   +----+-----+   +------+-------+   +----+-----+
-|  Module A:   |   |  Module B:   |   | Module C:|   |   Module D:  |   | Module F:|
-| Triage & Risk|   |Evidence Vault|   | Strategy |   | AI Counsel   |   | Live Sim |
-+---+----------+   +------+-------+   +----+-----+   +------+-------+   +----+-----+
-    |                     |                |                |                |
-    | (Data Persistence)  |                |                |                |
-    v                     v                v                v                v
-+---+---------------------+----------------+----------------+----------------+-------+
-|          Secure Data Layer (LocalStorage + Encryption)                             |
-+---+---------------------+----------------+----------------+----------------+-------+
-    |                     |                |                |                |
-    | (Case Context)      | (Files)        | (Facts)        | (Chat)         | (Audio)
-    v                     v                v                v                v
-+---+---------------------+----------------+----------------+----------------+-------+
-|           Intelligence Layer (Google Gemini API)                                   |
-|                 (Stateless Reasoning Engine)                                       |
-+------------------------------------------------------------------------------------+
+    User --> Login
+    Login --> AppShell
+    AppShell --> Modules
+    
+    Modules <--> DataLayer
+    Modules <-->|Anonymized Context| Gemini
+    
+    classDef secure fill:#d4edda,stroke:#28a745,stroke-width:2px;
+    class DataLayer secure;
 ```
 
 ---
@@ -139,56 +139,44 @@ If you encounter errors when pushing, check the following:
 
 ---
 
-## 🚀 Key Features
+## 🌟 Application Capabilities
 
-### 🌍 1. Full Bilingual Support (EN / ES)
+JusticeAlly provides a comprehensive suite of tools designed to empower users at every stage of the legal process.
 
-* **Deep Localization:** The entire interface, including AI analysis, risk assessments, and legal guides, allows instant toggling between **English** and **Spanish**.
+### 🧠 Core Intelligence
 
-### ⚖️ 2. Triage & Risk Assessment
+* **Case Triage & Risk Matrix**: Intelligent intake system that evaluates case viability using a Red/Yellow/Green risk assessment model. It analyzes jurisdiction, claims, and available evidence to recommend whether a user should proceed Pro Se or seek counsel.
+* **Bilingual Legal Brain**: The entire application toggles instantly between English and Spanish ("Justicia Aliada"), ensuring equal access to justice. The AI understands legal nuance in both languages.
 
-* **Pro Se Suitability Test:** Determines if a user can handle a case alone (Green/Yellow/Red risk analysis).
+### 🛡️ Evidence Management (Secure Vault)
 
-* **Wallet Reality Check:** Estimates filing fees and hidden costs.
+* **Multi-Modal Ingestion**: Upload case files including PDFs, High-Res Images, and **Body Cam/CCTV Footage (MP4)**.
+* **Smart Redaction Studio**: Integrated tool to manually or automatically redact Personally Identifiable Information (PII) before submission.
+* **Evidence Relevance Engine**: AI-powered scoring system (1-10) that evaluates how strongly each piece of evidence supports individual legal elements (Duty, Breach, Causation, Damages).
 
-### 🗄️ 3. Secure Evidence Vault
+### ⚔️ Litigation Strategy (The War Room)
 
-* **Multi-Modal Ingestion:** Accepts PDFs, Images, and **Videos (MP4)**.
+* **Strategic Roadmap**: Generates a phase-by-phase litigation plan (Pre-filing -> Discovery -> Motion Practice -> Trial).
+* **Black Letter Law Analysis**: Automatically maps user facts to specific legal elements required by state law.
+* **"Sun Tzu" Competitive Analysis**: Predicts opposing counsel's likely moves and suggests counter-strategies.
+* **Voice-to-Memo**: Dictate strategy notes directly into a structured legal memorandum format.
 
-* **Redaction Studio:** Integrated canvas tool to permanently blackout PII.
-* **Relevance Index:** A visual scoring system (1-10) rating evidence strength.
+### 🤖 AI Counsel (Interactive Assistant)
 
-### ♟️ 4. War Room Strategy
+* **Wargame Simulation**: Roleplay scenarios with the AI acting as an aggressive Opposing Counsel or a skeptical Judge to prepare for court.
+* **Socratic Legal Guide**: Ask complex questions ("What is the statute of limitations for fraud in CA?") and receive cited, simplified answers.
+* **Document Review**: Upload opposing motions for the AI to summarize and suggest potential grounds for objection.
 
-* **Sun Tzu Analysis:** Applies strategic principles to modern litigation.
+### 🏛️ Justice Hubs (Specialized Workflows)
 
-* **Black Letter Law Matrix:** Maps facts to specific legal elements (Duty, Breach, Causation, Damages).
-* **Voice Dictation:** Integrated speech-to-text for drafting Counsel's Memorandums.
+* **Housing / Eviction Defense**: Specialized flows for Unlawful Detainer responses and habitability claims.
+* **Traffic & DUI**: Checklists for "Trial by Declaration" and analyzing police report errors.
+* **Juvenile & Family**: Sensitive workflows for Emancipation, Dependency, and simple Divorce proceedings.
 
-### 💬 5. AI Counsel (Chat Assistant)
+### 🎤 Live Strategy (Real-Time Voice)
 
-* **Wargaming:** Ask the AI to simulate opposing counsel or a judge.
-
-* **Context-Aware:** Reads from your Evidence Vault and Case Strategy.
-* **Dictation:** Use voice commands to draft complex legal questions naturally.
-
-### 📝 6. Forms Library & Repository
-
-* **Official Resources:** Directs users to verified "Self-Help" court portals for 50 states.
-
-* **My Repository:** A secure local storage area for users to upload and manage filled forms.
-
-### 7. Specialized Justice Hubs
-
-* **Traffic & Defense:** DUI/DWI checklists and "Trial by Declaration" guides.
-
-* **Juvenile Justice:** Emancipation, Delinquency, and Dependency (CPS) guidance.
-
-### 🎙️ 8. Live Strategy (Voice)
-
-* **Real-Time Consultation:** Uses **Gemini Live API** for low-latency voice conversations.
-
-* **Oral Argument Practice:** Rehearse your case verbally with the AI strategist.
+* **Oral Argument Coach**: Practice your opening statement or motion arguments with a real-time voice-enabled AI feedback loop.
+* **Hearing Prep**: Simulate the high-pressure environment of a courtroom hearing using low-latency voice interaction.
 
 ---
 
