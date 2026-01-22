@@ -22,10 +22,10 @@ export const base64ToFile = (base64: string, filename: string, mimeType: string)
   const bstr = atob(dataStr);
   let n = bstr.length;
   const u8arr = new Uint8Array(n);
-  while(n--){
+  while (n--) {
     u8arr[n] = bstr.charCodeAt(n);
   }
-  return new File([u8arr], filename, {type: mimeType});
+  return new File([u8arr], filename, { type: mimeType });
 };
 
 export const fileToGenerativePart = async (file: File): Promise<{ inlineData: { data: string; mimeType: string } } | null> => {
@@ -37,8 +37,8 @@ export const fileToGenerativePart = async (file: File): Promise<{ inlineData: { 
   try {
     const base64String = await fileToBase64(file);
     const parts = base64String.split(',');
-    const base64Data = parts.length > 1 ? parts[1] : parts[0]; 
-    
+    const base64Data = parts.length > 1 ? parts[1] : parts[0];
+
     if (!base64Data || base64Data.trim() === '') return null;
 
     return {
@@ -55,16 +55,16 @@ export const fileToGenerativePart = async (file: File): Promise<{ inlineData: { 
 
 export const mapApiError = (error: any): string => {
   const msg = error?.message || error?.toString() || "";
-  
+
   if (msg.includes("429") || msg.includes("Resource has been exhausted")) return "apiError429";
   if (msg.includes("500") || msg.includes("503") || msg.includes("Internal error") || msg.includes("unavailable")) return "apiError500";
   if (msg.includes("API key") || msg.includes("403") || msg.includes("permission denied")) return "apiErrorKey";
   if (msg.includes("ContentUnion") || msg.includes("must not be empty")) return "apiErrorContent";
   if (msg.includes("SAFETY") || msg.includes("blocked")) return "apiErrorSafety";
   if (msg.includes("Failed to fetch") || msg.includes("NetworkError") || msg.includes("connection")) return "apiErrorNetwork";
-  if (msg.includes("FILE_TOO_LARGE")) return "fileTooLarge"; 
+  if (msg.includes("FILE_TOO_LARGE")) return "fileTooLarge";
   if (msg.includes("FILE_READ_ERROR")) return "fileReadError";
-  
+
   return "analysisFailed"; // Generic fallback
 };
 
@@ -97,18 +97,18 @@ const cleanJsonString = (str: string): string => {
 
 // Helper for resampling audio if browser doesn't support 16kHz natively
 const downsampleBuffer = (buffer: Float32Array, inputRate: number, outputRate: number = 16000): Float32Array => {
-    if (inputRate === outputRate) return buffer;
-    if (inputRate < outputRate) return buffer; // Should not happen for 16k target
-    
-    const sampleRateRatio = inputRate / outputRate;
-    const newLength = Math.floor(buffer.length / sampleRateRatio);
-    const result = new Float32Array(newLength);
-    
-    for (let i = 0; i < newLength; i++) {
-        // Nearest neighbor interpolation for speed
-        result[i] = buffer[Math.floor(i * sampleRateRatio)];
-    }
-    return result;
+  if (inputRate === outputRate) return buffer;
+  if (inputRate < outputRate) return buffer; // Should not happen for 16k target
+
+  const sampleRateRatio = inputRate / outputRate;
+  const newLength = Math.floor(buffer.length / sampleRateRatio);
+  const result = new Float32Array(newLength);
+
+  for (let i = 0; i < newLength; i++) {
+    // Nearest neighbor interpolation for speed
+    result[i] = buffer[Math.floor(i * sampleRateRatio)];
+  }
+  return result;
 };
 
 // Simple retry wrapper for API calls
@@ -240,8 +240,8 @@ const CASE_ANALYSIS_SCHEMA: Schema = {
 };
 
 export const assessCaseSuitability = async (context: CaseContext, language: Language = 'en'): Promise<TriageResult> => {
-  if (!process.env.API_KEY) throw new Error("API Key missing");
-  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+  if (!import.meta.env.VITE_GEMINI_API_KEY) throw new Error("API Key missing");
+  const ai = new GoogleGenAI({ apiKey: import.meta.env.VITE_GEMINI_API_KEY });
   const model = "gemini-2.5-flash";
 
   const prompt = `
@@ -274,24 +274,24 @@ export const analyzeCaseFiles = async (
   language: Language = 'en',
   context?: CaseContext,
 ): Promise<CaseData> => {
-  if (!process.env.API_KEY) throw new Error("API Key missing");
+  if (!import.meta.env.VITE_GEMINI_API_KEY) throw new Error("API Key missing");
 
-  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
-  const model = "gemini-3-pro-preview"; 
-  
+  const ai = new GoogleGenAI({ apiKey: import.meta.env.VITE_GEMINI_API_KEY });
+  const model = "gemini-3-pro-preview";
+
   const binaryFiles = files.filter(f => f.file && f.type !== 'link');
   const links = files.filter(f => f.type === 'link');
 
   // Process files safely, filtering nulls
   const processedFiles = await Promise.all(binaryFiles.map(async f => {
-      try {
-          return await fileToGenerativePart(f.file!);
-      } catch (e) {
-          throw e;
-      }
+    try {
+      return await fileToGenerativePart(f.file!);
+    } catch (e) {
+      throw e;
+    }
   }));
   const validFileParts = processedFiles.filter((p): p is { inlineData: { data: string; mimeType: string } } => p !== null);
-  
+
   const contextStr = context ? `Context: ${context.jurisdiction}, ${context.caseType}` : "";
   const linksStr = links.length > 0 ? `Links: ${links.map(l => l.url).join(', ')}` : "";
 
@@ -341,8 +341,8 @@ export const sendChatMessage = async (
   location?: { latitude: number; longitude: number },
   caseContext?: string
 ) => {
-  if (!process.env.API_KEY) throw new Error("API Key missing");
-  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+  if (!import.meta.env.VITE_GEMINI_API_KEY) throw new Error("API Key missing");
+  const ai = new GoogleGenAI({ apiKey: import.meta.env.VITE_GEMINI_API_KEY });
 
   // Prepare tools
   const tools: any[] = [];
@@ -351,12 +351,12 @@ export const sendChatMessage = async (
   if (useSearch) {
     tools.push({ googleSearch: {} });
     tools.push({ googleMaps: {} });
-    
+
     if (location) {
       toolConfig = {
         functionCallingConfig: { mode: 'AUTO' },
         googleSearchRetrieval: {
-           dynamicRetrievalConfig: { mode: 'MODE_DYNAMIC', dynamicThreshold: 0.7 }
+          dynamicRetrievalConfig: { mode: 'MODE_DYNAMIC', dynamicThreshold: 0.7 }
         }
       };
     }
@@ -365,66 +365,66 @@ export const sendChatMessage = async (
   // Handle files
   const fileParts = [];
   for (const file of files) {
-      if (file.type === 'link') continue;
-      if (file.file) {
-          try {
-             const part = await fileToGenerativePart(file.file);
-             if (part) fileParts.push(part);
-          } catch(e) { console.error(e); }
-      } else if (file.base64) {
-          fileParts.push({
-              inlineData: {
-                  mimeType: file.type,
-                  data: file.base64.split(',')[1] || file.base64
-              }
-          });
-      }
+    if (file.type === 'link') continue;
+    if (file.file) {
+      try {
+        const part = await fileToGenerativePart(file.file);
+        if (part) fileParts.push(part);
+      } catch (e) { console.error(e); }
+    } else if (file.base64) {
+      fileParts.push({
+        inlineData: {
+          mimeType: file.type,
+          data: file.base64.split(',')[1] || file.base64
+        }
+      });
+    }
   }
 
   // Construct contents
   const contents = [...history];
-  
+
   const newParts: any[] = fileParts.length > 0 ? [...fileParts] : [];
-  
+
   let textPrompt = message;
   if (location && useSearch) {
-      textPrompt += `\n[Context: User Location is Lat ${location.latitude}, Lng ${location.longitude}]`;
+    textPrompt += `\n[Context: User Location is Lat ${location.latitude}, Lng ${location.longitude}]`;
   }
-  
+
   newParts.push({ text: textPrompt });
 
   contents.push({
-      role: 'user',
-      parts: newParts
+    role: 'user',
+    parts: newParts
   });
 
   // Use Gemini 2.5 Flash for better availability/stability in chat
-  const model = "gemini-2.5-flash"; 
-  
+  const model = "gemini-2.5-flash";
+
   // Combine system instruction with case context if available
   const baseInstruction = getSystemInstruction(language);
-  const combinedInstruction = caseContext 
-    ? `${baseInstruction}\n\n# CURRENT CASE CONTEXT\n${caseContext}\n\nUse this context to answer specific questions about the user's situation.` 
+  const combinedInstruction = caseContext
+    ? `${baseInstruction}\n\n# CURRENT CASE CONTEXT\n${caseContext}\n\nUse this context to answer specific questions about the user's situation.`
     : baseInstruction;
 
   // Direct return for streaming, using retry if initial connection fails
   return withRetry(async () => {
-      return await ai.models.generateContentStream({
-        model,
-        contents: contents as any,
-        config: {
-          systemInstruction: combinedInstruction,
-          tools: tools.length > 0 ? tools : undefined,
-          toolConfig: toolConfig
-        }
-      });
+    return await ai.models.generateContentStream({
+      model,
+      contents: contents as any,
+      config: {
+        systemInstruction: combinedInstruction,
+        tools: tools.length > 0 ? tools : undefined,
+        toolConfig: toolConfig
+      }
+    });
   });
 };
 
 export const textToSpeech = async (text: string, language: Language = 'en'): Promise<string> => {
-  if (!process.env.API_KEY) throw new Error("API Key missing");
-  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
-  
+  if (!import.meta.env.VITE_GEMINI_API_KEY) throw new Error("API Key missing");
+  const ai = new GoogleGenAI({ apiKey: import.meta.env.VITE_GEMINI_API_KEY });
+
   const response = await ai.models.generateContent({
     model: "gemini-2.5-flash-preview-tts",
     contents: {
@@ -445,9 +445,9 @@ export const textToSpeech = async (text: string, language: Language = 'en'): Pro
 
 // --- AUDIO UTILS ---
 export const transcribeAudio = async (audioBlob: Blob, language: Language = 'en'): Promise<string> => {
-  if (!process.env.API_KEY) throw new Error("API Key missing");
-  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
-  
+  if (!import.meta.env.VITE_GEMINI_API_KEY) throw new Error("API Key missing");
+  const ai = new GoogleGenAI({ apiKey: import.meta.env.VITE_GEMINI_API_KEY });
+
   const reader = new FileReader();
   const base64Promise = new Promise<string>((resolve, reject) => {
     reader.onloadend = () => resolve((reader.result as string).split(',')[1]);
@@ -469,9 +469,9 @@ export const transcribeAudio = async (audioBlob: Blob, language: Language = 'en'
   return response.text || "";
 }
 
-export const generateSessionAnalysis = async (transcript: {role: string, text: string}[], language: Language = 'en'): Promise<SessionAnalysis> => {
-  if (!process.env.API_KEY) throw new Error("API Key missing");
-  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+export const generateSessionAnalysis = async (transcript: { role: string, text: string }[], language: Language = 'en'): Promise<SessionAnalysis> => {
+  if (!import.meta.env.VITE_GEMINI_API_KEY) throw new Error("API Key missing");
+  const ai = new GoogleGenAI({ apiKey: import.meta.env.VITE_GEMINI_API_KEY });
   const model = "gemini-2.5-flash";
 
   const transcriptText = transcript.map(t => `${t.role}: ${t.text}`).join('\n');
@@ -510,44 +510,43 @@ export const generateSessionAnalysis = async (transcript: {role: string, text: s
 
 // --- LIVE & DICTATION CLASSES ---
 export class LiveSessionClient {
-  private session: any; 
+  private session: any;
   private inputCtx: AudioContext | null = null;
   private outputCtx: AudioContext | null = null;
   private stream: MediaStream | null = null;
   private active = false;
   private nextStartTime = 0;
-  
+
   private processor: ScriptProcessorNode | null = null;
   private source: MediaStreamAudioSourceNode | null = null;
 
   constructor(
     private onStatus: (s: string) => void,
     private onTranscript?: (role: string, text: string) => void
-  ) {}
+  ) { }
 
-  async connect(language: Language = 'en') {
-    if (!process.env.API_KEY) throw new Error("Missing API Key");
-    const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+  async connect(language: Language = 'en', caseContext?: string) {
+    if (!import.meta.env.VITE_GEMINI_API_KEY) throw new Error("Missing API Key");
+    const ai = new GoogleGenAI({ apiKey: import.meta.env.VITE_GEMINI_API_KEY });
     this.active = true;
     this.onStatus("Connecting...");
 
     try {
-      this.inputCtx = new (window.AudioContext || (window as any).webkitAudioContext)({sampleRate: 16000});
-      this.outputCtx = new (window.AudioContext || (window as any).webkitAudioContext)({sampleRate: 24000});
-      
+      this.inputCtx = new (window.AudioContext || (window as any).webkitAudioContext)({ sampleRate: 16000 });
+      this.outputCtx = new (window.AudioContext || (window as any).webkitAudioContext)({ sampleRate: 24000 });
+
       if (this.inputCtx && this.inputCtx.state === 'suspended') await this.inputCtx.resume();
       if (this.outputCtx && this.outputCtx.state === 'suspended') await this.outputCtx.resume();
 
       this.stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      
+
       this.session = ai.live.connect({
         model: 'gemini-2.5-flash-native-audio-preview-09-2025',
         config: {
           responseModalities: [Modality.AUDIO],
-          inputAudioTranscription: {}, 
+          inputAudioTranscription: {},
           outputAudioTranscription: {},
-          // PASS LANGUAGE TO SYSTEM INSTRUCTION HERE
-          systemInstruction: getSystemInstruction(language)
+          systemInstruction: getSystemInstruction(language) + (caseContext ? `\n\n# CURRENT CASE CONTEXT\n${caseContext}` : '')
         },
         callbacks: {
           onopen: () => { this.onStatus("Connected"); this.streamAudio(); },
@@ -567,21 +566,21 @@ export class LiveSessionClient {
     if (!this.inputCtx || !this.stream) return;
     this.source = this.inputCtx.createMediaStreamSource(this.stream);
     this.processor = this.inputCtx.createScriptProcessor(4096, 1, 1);
-    
+
     this.processor.onaudioprocess = (e) => {
       if (!this.active) return;
-      
+
       const input = e.inputBuffer.getChannelData(0);
       const outputRate = 16000;
       let dataToSend = input;
 
       if (this.inputCtx && this.inputCtx.sampleRate !== outputRate) {
-          dataToSend = downsampleBuffer(input, this.inputCtx.sampleRate, outputRate);
+        dataToSend = downsampleBuffer(input, this.inputCtx.sampleRate, outputRate);
       }
 
       const int16 = new Int16Array(dataToSend.length);
-      for (let i=0; i<dataToSend.length; i++) int16[i] = dataToSend[i] * 32768;
-      
+      for (let i = 0; i < dataToSend.length; i++) int16[i] = dataToSend[i] * 32768;
+
       this.session.then((s: any) => s.sendRealtimeInput({
         media: { mimeType: 'audio/pcm;rate=16000', data: encodeAudio(new Uint8Array(int16.buffer)) }
       }));
@@ -593,26 +592,26 @@ export class LiveSessionClient {
   private async handleMessage(msg: LiveServerMessage) {
     const audioData = msg.serverContent?.modelTurn?.parts[0]?.inlineData?.data;
     if (audioData && this.outputCtx) {
-        const audioBytes = decodeAudio(audioData);
-        const buffer = this.outputCtx.createBuffer(1, audioBytes.length/2, 24000);
-        const channel = buffer.getChannelData(0);
-        const int16 = new Int16Array(audioBytes.buffer);
-        for(let i=0; i<int16.length; i++) channel[i] = int16[i] / 32768.0;
-        
-        const source = this.outputCtx.createBufferSource();
-        source.buffer = buffer;
-        source.connect(this.outputCtx.destination);
-        
-        this.nextStartTime = Math.max(this.outputCtx.currentTime, this.nextStartTime);
-        source.start(this.nextStartTime);
-        this.nextStartTime += buffer.duration;
+      const audioBytes = decodeAudio(audioData);
+      const buffer = this.outputCtx.createBuffer(1, audioBytes.length / 2, 24000);
+      const channel = buffer.getChannelData(0);
+      const int16 = new Int16Array(audioBytes.buffer);
+      for (let i = 0; i < int16.length; i++) channel[i] = int16[i] / 32768.0;
+
+      const source = this.outputCtx.createBufferSource();
+      source.buffer = buffer;
+      source.connect(this.outputCtx.destination);
+
+      this.nextStartTime = Math.max(this.outputCtx.currentTime, this.nextStartTime);
+      source.start(this.nextStartTime);
+      this.nextStartTime += buffer.duration;
     }
 
     if (msg.serverContent?.inputTranscription?.text) {
-        this.onTranscript?.('user', msg.serverContent.inputTranscription.text);
+      this.onTranscript?.('user', msg.serverContent.inputTranscription.text);
     }
     if (msg.serverContent?.outputTranscription?.text) {
-        this.onTranscript?.('model', msg.serverContent.outputTranscription.text);
+      this.onTranscript?.('model', msg.serverContent.outputTranscription.text);
     }
   }
 
@@ -621,8 +620,8 @@ export class LiveSessionClient {
     this.stream?.getTracks().forEach(t => t.stop());
     this.source?.disconnect();
     this.processor?.disconnect();
-    if (this.inputCtx && this.inputCtx.state !== 'closed') try { await this.inputCtx.close(); } catch(e) {}
-    if (this.outputCtx && this.outputCtx.state !== 'closed') try { await this.outputCtx.close(); } catch(e) {}
+    if (this.inputCtx && this.inputCtx.state !== 'closed') try { await this.inputCtx.close(); } catch (e) { }
+    if (this.outputCtx && this.outputCtx.state !== 'closed') try { await this.outputCtx.close(); } catch (e) { }
     this.onStatus("Disconnected");
   }
 }
@@ -635,29 +634,29 @@ export class StreamingDictationClient {
   private processor: ScriptProcessorNode | null = null;
   private source: MediaStreamAudioSourceNode | null = null;
 
-  constructor(private onText: (t: string) => void, private onError: (e: any) => void) {}
+  constructor(private onText: (t: string) => void, private onError: (e: any) => void) { }
 
   async start(language: Language) {
-    if (!process.env.API_KEY) throw new Error("No API Key");
-    const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+    if (!import.meta.env.VITE_GEMINI_API_KEY) throw new Error("No API Key");
+    const ai = new GoogleGenAI({ apiKey: import.meta.env.VITE_GEMINI_API_KEY });
     this.active = true;
 
     try {
-      this.ctx = new (window.AudioContext || (window as any).webkitAudioContext)({sampleRate: 16000});
+      this.ctx = new (window.AudioContext || (window as any).webkitAudioContext)({ sampleRate: 16000 });
       if (this.ctx && this.ctx.state === 'suspended') await this.ctx.resume();
       this.stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      
+
       this.session = ai.live.connect({
         model: 'gemini-2.5-flash-native-audio-preview-09-2025',
-        config: { 
-          responseModalities: [Modality.AUDIO], 
+        config: {
+          responseModalities: [Modality.AUDIO],
           inputAudioTranscription: {},
-          systemInstruction: `Dictation Mode. Transcribe speech strictly into ${language === 'es' ? 'Spanish' : 'English'}.` 
+          systemInstruction: `Dictation Mode. Transcribe speech strictly into ${language === 'es' ? 'Spanish' : 'English'}.`
         },
         callbacks: {
           onopen: () => this.streamAudio(),
           onmessage: (m: LiveServerMessage) => {
-             if (m.serverContent?.inputTranscription?.text) this.onText(m.serverContent.inputTranscription.text);
+            if (m.serverContent?.inputTranscription?.text) this.onText(m.serverContent.inputTranscription.text);
           },
           onerror: (e) => { this.onError(e); this.stop(); },
           onclose: () => this.stop()
@@ -673,18 +672,18 @@ export class StreamingDictationClient {
     if (!this.ctx || !this.stream) return;
     this.source = this.ctx.createMediaStreamSource(this.stream);
     this.processor = this.ctx.createScriptProcessor(4096, 1, 1);
-    
+
     this.processor.onaudioprocess = (e) => {
       if (!this.active) return;
       const input = e.inputBuffer.getChannelData(0);
       const outputRate = 16000;
       let dataToSend = input;
       if (this.ctx && this.ctx.sampleRate !== outputRate) {
-          dataToSend = downsampleBuffer(input, this.ctx.sampleRate, outputRate);
+        dataToSend = downsampleBuffer(input, this.ctx.sampleRate, outputRate);
       }
       const int16 = new Int16Array(dataToSend.length);
-      for (let i=0; i<dataToSend.length; i++) int16[i] = dataToSend[i] * 32768;
-      
+      for (let i = 0; i < dataToSend.length; i++) int16[i] = dataToSend[i] * 32768;
+
       this.session.then((s: any) => s.sendRealtimeInput({
         media: { mimeType: 'audio/pcm;rate=16000', data: encodeAudio(new Uint8Array(int16.buffer)) }
       }));
@@ -698,6 +697,6 @@ export class StreamingDictationClient {
     this.stream?.getTracks().forEach(t => t.stop());
     this.source?.disconnect();
     this.processor?.disconnect();
-    if (this.ctx && this.ctx.state !== 'closed') try { this.ctx.close(); } catch(e) {}
+    if (this.ctx && this.ctx.state !== 'closed') try { this.ctx.close(); } catch (e) { }
   }
 }

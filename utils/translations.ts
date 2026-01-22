@@ -147,7 +147,7 @@ export const translations = {
   },
   live: {
     header: { en: "Live Strategy Session", es: "Sesión de Estrategia en Vivo" },
-    secureChannel: { en: "Canal de Voz Seguro", es: "Canal de Voz Seguro" },
+    secureChannel: { en: "Secure Voice Channel", es: "Canal de Voz Seguro" },
     initLink: { en: "Initialize Voice Link", es: "Inicializar Enlace de Voz" },
     terminate: { en: "Terminate Connection", es: "Terminar Conexión" },
     transcript: { en: "Live Transcript", es: "Transcripción en Vivo" },

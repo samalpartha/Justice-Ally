@@ -327,7 +327,7 @@ const WarRoom: React.FC<WarRoomProps> = ({ caseData, onFilesAdded, onLinkAdded, 
                </h3>
                <div className="flex items-center gap-3">
                    <DictationButton 
-                      onTranscript={(text) => onNotesChange && onNotesChange((caseData?.notes || '') + (caseData?.notes ? '\n' : '') + text)} 
+                      onTranscript={(text) => onNotesChange && onNotesChange((caseData?.notes || '') + (caseData?.notes ? ' ' : '') + text)} 
                       className="text-slate-500 hover:text-amber-500"
                    />
                </div>

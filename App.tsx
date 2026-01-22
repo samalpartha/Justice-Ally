@@ -41,12 +41,12 @@ const App: React.FC = () => {
   const [analyzing, setAnalyzing] = useState(false);
   const [caseContext, setCaseContext] = useState<CaseContext | undefined>();
   const [triageResult, setTriageResult] = useState<TriageResult | null>(null);
-  const [notification, setNotification] = useState<{message: string, type: 'success' | 'error'} | null>(null);
+  const [notification, setNotification] = useState<{ message: string, type: 'success' | 'error' } | null>(null);
 
   const showNotify = (messageKey: string, type: 'success' | 'error') => {
-      const msg = t('alerts', messageKey) || messageKey;
-      setNotification({ message: msg, type });
-      setTimeout(() => setNotification(null), 5000);
+    const msg = t('alerts', messageKey) || messageKey;
+    setNotification({ message: msg, type });
+    setTimeout(() => setNotification(null), 5000);
   };
 
   useEffect(() => {
@@ -98,7 +98,7 @@ const App: React.FC = () => {
   };
 
   const handleFileUpdated = (updatedFile: UploadedFile) => {
-      setFiles(prev => prev.map(f => f.id === updatedFile.id ? updatedFile : f));
+    setFiles(prev => prev.map(f => f.id === updatedFile.id ? updatedFile : f));
   };
 
   const handleFileDeleted = (fileId: string) => {
@@ -124,17 +124,17 @@ const App: React.FC = () => {
       };
 
       if (statementOfFacts && statementOfFacts !== currentContext.description) {
-         currentContext.description = statementOfFacts;
-         setCaseContext(currentContext);
+        currentContext.description = statementOfFacts;
+        setCaseContext(currentContext);
       }
 
       const result = await analyzeCaseFiles(files, statementOfFacts, language, currentContext);
-      
+
       setCaseData(prev => ({
         ...result,
         notes: prev?.notes || result.notes || ''
       }));
-      
+
       showNotify("Analysis Complete", "success");
       setMode(AppMode.WAR_ROOM);
     } catch (err: any) {
@@ -148,90 +148,90 @@ const App: React.FC = () => {
 
   const handleSaveState = async () => {
     try {
-        const serializableFiles = await Promise.all(files.map(async f => {
-            if (f.type === 'link') return f;
-            if (f.file) {
-               try {
-                   const b64 = await fileToBase64(f.file);
-                   return { ...f, file: undefined, base64: b64, previewUrl: undefined };
-               } catch (e) {
-                   console.error("File skip", e);
-                   return null; 
-               }
-            }
-            return f;
-        }));
-
-        const state = {
-            files: serializableFiles.filter(f => f !== null),
-            caseData,
-            caseContext,
-            triageResult,
-            timestamp: Date.now()
-        };
-
-        try {
-            localStorage.setItem(SAVE_KEY, JSON.stringify(state));
-            showNotify('saveSuccess', 'success');
-        } catch (e) {
-            const liteState = {
-                ...state,
-                files: state.files.filter((f: any) => f.type === 'link')
-            };
-            localStorage.setItem(SAVE_KEY, JSON.stringify(liteState));
-            showNotify('saveLite', 'success');
+      const serializableFiles = await Promise.all(files.map(async f => {
+        if (f.type === 'link') return f;
+        if (f.file) {
+          try {
+            const b64 = await fileToBase64(f.file);
+            return { ...f, file: undefined, base64: b64, previewUrl: undefined };
+          } catch (e) {
+            console.error("File skip", e);
+            return null;
+          }
         }
+        return f;
+      }));
+
+      const state = {
+        files: serializableFiles.filter(f => f !== null),
+        caseData,
+        caseContext,
+        triageResult,
+        timestamp: Date.now()
+      };
+
+      try {
+        localStorage.setItem(SAVE_KEY, JSON.stringify(state));
+        showNotify('saveSuccess', 'success');
+      } catch (e) {
+        const liteState = {
+          ...state,
+          files: state.files.filter((f: any) => f.type === 'link')
+        };
+        localStorage.setItem(SAVE_KEY, JSON.stringify(liteState));
+        showNotify('saveLite', 'success');
+      }
     } catch (e) {
-        console.error(e);
-        showNotify('saveFail', 'error');
+      console.error(e);
+      showNotify('saveFail', 'error');
     }
   };
 
   const handleLoadState = () => {
-      const saved = localStorage.getItem(SAVE_KEY);
-      if (!saved) {
-          showNotify('noSavedCase', 'error');
-          return;
-      }
-      try {
-          const state = JSON.parse(saved);
-          const rehydratedFiles = state.files.map((f: any) => {
-              if (f.base64) {
-                  const fileObj = base64ToFile(f.base64, f.name, f.type);
-                  return { ...f, file: fileObj, previewUrl: URL.createObjectURL(fileObj) };
-              }
-              return f;
-          });
+    const saved = localStorage.getItem(SAVE_KEY);
+    if (!saved) {
+      showNotify('noSavedCase', 'error');
+      return;
+    }
+    try {
+      const state = JSON.parse(saved);
+      const rehydratedFiles = state.files.map((f: any) => {
+        if (f.base64) {
+          const fileObj = base64ToFile(f.base64, f.name, f.type);
+          return { ...f, file: fileObj, previewUrl: URL.createObjectURL(fileObj) };
+        }
+        return f;
+      });
 
-          setFiles(rehydratedFiles);
-          setCaseData(state.caseData);
-          setCaseContext(state.caseContext);
-          setTriageResult(state.triageResult);
-          showNotify('loadSuccess', 'success');
-          setMode(AppMode.DASHBOARD);
-      } catch (e) {
-          console.error(e);
-          showNotify('loadFail', 'error');
-      }
+      setFiles(rehydratedFiles);
+      setCaseData(state.caseData);
+      setCaseContext(state.caseContext);
+      setTriageResult(state.triageResult);
+      showNotify('loadSuccess', 'success');
+      setMode(AppMode.DASHBOARD);
+    } catch (e) {
+      console.error(e);
+      showNotify('loadFail', 'error');
+    }
   };
 
   const loadDemoData = () => {
-      setCaseContext({
-          jurisdiction: 'California',
-          caseType: 'Landlord/Tenant',
-          budget: 'Low',
-          description: 'Eviction defense for non-payment due to habitability issues (broken heater).'
-      });
-      
-      const dummyLink: UploadedFile = {
-          id: 'demo_email',
-          name: 'Email_Thread_Repair_Request_Jan2024.pdf',
-          type: 'link',
-          url: 'https://mail.google.com/mail/u/0/#search/landlord'
-      };
-      
-      setFiles(prev => [...prev, dummyLink]);
-      showNotify('demoLoaded', 'success');
+    setCaseContext({
+      jurisdiction: 'California',
+      caseType: 'Landlord/Tenant',
+      budget: 'Low',
+      description: 'Eviction defense for non-payment due to habitability issues (broken heater).'
+    });
+
+    const dummyLink: UploadedFile = {
+      id: 'demo_email',
+      name: 'Email_Thread_Repair_Request_Jan2024.pdf',
+      type: 'link',
+      url: 'https://mail.google.com/mail/u/0/#search/landlord'
+    };
+
+    setFiles(prev => [...prev, dummyLink]);
+    showNotify('demoLoaded', 'success');
   };
 
   const renderContent = () => {
@@ -250,12 +250,12 @@ const App: React.FC = () => {
         return <ChatInterface caseData={caseData} />;
       case AppMode.TRIAGE:
         return <Triage onComplete={(ctx, res) => {
-            setCaseContext(ctx);
-            setTriageResult(res);
-            setMode(AppMode.DASHBOARD);
+          setCaseContext(ctx);
+          setTriageResult(res);
+          setMode(AppMode.DASHBOARD);
         }} />;
       case AppMode.LIVE_STRATEGY:
-        return <LiveSession />;
+        return <LiveSession caseData={caseData} />;
       case AppMode.FORMS:
         return <FormsLibrary files={files} onFilesAdded={handleFilesAdded} />;
       case AppMode.JUVENILE:
@@ -300,7 +300,7 @@ const App: React.FC = () => {
       >
         {notification && (
           <div className={`fixed top-4 right-4 z-[100] px-6 py-4 rounded-sm shadow-2xl border-l-4 flex items-center gap-3 animate-in fade-in slide-in-from-top-2 ${notification.type === 'success' ? 'bg-slate-900 border-green-500 text-green-400' : 'bg-slate-900 border-red-500 text-red-400'}`}>
-              <span className="font-bold text-xs uppercase tracking-wide">{notification.message}</span>
+            <span className="font-bold text-xs uppercase tracking-wide">{notification.message}</span>
           </div>
         )}
         {renderContent()}
