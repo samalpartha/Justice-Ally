@@ -311,46 +311,44 @@ gantt
 
 ---
 
-## 💰 Financial Projections
+## 🚀 Strategic Growth & Scaling
 
-### Revenue Forecast (5 Years)
+### Phase 1: The Legal Forms Engine
 
-| Year | Users | MRR | ARR | Growth Rate |
-|------|-------|-----|-----|-------------|
-| **Y1** | 5,000 | $50K | $600K | - |
-| **Y2** | 25,000 | $250K | $3M | 400% |
-| **Y3** | 100,000 | $1M | $12M | 300% |
-| **Y4** | 250,000 | $2.5M | $30M | 150% |
-| **Y5** | 500,000 | $5M | $60M | 100% |
+**Democratizing access to the "Operating System" of the Law**
 
-### Unit Economics
+- **Problem**: 50 states, 3,000+ counties, all with different PDF forms.
+- **Solution**: Proprietary OCR & Field Mapping engine that ingests verified court forms and auto-fills them from natural language user stories.
+- **Moat**: Building the largest verified repository of rigid court documents in the US.
 
-```mermaid
-pie title "Customer Acquisition Cost (CAC) Breakdown"
-    "Marketing/Ads" : 40
-    "Content/SEO" : 25
-    "Partnerships" : 20
-    "Sales Team" : 15
-```
+### Phase 2: The Everywhere Ecosystem
 
-**Target Metrics:**
+**Justice where you need it - Browser & Mobile**
 
-- **CAC (Customer Acquisition Cost)**: $50-$100
-- **LTV (Lifetime Value)**: $800-$1,200
-- **LTV:CAC Ratio**: 8:1 to 12:1
-- **Payback Period**: 2-3 months
-- **Gross Margin**: 85%+ (software)
+- **Chrome Extension**: "Justice Anywhere" toolbar provides instant analysis of contracts and websites.
+- **Mobile App (Android)**: Offline-first native app for reliable evidence collection and access in remote connectivity zones (targeting Global South).
 
-### Use of Seed Funding ($1.5M)
+### Phase 3: The "Justice Protocol" (API Economy)
 
-| Category | Amount | % | Purpose |
-|----------|--------|---|---------|
-| **Engineering & Product** | $750K | 50% | Backend, mobile, AI features |
-| **Sales & Marketing** | $375K | 25% | Customer acquisition, partnerships |
-| **Legal & Compliance** | $225K | 15% | SOC 2, legal review, insurance |
-| **Operations & Infrastructure** | $150K | 10% | Cloud costs, tools, admin |
+**Becoming the AWS of LegalTech**
 
-**Burn Rate**: $125K/month (12-month runway)
+- **MCP Server**: Exposing our "Black Letter Law" reasoning engine to agents in IDEs (Cursor/Windsurf) and productivity tools.
+- **Global Expansion**: Abstracting legal logic to support varied legal systems (Common Law vs. Civil Law) in UK/EU/LATAM.
+
+---
+
+## 💰 Growth Metrics
+
+### Revenue Forecast
+
+*Conservative projections based on current traction*
+
+| Year | Active Users | ARR Potential | Focus |
+|------|--------------|---------------|-------|
+| **Y1** | 5,000 | $600K | Product-Market Fit |
+| **Y2** | 25,000 | $3M | Scale & Partnerships |
+| **Y3** | 100,000 | $12M | National Dominance |
+| **Y4** | 250,000 | $30M | Global Expansion |
 
 ---
 
@@ -376,261 +374,23 @@ pie title "Customer Acquisition Cost (CAC) Breakdown"
 **AI Advisor**: ML researcher or Google AI alum
 **Business Advisor**: LegalTech founder or VC
 
-### Hiring Plan (First 12 Months)
-
-| Role | Months 1-3 | Months 4-6 | Months 7-12 |
-|------|------------|------------|-------------|
-| **Engineering** | Backend, DevOps | 2x AI Engineers | 2x Mobile Engineers |
-| **Product** | - | Product Manager | UX Designer |
-| **Legal/Compliance** | Compliance Specialist | Legal Content Creator | - |
-| **GTM** | - | Customer Success | VP Sales, Marketing Manager |
-
 ---
 
-## 🎯 Go-to-Market Strategy
+## 🎬 The Ask / Partnership
 
-### Phase 1: Product-Led Growth (Months 0-6)
+We are seeking **Strategic Partners** and **Capital** to accelerate our vision.
 
-**Strategy**: Free tier drives viral growth
+### What We Are Looking For
 
-1. **Content Marketing**
-   - Blog: "How to Win in Small Claims Court"
-   - YouTube: Legal strategy tutorials
-   - SEO for "how to represent yourself"
+1. **Capital for Scale**: Funding to aggressively capture the "Pro Se" market and build the Forms Engine.
+2. **Strategic Access**: Introductions to State Bar Associations and Legal Aid board members.
+3. **Technical Guidance**: Expertise in scaling secure, compliant backend infrastructure.
 
-2. **Community Building**
-   - Reddit: r/legaladvice, r/personalfinance
-   - Facebook groups for pro se litigants
-   - Discord for legal aid workers
+### Execution Plan (Next 12 Months)
 
-3. **Strategic Partnerships**
-   - Legal aid societies (pilot programs)
-   - Law school clinics (student training)
-   - Local bar associations (CLE sponsorships)
-
-**Target**: 5,000 free users, 500 paid conversions
-
-### Phase 2: Direct Sales (Months 6-12)
-
-**Strategy**: B2B sales to law firms and legal aid
-
-1. **Outbound Sales**
-   - Target solo practitioners and small firms
-   - Focus on legal deserts (underserved areas)
-   - Legal aid conference sponsorships
-
-2. **Inbound Marketing**
-   - Case study content
-   - Webinars on AI for attorneys
-   - Free firm trials (14 days)
-
-3. **Channel Partnerships**
-   - LegalTech platforms (integrations)
-   - Bar association partnerships
-   - Legal billing software partnerships
-
-**Target**: 50 law firm accounts, 10 legal aid orgs
-
-### Phase 3: Scale (Months 12-24)
-
-**Strategy**: National marketing push
-
-1. **Performance Marketing**
-   - Google Ads: Legal keywords
-   - Facebook/Instagram: Targeted demos
-   - Podcast sponsorships (true crime, legal)
-
-2. **PR & Media**
-   - TechCrunch, VentureBeat coverage
-   - Legal industry publications
-   - Success story press releases
-
-3. **Enterprise Sales**
-   - Dedicated sales team
-   - Large law firm outreach
-   - Government/municipal pilots
-
-**Target**: 25,000 users, $250K MRR
-
----
-
-## 🛡️ Risk Analysis & Mitigation
-
-### Key Risks
-
-#### 1. **Unauthorized Practice of Law (UPL)**
-
-**Risk**: Regulators could claim we're practicing law without a license
-
-**Mitigation**:
-
-- Clear disclaimers: "Educational tool, not legal advice"
-- Legal advisory board review
-- State-by-state bar association outreach
-- E&O insurance ($5M coverage)
-- User acknowledges limitations at signup
-
-**Precedent**: LegalZoom, Rocket Lawyer operate successfully with similar disclaimers
-
-#### 2. **AI Accuracy & Liability**
-
-**Risk**: AI provides incorrect legal analysis, user loses case
-
-**Mitigation**:
-
-- Human-in-the-loop review for critical decisions
-- Confidence scoring on all AI outputs
-- "Second opinion" feature (another AI model)
-- Comprehensive liability insurance
-- Terms of Service limit liability
-- Encourage attorney consultation for complex matters
-
-#### 3. **Data Security & Privacy**
-
-**Risk**: Sensitive legal data breach
-
-**Mitigation**:
-
-- SOC 2 Type II certification (Month 9)
-- End-to-end encryption
-- Zero-knowledge architecture
-- Regular penetration testing
-- Bug bounty program
-- Cyber insurance ($10M coverage)
-
-#### 4. **Google Gemini API Dependency**
-
-**Risk**: API pricing changes or availability issues
-
-**Mitigation**:
-
-- Model-agnostic architecture (can swap to GPT-4, Claude)
-- Caching layer to reduce API calls
-- Direct Vertex AI integration (better pricing)
-- Negotiate enterprise pricing with Google
-- Build proprietary fine-tuned models over time
-
-#### 5. **Competition from Big Tech**
-
-**Risk**: Google, Microsoft launch competing products
-
-**Mitigation**:
-
-- First-mover advantage (12-18 month lead)
-- Deep domain expertise in litigation strategy
-- Community and partnerships moat
-- Niche focus (vs. their broad products)
-- Potential acquisition target
-
-### Regulatory Landscape
-
-**Favorable Trends**:
-
-- ABA encourages innovative delivery of legal services
-- Several states (Utah, Arizona) have regulatory sandboxes
-- Access to justice initiatives by state courts
-- Pro se assistance programs expanding nationwide
-
----
-
-## 🚀 Investment Ask
-
-### Seed Round: **$1.5 Million**
-
-**Valuation**: $6M pre-money ($7.5M post-money)
-
-**Structure**: 20% equity (SAFE or priced round)
-
-### What You Get
-
-#### Financial Returns
-
-- **10x potential in 5 years** ($60M ARR at 3x revenue multiple = $180M valuation)
-- Clear path to profitability by Month 24
-- Series A exit opportunity at 18 months (8-10x)
-- Acquisition potential by LegalZoom, Clio, or Google
-
-#### Impact Returns
-
-- **Enable 100,000+ people to access justice**
-- Level the playing field for underserved communities
-- Create 50+ high-quality jobs
-- Transform the legal industry
-
-### Use of Funds (12-Month Runway)
-
-**Month breakdown:**
-
-- Months 1-6: Build production infrastructure, early hires
-- Months 7-9: Beta launch, SOC 2 certification
-- Months 10-12: Marketing push, Series A prep
-
-**Key Deliverables:**
-
-- Month 6: Production launch (1,000 users)
-- Month 9: SOC 2 certified
-- Month 12: Product-market fit ($50K MRR)
-
----
-
-## 📊 Success Metrics & Board Reporting
-
-### North Star Metric
-
-**Monthly Active Cases**: Cases actively being worked on with JusticeAlly
-
-### KPIs We'll Track
-
-| Category | Metrics |
-|----------|---------|
-| **Growth** | MAU, New signups, Conversion rate (free → paid) |
-| **Revenue** | MRR, ARR, ARPU, LTV:CAC |
-| **Engagement** | DAU/MAU ratio, Sessions per user, Time in app |
-| **Product** | Feature adoption, NPS, Support tickets |
-| **Outcomes** | Cases won (user reported), User satisfaction, Testimonials |
-
-### Monthly Investor Updates
-
-1. Key metrics dashboard
-2. Revenue & cash position
-3. Product milestones
-4. Customer stories
-5. Challenges & asks
-
----
-
-## 🎬 The Ask
-
-### What We Need From You
-
-1. **Capital**: $1.5M to reach Product-Market Fit
-2. **Network**: Introductions to legal industry partners
-3. **Expertise**: Guidance on legal compliance and scaling
-4. **Follow-on**: Commitment to Series A participation
-
-### What Happens Next
-
-**Week 1**: Product demo with your team  
-**Week 2**: Technical & legal diligence  
-**Week 3**: Reference calls with advisors  
-**Week 4**: Term sheet & closing
-
-### Contact
-
-**Email**: [email]  
-**Phone**: [phone]  
-**Demo**: [calendly link]  
-**Deck**: [deck link]
-
----
-
-## 🌟 Vision
-
-**By 2030, JusticeAlly will be the default AI legal strategist for millions of Americans**, ensuring that justice is determined by the merits of the case, not the size of the legal budget.
-
-We're not just building a SaaS product. We're building the infrastructure for accessible justice in the AI age.
-
-**Join us in making justice accessible to all.**
+- **Q1-Q2**: Launch "Verified Forms" engine for top 5 states (CA, NY, TX, FL, IL).
+- **Q3**: Achieve SOC 2 Type II Certification for enterprise readiness.
+- **Q4**: International pilot launch (Canada/UK).
 
 ---
 
@@ -642,7 +402,7 @@ See [ARCHITECTURE.md](./ARCHITECTURE.md) for complete technical documentation
 
 ### Demo Access
 
-- **Live Demo**: <http://justiceally-demo.com>
+- **Live Demo**: [https://justiceally-108816008638.us-west1.run.app](https://justiceally-108816008638.us-west1.run.app)
 - **Video Walkthrough**: [YouTube link]
 - **Case Studies**: [Google Drive link]
 

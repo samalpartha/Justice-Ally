@@ -184,72 +184,57 @@ JusticeAlly provides a comprehensive suite of tools designed to empower users at
 
 ### Development Roadmap
 
-#### Phase 1: Security & Backend (Weeks 1-4)
+#### Phase 1: Production Infrastructure & Security (Weeks 1-4)
 
-**Goal**: Transition from MVP to production-ready infrastructure
+**Goal**: Transition from MVP to a robust, scalable backend capable of handling sensitive legal data.
 
-* [ ] **Backend API Development**
-  * Node.js/Express API on Google Cloud Run
-  * JWT-based authentication system
-  * Secure API key management (move keys server-side)
-  * Rate limiting and request validation
+* [ ] **High-Performance Backend**
+  * **API Gateway**: Node.js/Express on Cloud Run for stateless, auto-scaling execution.
+  * **Secure Authentication**: JWT-based session management with role-based access control (RBAC).
+  * **Rate Limiting**: Redis-backed throttling to prevent abuse and manage API costs.
   
-* [ ] **Database Layer**
-  * PostgreSQL on Cloud SQL for case data
-  * Redis cache for session management
-  * Automated backup and disaster recovery
+* [ ] **Database & Persistence**
+  * **Cloud SQL (PostgreSQL)**: Relational storage for user profiles and structured case metadata.
+  * **Encrypted Storage**: Cloud Storage buckets with customer-managed encryption keys for evidence files.
   
 * [ ] **Security Hardening**
-  * Remove API key from client bundle
-  * Implement OAuth 2.0 authentication
-  * Add end-to-end encryption for sensitive data
-  * HTTPS enforcement and CORS policies
+  * Server-side API key management (removing keys from client bundle).
+  * End-to-End Encryption implementation.
+  * Strict Content Security Policy (CSP) and CORS enforcement.
 
-**Investment Needed**: $25K-$50K (Infrastructure, Security Audit, 2 Backend Engineers)
+#### Phase 2: The Legal Forms Engine & Ecosystem (Months 2-3)
 
-#### Phase 2: Enterprise Features (Months 2-3)
+**Goal**: Democratize access to court documents and expand reach.
 
-**Goal**: Enable law firms and legal aid organizations
+* [ ] **Verified Forms Repository**
+  * **OCR & Ingestion**: Pipeline to ingest PDF forms from 50 state court websites.
+  * **Smart Field Mapping**: AI-driven mapping of user facts to specific form fields (e.g., mapping "Plaintiff Name" to Form UD-100).
+  * **Expert Verification Layer**: Community-driven verification system for form accuracy.
 
-* [ ] **Multi-Tenancy Architecture**
-  * Firm-level accounts with role-based access
-  * Team collaboration features
-  * Shared case management
-  
-* [ ] **Compliance & Audit**
-  * HIPAA compliance for medical malpractice cases
-  * SOC 2 Type II certification
-  * Comprehensive audit logging
-  * Data retention policy enforcement
-  
-* [ ] **Advanced AI Features**
-  * RAG (Retrieval Augmented Generation) for case law
-  * Vector database for precedent matching
-  * Automated brief generation
-  * Predictive case outcome modeling
+* [ ] **Browser Companion (Chrome Extension)**
+  * **"Justice Anywhere"**: Analyze legal text on any webpage (e.g., rental contracts, Terms of Service).
+  * **One-Click Triage**: Instant risk assessment from browser toolbar.
 
-**Investment Needed**: $100K-$150K (Legal Compliance, AI Engineers, Product Team)
+* [ ] **Enterprise Features**
+  * Multi-tenancy for law firms and legal aid organizations.
+  * Team collaboration and shared case workspaces.
+  * Audit logs for compliance and accountability.
 
-#### Phase 3: Market Expansion (Months 4-6)
+#### Phase 3: Global Expansion & The API Economy (Months 4-6)
 
-**Goal**: Scale to 10,000+ users
+**Goal**: Transcend borders and become the standard protocol for legal intelligence.
 
-* [ ] **Geographic Distribution**
-  * Multi-region deployment (US, EU, LATAM)
-  * CDN integration for global performance
-  * Localization for additional languages
-  
-* [ ] **Mobile Applications**
-  * React Native iOS/Android apps
-  * Offline mode for evidence collection
-  * Push notifications for deadlines
-  
-* [ ] **Partnership Integrations**
-  * Court e-filing system integrations
-  * Legal aid society portals
-  * Law school clinical program partnerships
+* [ ] **Mobile Justice (Android First)**
+  * **Native Android App**: Targeting the widest global user base first.
+  * **Offline Capability**: Evidence collection and voice notes without internet.
 
-**Investment Needed**: $250K-$400K (Scale Infrastructure, Mobile Team, Business Development)
+* [ ] **The "Justice Protocol" (MCP Server)**
+  * **Model Context Protocol**: Expose JusticeAlly's "Black Letter Law" engine as an MCP server.
+  * **Agent Interoperability**: Allow other AI agents (e.g., inside IDEs or productivity tools) to consult JusticeAlly for legal constraints.
+
+* [ ] **International Justice Modules**
+  * **Jurisdiction Agnostic Core**: Abstracting legal logic to support varied legal systems (Common Law vs. Civil Law).
+  * **Localization Engine**: Expansion beyond Spanish to French, Portuguese, and Mandarin.
 
 ### Business Model
 
