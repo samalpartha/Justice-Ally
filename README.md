@@ -27,7 +27,8 @@
 - [Project Structure](#project-structure)
 - [Installation & Setup](#installation)
 - [Capabilities](#capabilities)
-- [Roadmap](#roadmap)
+- [Capabilities](#capabilities)
+- [Tech Stack](#tech-stack)
 - [Contributing](#contributing)
 
 ---
@@ -57,9 +58,10 @@ graph TD
         DataLayer[(Secure Data Layer<br/>LocalStorage + Encryption)]
     end
     
-    subgraph Cloud [Google Cloud]
+    subgraph Cloud [Google Cloud Platform]
         style Cloud fill:#e8f0fe,stroke:#4285f4,stroke-width:2px
-        Gemini[<img src='https://upload.wikimedia.org/wikipedia/commons/8/8a/Google_Gemini_logo.svg' width='20' /> Gemini API<br/>Stateless Reasoning Engine]
+        Gemini[Google Gemini API<br/>(Multimodal Reasoning)]
+        CloudRun[Cloud Run<br/>(Containerized Hosting)]
     end
 
     User --> Login
@@ -67,11 +69,22 @@ graph TD
     AppShell --> Modules
     
     Modules <--> DataLayer
-    Modules <-->|Anonymized Context| Gemini
+    Modules <-->|Secure Context| Gemini
+    AppShell -.->|Deploy| CloudRun
     
     classDef secure fill:#d4edda,stroke:#28a745,stroke-width:2px;
     class DataLayer secure;
 ```
+
+## <a id="tech-stack"></a>🛠️ Technology Stack
+
+| Component | Technologies |
+|-----------|--------------|
+| **Frontend** | ![React](https://img.shields.io/badge/-React_19-20232A?logo=react&logoColor=61DAFB) ![TypeScript](https://img.shields.io/badge/-TypeScript-007ACC?logo=typescript&logoColor=white) ![Vite](https://img.shields.io/badge/-Vite-646CFF?logo=vite&logoColor=white) |
+| **Styling** | ![CSS3](https://img.shields.io/badge/-CSS_Modules-1572B6?logo=css3&logoColor=white) (Custom Design System) |
+| **AI Engine** | ![Gemini](https://img.shields.io/badge/-Google_Gemini_1.5_Pro-8E75B2?logo=google&logoColor=white) (Multimodal Reasoning) |
+| **Infrastructure** | ![Google Cloud Run](https://img.shields.io/badge/-Google_Cloud_Run-4285F4?logo=google-cloud&logoColor=white) ![Docker](https://img.shields.io/badge/-Docker-2496ED?logo=docker&logoColor=white) |
+| **Data Privacy** | LocalStorage (Client-Side Persistence), In-Memory State |
 
 ### <a id="project-structure"></a>📂 Project Structure
 
@@ -212,192 +225,6 @@ JusticeAlly provides a comprehensive suite of tools designed to empower users at
 
 ---
 
-## <a id="roadmap"></a>🗺️ Path Forward
-
-### Development Roadmap
-
-#### Phase 1: Production Infrastructure & Security (Weeks 1-4)
-
-**Goal**: Transition from MVP to a robust, scalable backend capable of handling sensitive legal data.
-
-- [ ] **High-Performance Backend**
-  - **API Gateway**: Node.js/Express on Cloud Run for stateless, auto-scaling execution.
-  - **Secure Authentication**: JWT-based session management with role-based access control (RBAC).
-  - **Rate Limiting**: Redis-backed throttling to prevent abuse and manage API costs.
-  
-- [ ] **Database & Persistence**
-  - **Cloud SQL (PostgreSQL)**: Relational storage for user profiles and structured case metadata.
-  - **Encrypted Storage**: Cloud Storage buckets with customer-managed encryption keys for evidence files.
-  
-- [ ] **Security Hardening**
-  - Server-side API key management (removing keys from client bundle).
-  - End-to-End Encryption implementation.
-  - Strict Content Security Policy (CSP) and CORS enforcement.
-
-#### Phase 2: The Legal Forms Engine & Ecosystem (Months 2-3)
-
-**Goal**: Democratize access to court documents and expand reach.
-
-- [ ] **Verified Forms Repository**
-  - **OCR & Ingestion**: Pipeline to ingest PDF forms from 50 state court websites.
-  - **Smart Field Mapping**: AI-driven mapping of user facts to specific form fields (e.g., mapping "Plaintiff Name" to Form UD-100).
-  - **Expert Verification Layer**: Community-driven verification system for form accuracy.
-
-- [ ] **Browser Companion (Chrome Extension)**
-  - **"Justice Anywhere"**: Analyze legal text on any webpage (e.g., rental contracts, Terms of Service).
-  - **One-Click Triage**: Instant risk assessment from browser toolbar.
-
-- [ ] **Enterprise Features**
-  - Multi-tenancy for law firms and legal aid organizations.
-  - Team collaboration and shared case workspaces.
-  - Audit logs for compliance and accountability.
-
-#### Phase 3: Global Expansion & The API Economy (Months 4-6)
-
-**Goal**: Transcend borders and become the standard protocol for legal intelligence.
-
-- [ ] **Mobile Justice (Android First)**
-  - **Native Android App**: Targeting the widest global user base first.
-  - **Offline Capability**: Evidence collection and voice notes without internet.
-
-- [ ] **The "Justice Protocol" (MCP Server)**
-  - **Model Context Protocol**: Expose JusticeAlly's "Black Letter Law" engine as an MCP server.
-  - **Agent Interoperability**: Allow other AI agents (e.g., inside IDEs or productivity tools) to consult JusticeAlly for legal constraints.
-
-- [ ] **International Justice Modules**
-  - **Jurisdiction Agnostic Core**: Abstracting legal logic to support varied legal systems (Common Law vs. Civil Law).
-  - **Localization Engine**: Expansion beyond Spanish to French, Portuguese, and Mandarin.
-
-### Business Model
-
-#### Revenue Streams
-
-1. **Freemium Individual Users**
-   - Free tier: Basic triage and AI counsel (5 questions/month)
-   - Pro tier: $29/month - Unlimited AI, evidence vault, strategy tools
-   - Premium tier: $79/month - Live voice strategy, priority support
-
-2. **Law Firm Subscriptions**
-   - Starter: $499/month (5 attorneys, unlimited cases)
-   - Professional: $1,499/month (20 attorneys, team collaboration)
-   - Enterprise: Custom pricing (unlimited users, white-label options)
-
-3. **Legal Aid Organizations**
-   - Non-profit pricing: 70% discount on all tiers
-   - Grant-funded deployments
-   - Training and implementation services
-
-4. **API & Data Licensing**
-   - Anonymous case outcome data for legal research
-   - AI model training partnerships
-   - Integration into LegalTech platforms
-
-#### Market Opportunity
-
-- **Total Addressable Market (TAM)**: $10B+ (US legal services market for individuals)
-- **Serviceable Addressable Market (SAM)**: $2.5B (self-represented litigants + solo practitioners)
-- **Serviceable Obtainable Market (SOM)**: $250M (target 10% in 5 years)
-
-**Key Metrics:**
-
-- 40M self-represented litigants in US annually
-- 80% cannot afford legal representation
-- Average legal issue costs $3K-$15K
-- Our solution: $29-$79/month
-
-### Go-to-Market Strategy
-
-#### Year 1: Product-Market Fit
-
-- Launch beta with 5 legal aid organizations
-
-- Target 1,000 paid individual users
-- Achieve $30K MRR (Monthly Recurring Revenue)
-- Gather testimonials and case studies
-
-#### Year 2: Growth
-
-- Expand to 50 legal aid partnerships
-
-- Acquire 10,000 paid individual users
-- Sign 50 law firm accounts
-- Achieve $500K MRR
-
-#### Year 3: Scale
-
-- National coverage across all 50 states
-
-- 100,000+ active users
-- 500+ law firm clients
-- $5M ARR (Annual Recurring Revenue)
-
-### Competitive Advantages
-
-1. **AI-First Design**: Built on Gemini's multimodal AI from day one
-2. **Privacy-First**: Data sovereignty and local-first architecture
-3. **Bilingual**: Native Spanish support (40M+ US Spanish speakers)
-4. **Voice Interface**: Only platform with real-time AI litigation strategy via voice
-5. **Evidence AI**: Unique multimodal evidence analysis (documents, images, video)
-
-### Team & Hiring Roadmap
-
-**Current Team**: 2 founders (Product/Engineering)
-
-**Phase 1 Hires** (Months 1-3):
-
-- Senior Backend Engineer ($150K)
-- DevOps Engineer ($140K)
-- Legal Compliance Specialist ($120K)
-
-**Phase 2 Hires** (Months 4-6):
-
-- Product Manager ($160K)
-- 2x AI Engineers ($180K each)
-- Customer Success Lead ($110K)
-
-**Phase 3 Hires** (Months 7-12):
-
-- VP of Sales ($200K + equity)
-- Marketing Manager ($130K)
-- 2x Mobile Engineers ($160K each)
-- Legal Content Creator ($100K)
-
-### Funding Requirements
-
-**Seed Round Target**: $1.5M
-
-**Use of Funds:**
-
-- Engineering & Product: 50% ($750K)
-- Sales & Marketing: 25% ($375K)
-- Legal & Compliance: 15% ($225K)
-- Operations & Infrastructure: 10% ($150K)
-
-**Expected Milestones:**
-
-- Month 6: Production launch with 1,000 users
-- Month 12: $50K MRR, SOC 2 certified
-- Month 18: $200K MRR, Series A ready
-
-**Series A (18-24 months)**: $8M-$12M for national expansion
-
-### Risk Mitigation
-
-| Risk | Mitigation Strategy |
-|------|---------------------|
-| **AI Accuracy** | Human-in-the-loop review, disclaimer enforcement, liability insurance |
-| **Regulatory** | Legal advisory board, state-by-state compliance review |
-| **Competition** | Strong IP protection, first-mover advantage, community building |
-| **API Costs** | Caching layer, model optimization, tiered pricing to cover costs |
-| **Data Security** | SOC 2 compliance, pen testing, bug bounty program |
-
-### Next Steps for Investors
-
-1. **Schedule Product Demo**: See JusticeAlly in action with real case scenarios
-2. **Review Technical Diligence**: Access to [Architecture Documentation](./ARCHITECTURE.md)
-3. **Pilot Program**: Partner with your portfolio companies' legal teams
-4. **Advisory Interviews**: Speak with our legal and technical advisors
-
 ---
 
 ## 📊 Metrics & Analytics
@@ -409,12 +236,10 @@ JusticeAlly provides a comprehensive suite of tools designed to empower users at
 - <500ms AI response time
 - 100% client-side privacy (no data sent to our servers)
 
-**Target Production Metrics**:
-
-- 99.9% uptime SLA
-- <200ms API response time
-- <3s AI analysis completion
-- 100% data encryption at rest and in transit
+- 0 external dependencies (runs entirely client-side)
+- <2s page load time
+- <500ms AI response time
+- 100% client-side privacy (no data sent to our servers)
 
 ---
 
