@@ -60,8 +60,8 @@ graph TD
     
     subgraph Cloud [Google Cloud Platform]
         style Cloud fill:#e8f0fe,stroke:#4285f4,stroke-width:2px
-        Gemini[Google Gemini API<br/>(Multimodal Reasoning)]
-        CloudRun[Cloud Run<br/>(Containerized Hosting)]
+        Gemini["Google Gemini API<br/>(Multimodal Reasoning)"]
+        CloudRun["Cloud Run<br/>(Containerized Hosting)"]
     end
 
     User --> Login
