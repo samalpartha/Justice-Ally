@@ -151,7 +151,7 @@ graph TD
     end
     
     subgraph "AI Integration"
-        GENAI[@google/genai SDK]
+        GENAI["@google/genai SDK"]
         MODELS[Flash/Pro/Live]
     end
     
