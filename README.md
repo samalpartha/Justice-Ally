@@ -27,7 +27,6 @@
 - [Project Structure](#project-structure)
 - [Installation & Setup](#installation)
 - [Capabilities](#capabilities)
-- [Capabilities](#capabilities)
 - [Tech Stack](#tech-stack)
 - [Contributing](#contributing)
 
