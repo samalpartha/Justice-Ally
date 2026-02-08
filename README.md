@@ -1,10 +1,19 @@
 
 # JusticeAlly: The Universal Legal Navigator
 
-![License](https://img.shields.io/badge/License-MIT-blue.svg)
-![Status](https://img.shields.io/badge/Status-MVP-yellow.svg)
-![AI Model](https://img.shields.io/badge/AI-Google%20Gemini-purple)
-![Language](https://img.shields.io/badge/Language-English%20%7C%20Español-orange)
+<div align="center">
+
+![License](https://img.shields.io/badge/License-MIT-blue.svg?style=flat-square)
+![Status](https://img.shields.io/badge/Status-MVP-yellow.svg?style=flat-square)
+![AI Model](https://img.shields.io/badge/AI-Google%20Gemini-purple?style=flat-square)
+![Language](https://img.shields.io/badge/Language-English%20%7C%20Español-orange?style=flat-square)
+<br/>
+![React](https://img.shields.io/badge/React-20232A?style=flat-square&logo=react&logoColor=61DAFB)
+![Vite](https://img.shields.io/badge/Vite-646CFF?style=flat-square&logo=vite&logoColor=white)
+![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=flat-square&logo=typescript&logoColor=white)
+![Google Cloud](https://img.shields.io/badge/Google_Cloud-4285F4?style=flat-square&logo=google-cloud&logoColor=white)
+
+</div>
 
 **JusticeAlly** is an AI-powered legal navigation platform designed to bridge the "Access to Justice" gap. Acting as a **Senior Litigation Strategist** for Self-Represented Litigants and a **Force Multiplier** for Junior Attorneys, it combines ruthless legal strategy with compassionate administrative guidance powered by Google's Gemini AI.
 
@@ -12,9 +21,18 @@
 >
 > **🎯 Current Status**: MVP demonstrating core AI capabilities | [View Full Architecture](./ARCHITECTURE.md) | [View Pitch Deck](./PITCH_DECK.md)
 
+## 📋 Table of Contents
+
+- [System Architecture](#system-architecture)
+- [Project Structure](#project-structure)
+- [Installation & Setup](#installation)
+- [Capabilities](#capabilities)
+- [Roadmap](#roadmap)
+- [Contributing](#contributing)
+
 ---
 
-## 🏗️ System Architecture
+## <a id="system-architecture"></a>🏗️ System Architecture
 
 ```mermaid
 graph TD
@@ -55,9 +73,23 @@ graph TD
     class DataLayer secure;
 ```
 
+### <a id="project-structure"></a>📂 Project Structure
+
+```bash
+├── src/
+│   ├── components/       # Reusable UI components (ChatInterface, StrategyBoard)
+│   ├── services/         # API integrations (Gemini AI service)
+│   ├── context/          # Global state management
+│   ├── utils/            # Helper functions and types
+│   └── App.tsx           # Main application entry
+├── public/               # Static assets
+├── Dockerfile            # Container definition
+└── package.json          # Dependencies and scripts
+```
+
 ---
 
-## 💻 Installation & Setup
+## <a id="installation"></a>💻 Installation & Setup
 
 For a quick preview, visit the **[Live Demo](https://justiceally-108816008638.us-west1.run.app)**.
 
@@ -65,8 +97,8 @@ To run the project locally for development:
 
 ### Prerequisites
 
-* **Node.js** (v18 or higher)
-* **Google Gemini API Key** (Get one at [Google AI Studio](https://aistudio.google.com/))
+- **Node.js** (v18 or higher)
+- **Google Gemini API Key** (Get one at [Google AI Studio](https://aistudio.google.com/))
 
 ### 1. Clone the Repository
 
@@ -134,53 +166,53 @@ If you encounter errors when pushing, check the following:
 
 ### API Errors (403/503)
 
-* **403 Permission Denied**: Verify your API Key in `.env` is correct and has access to **Gemini 1.5 Pro/Flash** and **Gemini 3.0 Pro** models.
-* **503 Unavailable**: The model might be overloaded. The app includes an exponential backoff retry mechanism, but you can also try again in a few seconds.
+- **403 Permission Denied**: Verify your API Key in `.env` is correct and has access to **Gemini 1.5 Pro/Flash** and **Gemini 3.0 Pro** models.
+- **503 Unavailable**: The model might be overloaded. The app includes an exponential backoff retry mechanism, but you can also try again in a few seconds.
 
 ---
 
-## 🌟 Application Capabilities
+## <a id="capabilities"></a>🌟 Application Capabilities
 
 JusticeAlly provides a comprehensive suite of tools designed to empower users at every stage of the legal process.
 
 ### 🧠 Core Intelligence
 
-* **Case Triage & Risk Matrix**: Intelligent intake system that evaluates case viability using a Red/Yellow/Green risk assessment model. It analyzes jurisdiction, claims, and available evidence to recommend whether a user should proceed Pro Se or seek counsel.
-* **Bilingual Legal Brain**: The entire application toggles instantly between English and Spanish ("Justicia Aliada"), ensuring equal access to justice. The AI understands legal nuance in both languages.
+- **Case Triage & Risk Matrix**: Intelligent intake system that evaluates case viability using a Red/Yellow/Green risk assessment model. It analyzes jurisdiction, claims, and available evidence to recommend whether a user should proceed Pro Se or seek counsel.
+- **Bilingual Legal Brain**: The entire application toggles instantly between English and Spanish ("Justicia Aliada"), ensuring equal access to justice. The AI understands legal nuance in both languages.
 
 ### 🛡️ Evidence Management (Secure Vault)
 
-* **Multi-Modal Ingestion**: Upload case files including PDFs, High-Res Images, and **Body Cam/CCTV Footage (MP4)**.
-* **Smart Redaction Studio**: Integrated tool to manually or automatically redact Personally Identifiable Information (PII) before submission.
-* **Evidence Relevance Engine**: AI-powered scoring system (1-10) that evaluates how strongly each piece of evidence supports individual legal elements (Duty, Breach, Causation, Damages).
+- **Multi-Modal Ingestion**: Upload case files including PDFs, High-Res Images, and **Body Cam/CCTV Footage (MP4)**.
+- **Smart Redaction Studio**: Integrated tool to manually or automatically redact Personally Identifiable Information (PII) before submission.
+- **Evidence Relevance Engine**: AI-powered scoring system (1-10) that evaluates how strongly each piece of evidence supports individual legal elements (Duty, Breach, Causation, Damages).
 
 ### ⚔️ Litigation Strategy (The War Room)
 
-* **Strategic Roadmap**: Generates a phase-by-phase litigation plan (Pre-filing -> Discovery -> Motion Practice -> Trial).
-* **Black Letter Law Analysis**: Automatically maps user facts to specific legal elements required by state law.
-* **"Sun Tzu" Competitive Analysis**: Predicts opposing counsel's likely moves and suggests counter-strategies.
-* **Voice-to-Memo**: Dictate strategy notes directly into a structured legal memorandum format.
+- **Strategic Roadmap**: Generates a phase-by-phase litigation plan (Pre-filing -> Discovery -> Motion Practice -> Trial).
+- **Black Letter Law Analysis**: Automatically maps user facts to specific legal elements required by state law.
+- **"Sun Tzu" Competitive Analysis**: Predicts opposing counsel's likely moves and suggests counter-strategies.
+- **Voice-to-Memo**: Dictate strategy notes directly into a structured legal memorandum format.
 
 ### 🤖 AI Counsel (Interactive Assistant)
 
-* **Wargame Simulation**: Roleplay scenarios with the AI acting as an aggressive Opposing Counsel or a skeptical Judge to prepare for court.
-* **Socratic Legal Guide**: Ask complex questions ("What is the statute of limitations for fraud in CA?") and receive cited, simplified answers.
-* **Document Review**: Upload opposing motions for the AI to summarize and suggest potential grounds for objection.
+- **Wargame Simulation**: Roleplay scenarios with the AI acting as an aggressive Opposing Counsel or a skeptical Judge to prepare for court.
+- **Socratic Legal Guide**: Ask complex questions ("What is the statute of limitations for fraud in CA?") and receive cited, simplified answers.
+- **Document Review**: Upload opposing motions for the AI to summarize and suggest potential grounds for objection.
 
 ### 🏛️ Justice Hubs (Specialized Workflows)
 
-* **Housing / Eviction Defense**: Specialized flows for Unlawful Detainer responses and habitability claims.
-* **Traffic & DUI**: Checklists for "Trial by Declaration" and analyzing police report errors.
-* **Juvenile & Family**: Sensitive workflows for Emancipation, Dependency, and simple Divorce proceedings.
+- **Housing / Eviction Defense**: Specialized flows for Unlawful Detainer responses and habitability claims.
+- **Traffic & DUI**: Checklists for "Trial by Declaration" and analyzing police report errors.
+- **Juvenile & Family**: Sensitive workflows for Emancipation, Dependency, and simple Divorce proceedings.
 
 ### 🎤 Live Strategy (Real-Time Voice)
 
-* **Oral Argument Coach**: Practice your opening statement or motion arguments with a real-time voice-enabled AI feedback loop.
-* **Hearing Prep**: Simulate the high-pressure environment of a courtroom hearing using low-latency voice interaction.
+- **Oral Argument Coach**: Practice your opening statement or motion arguments with a real-time voice-enabled AI feedback loop.
+- **Hearing Prep**: Simulate the high-pressure environment of a courtroom hearing using low-latency voice interaction.
 
 ---
 
-## 🗺️ Path Forward
+## <a id="roadmap"></a>🗺️ Path Forward
 
 ### Development Roadmap
 
@@ -188,116 +220,116 @@ JusticeAlly provides a comprehensive suite of tools designed to empower users at
 
 **Goal**: Transition from MVP to a robust, scalable backend capable of handling sensitive legal data.
 
-* [ ] **High-Performance Backend**
-  * **API Gateway**: Node.js/Express on Cloud Run for stateless, auto-scaling execution.
-  * **Secure Authentication**: JWT-based session management with role-based access control (RBAC).
-  * **Rate Limiting**: Redis-backed throttling to prevent abuse and manage API costs.
+- [ ] **High-Performance Backend**
+  - **API Gateway**: Node.js/Express on Cloud Run for stateless, auto-scaling execution.
+  - **Secure Authentication**: JWT-based session management with role-based access control (RBAC).
+  - **Rate Limiting**: Redis-backed throttling to prevent abuse and manage API costs.
   
-* [ ] **Database & Persistence**
-  * **Cloud SQL (PostgreSQL)**: Relational storage for user profiles and structured case metadata.
-  * **Encrypted Storage**: Cloud Storage buckets with customer-managed encryption keys for evidence files.
+- [ ] **Database & Persistence**
+  - **Cloud SQL (PostgreSQL)**: Relational storage for user profiles and structured case metadata.
+  - **Encrypted Storage**: Cloud Storage buckets with customer-managed encryption keys for evidence files.
   
-* [ ] **Security Hardening**
-  * Server-side API key management (removing keys from client bundle).
-  * End-to-End Encryption implementation.
-  * Strict Content Security Policy (CSP) and CORS enforcement.
+- [ ] **Security Hardening**
+  - Server-side API key management (removing keys from client bundle).
+  - End-to-End Encryption implementation.
+  - Strict Content Security Policy (CSP) and CORS enforcement.
 
 #### Phase 2: The Legal Forms Engine & Ecosystem (Months 2-3)
 
 **Goal**: Democratize access to court documents and expand reach.
 
-* [ ] **Verified Forms Repository**
-  * **OCR & Ingestion**: Pipeline to ingest PDF forms from 50 state court websites.
-  * **Smart Field Mapping**: AI-driven mapping of user facts to specific form fields (e.g., mapping "Plaintiff Name" to Form UD-100).
-  * **Expert Verification Layer**: Community-driven verification system for form accuracy.
+- [ ] **Verified Forms Repository**
+  - **OCR & Ingestion**: Pipeline to ingest PDF forms from 50 state court websites.
+  - **Smart Field Mapping**: AI-driven mapping of user facts to specific form fields (e.g., mapping "Plaintiff Name" to Form UD-100).
+  - **Expert Verification Layer**: Community-driven verification system for form accuracy.
 
-* [ ] **Browser Companion (Chrome Extension)**
-  * **"Justice Anywhere"**: Analyze legal text on any webpage (e.g., rental contracts, Terms of Service).
-  * **One-Click Triage**: Instant risk assessment from browser toolbar.
+- [ ] **Browser Companion (Chrome Extension)**
+  - **"Justice Anywhere"**: Analyze legal text on any webpage (e.g., rental contracts, Terms of Service).
+  - **One-Click Triage**: Instant risk assessment from browser toolbar.
 
-* [ ] **Enterprise Features**
-  * Multi-tenancy for law firms and legal aid organizations.
-  * Team collaboration and shared case workspaces.
-  * Audit logs for compliance and accountability.
+- [ ] **Enterprise Features**
+  - Multi-tenancy for law firms and legal aid organizations.
+  - Team collaboration and shared case workspaces.
+  - Audit logs for compliance and accountability.
 
 #### Phase 3: Global Expansion & The API Economy (Months 4-6)
 
 **Goal**: Transcend borders and become the standard protocol for legal intelligence.
 
-* [ ] **Mobile Justice (Android First)**
-  * **Native Android App**: Targeting the widest global user base first.
-  * **Offline Capability**: Evidence collection and voice notes without internet.
+- [ ] **Mobile Justice (Android First)**
+  - **Native Android App**: Targeting the widest global user base first.
+  - **Offline Capability**: Evidence collection and voice notes without internet.
 
-* [ ] **The "Justice Protocol" (MCP Server)**
-  * **Model Context Protocol**: Expose JusticeAlly's "Black Letter Law" engine as an MCP server.
-  * **Agent Interoperability**: Allow other AI agents (e.g., inside IDEs or productivity tools) to consult JusticeAlly for legal constraints.
+- [ ] **The "Justice Protocol" (MCP Server)**
+  - **Model Context Protocol**: Expose JusticeAlly's "Black Letter Law" engine as an MCP server.
+  - **Agent Interoperability**: Allow other AI agents (e.g., inside IDEs or productivity tools) to consult JusticeAlly for legal constraints.
 
-* [ ] **International Justice Modules**
-  * **Jurisdiction Agnostic Core**: Abstracting legal logic to support varied legal systems (Common Law vs. Civil Law).
-  * **Localization Engine**: Expansion beyond Spanish to French, Portuguese, and Mandarin.
+- [ ] **International Justice Modules**
+  - **Jurisdiction Agnostic Core**: Abstracting legal logic to support varied legal systems (Common Law vs. Civil Law).
+  - **Localization Engine**: Expansion beyond Spanish to French, Portuguese, and Mandarin.
 
 ### Business Model
 
 #### Revenue Streams
 
 1. **Freemium Individual Users**
-   * Free tier: Basic triage and AI counsel (5 questions/month)
-   * Pro tier: $29/month - Unlimited AI, evidence vault, strategy tools
-   * Premium tier: $79/month - Live voice strategy, priority support
+   - Free tier: Basic triage and AI counsel (5 questions/month)
+   - Pro tier: $29/month - Unlimited AI, evidence vault, strategy tools
+   - Premium tier: $79/month - Live voice strategy, priority support
 
 2. **Law Firm Subscriptions**
-   * Starter: $499/month (5 attorneys, unlimited cases)
-   * Professional: $1,499/month (20 attorneys, team collaboration)
-   * Enterprise: Custom pricing (unlimited users, white-label options)
+   - Starter: $499/month (5 attorneys, unlimited cases)
+   - Professional: $1,499/month (20 attorneys, team collaboration)
+   - Enterprise: Custom pricing (unlimited users, white-label options)
 
 3. **Legal Aid Organizations**
-   * Non-profit pricing: 70% discount on all tiers
-   * Grant-funded deployments
-   * Training and implementation services
+   - Non-profit pricing: 70% discount on all tiers
+   - Grant-funded deployments
+   - Training and implementation services
 
 4. **API & Data Licensing**
-   * Anonymous case outcome data for legal research
-   * AI model training partnerships
-   * Integration into LegalTech platforms
+   - Anonymous case outcome data for legal research
+   - AI model training partnerships
+   - Integration into LegalTech platforms
 
 #### Market Opportunity
 
-* **Total Addressable Market (TAM)**: $10B+ (US legal services market for individuals)
-* **Serviceable Addressable Market (SAM)**: $2.5B (self-represented litigants + solo practitioners)
-* **Serviceable Obtainable Market (SOM)**: $250M (target 10% in 5 years)
+- **Total Addressable Market (TAM)**: $10B+ (US legal services market for individuals)
+- **Serviceable Addressable Market (SAM)**: $2.5B (self-represented litigants + solo practitioners)
+- **Serviceable Obtainable Market (SOM)**: $250M (target 10% in 5 years)
 
 **Key Metrics:**
 
-* 40M self-represented litigants in US annually
-* 80% cannot afford legal representation
-* Average legal issue costs $3K-$15K
-* Our solution: $29-$79/month
+- 40M self-represented litigants in US annually
+- 80% cannot afford legal representation
+- Average legal issue costs $3K-$15K
+- Our solution: $29-$79/month
 
 ### Go-to-Market Strategy
 
 #### Year 1: Product-Market Fit
 
-* Launch beta with 5 legal aid organizations
+- Launch beta with 5 legal aid organizations
 
-* Target 1,000 paid individual users
-* Achieve $30K MRR (Monthly Recurring Revenue)
-* Gather testimonials and case studies
+- Target 1,000 paid individual users
+- Achieve $30K MRR (Monthly Recurring Revenue)
+- Gather testimonials and case studies
 
 #### Year 2: Growth
 
-* Expand to 50 legal aid partnerships
+- Expand to 50 legal aid partnerships
 
-* Acquire 10,000 paid individual users
-* Sign 50 law firm accounts
-* Achieve $500K MRR
+- Acquire 10,000 paid individual users
+- Sign 50 law firm accounts
+- Achieve $500K MRR
 
 #### Year 3: Scale
 
-* National coverage across all 50 states
+- National coverage across all 50 states
 
-* 100,000+ active users
-* 500+ law firm clients
-* $5M ARR (Annual Recurring Revenue)
+- 100,000+ active users
+- 500+ law firm clients
+- $5M ARR (Annual Recurring Revenue)
 
 ### Competitive Advantages
 
@@ -313,22 +345,22 @@ JusticeAlly provides a comprehensive suite of tools designed to empower users at
 
 **Phase 1 Hires** (Months 1-3):
 
-* Senior Backend Engineer ($150K)
-* DevOps Engineer ($140K)
-* Legal Compliance Specialist ($120K)
+- Senior Backend Engineer ($150K)
+- DevOps Engineer ($140K)
+- Legal Compliance Specialist ($120K)
 
 **Phase 2 Hires** (Months 4-6):
 
-* Product Manager ($160K)
-* 2x AI Engineers ($180K each)
-* Customer Success Lead ($110K)
+- Product Manager ($160K)
+- 2x AI Engineers ($180K each)
+- Customer Success Lead ($110K)
 
 **Phase 3 Hires** (Months 7-12):
 
-* VP of Sales ($200K + equity)
-* Marketing Manager ($130K)
-* 2x Mobile Engineers ($160K each)
-* Legal Content Creator ($100K)
+- VP of Sales ($200K + equity)
+- Marketing Manager ($130K)
+- 2x Mobile Engineers ($160K each)
+- Legal Content Creator ($100K)
 
 ### Funding Requirements
 
@@ -336,16 +368,16 @@ JusticeAlly provides a comprehensive suite of tools designed to empower users at
 
 **Use of Funds:**
 
-* Engineering & Product: 50% ($750K)
-* Sales & Marketing: 25% ($375K)
-* Legal & Compliance: 15% ($225K)
-* Operations & Infrastructure: 10% ($150K)
+- Engineering & Product: 50% ($750K)
+- Sales & Marketing: 25% ($375K)
+- Legal & Compliance: 15% ($225K)
+- Operations & Infrastructure: 10% ($150K)
 
 **Expected Milestones:**
 
-* Month 6: Production launch with 1,000 users
-* Month 12: $50K MRR, SOC 2 certified
-* Month 18: $200K MRR, Series A ready
+- Month 6: Production launch with 1,000 users
+- Month 12: $50K MRR, SOC 2 certified
+- Month 18: $200K MRR, Series A ready
 
 **Series A (18-24 months)**: $8M-$12M for national expansion
 
@@ -372,17 +404,29 @@ JusticeAlly provides a comprehensive suite of tools designed to empower users at
 
 **Current MVP Metrics**:
 
-* 0 external dependencies (runs entirely client-side)
-* <2s page load time
-* <500ms AI response time
-* 100% client-side privacy (no data sent to our servers)
+- 0 external dependencies (runs entirely client-side)
+- <2s page load time
+- <500ms AI response time
+- 100% client-side privacy (no data sent to our servers)
 
 **Target Production Metrics**:
 
-* 99.9% uptime SLA
-* <200ms API response time
-* <3s AI analysis completion
-* 100% data encryption at rest and in transit
+- 99.9% uptime SLA
+- <200ms API response time
+- <3s AI analysis completion
+- 100% data encryption at rest and in transit
+
+---
+
+## <a id="contributing"></a>🤝 Contributing
+
+We welcome contributions! Please follow these steps:
+
+1. **Fork** the repository.
+2. Create a **Feature Branch** (`git checkout -b feature/AmazingFeature`).
+3. **Commit** your changes (`git commit -m 'Add some AmazingFeature'`).
+4. **Push** to the branch (`git push origin feature/AmazingFeature`).
+5. Open a **Pull Request**.
 
 ---
 

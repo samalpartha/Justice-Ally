@@ -1,7 +1,14 @@
 {
   "name": "justiceally",
+  "version": "0.1.0",
+  "description": "AI-powered legal navigation platform",
+  "author": "JusticeAlly Team",
+  "license": "MIT",
   "private": true,
-  "version": "0.0.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/samalpartha/Justice-Ally.git"
+  },
   "type": "module",
   "scripts": {
     "dev": "vite",
